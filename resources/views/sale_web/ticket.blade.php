@@ -14,8 +14,7 @@
 
             <h4 class="py-3 mb-2">TICKETERA WEB</h4>
 
-            <p class="mb-4">Each category (Basic, Professional, and Business) includes the four predefined roles shown
-                below.</p>
+            <p class="mb-4">Añade las entradas a una lista y genera un código QR para que lo validen en Caja.</p>
 
 
             <!-- Permission Table -->
@@ -25,7 +24,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th></th>
-                                <th></th>
+                                <th>Ticket</th>
                                 <th>DNI</th>
                                 <th>Nombres y Apellidos</th>
                                 <th>Producto</th>
@@ -197,6 +196,13 @@
                                         </label>
                                     </div>
                                 </div>
+                                <div class="d-flex align-items-start mt-4 align-items-sm-center">
+                                    <div
+                                        class="d-flex justify-content-between flex-grow-1 align-items-center flex-wrap gap-2">
+                                        <button
+                                            class="btn btn-danger waves-effect waves-light btn-finish">FINALIZAR</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -224,6 +230,9 @@
                                 </div>
                             </div>
                             <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-outline-danger me-sm-3 me-1 btn-finish"><i
+                                        class="mdi mdi-close-octagon-outline me-1 scaleX-n1-rtl"></i><span
+                                        class="align-middle d-none d-sm-inline-block">Finalizar</span></button>
                                 <button type="submit" class="btn btn-outline-secondary me-sm-3 me-1"
                                     data-bs-toggle="modal" data-bs-target="#twoFactorAuth"><i
                                         class="mdi mdi-arrow-left me-1 scaleX-n1-rtl"></i><span

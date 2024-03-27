@@ -48,7 +48,7 @@ $(() => {
                         return "";
                     },
                 },
-                { targets: 1, searchable: !1, visible: !1 },
+                { targets: 1, searchable: !1},
 
                 {
                     targets: 2,
@@ -137,7 +137,7 @@ $(() => {
                 {
                     text: "Verificar Cupon",
                     className:
-                        "add-new btn rounded-pill btn-primary waves-effect waves-light mt-3",
+                        "add-new btn rounded-pill btn-info waves-effect waves-light mt-3",
                     attr: {
                         "data-bs-toggle": "modal",
                         "data-bs-target": "#addPermissionModal",
@@ -210,67 +210,86 @@ $(() => {
     });
     $("#ticket").on("input", function (e) {
         var ticket = $(this).val();
+        var ticketExists = false;
         if (ticket.length > 5) {
-            $.blockUI({
-                message:
-                    '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
-                css: { backgroundColor: "transparent", border: "0" },
-                overlayCSS: { opacity: 0.5 },
+            $(".datatables-permissions tbody tr").each(function () {
+                
+                var ticketEnTabla = $(this).find("td:eq(1)").text(); // Suponiendo que el ticket está en la segunda columna
+                console.log("Ticket en tabla:", ticketEnTabla);
+                console.log("Ticket ingresado:", ticket);
+                if (ticketEnTabla === ticket) {
+                    ticketExists = true;
+                    console.log("Ticket encontrado en la tabla");
+                    return false;
+                }
             });
-            $.ajax({
-                url: "viewTicket",
-                method: "POST",
-                data: { ticket: ticket, _token: csrfToken },
-                dataType: "json",
-            })
-                .done(function (response) {
-                    console.log(response);
-                    if (response.success) {
-                        var data = response.ticket;
-
-                        if (data.status === 1) {
-                            $("#dni").attr("disabled", true);
-                            $("#validate_message").show();
-                            $("#date_use").text(data.used);
-                        } else {
-                            $("#dni").removeAttr("disabled", true);
-                            $("#validate_message").attr(
-                                "style",
-                                "display: none !important;"
-                            );
-                            $("#date_use").text("");
-                            $("#dni").focus();
-                        }
-
-                        $("#names").val(data.name);
-                        $("#shift").val(shift[data.shift].title);
-                        $("#device").val(device[data.device].title);
-                        $("#price").val(data.price);
-
-                        var purchaseDate = moment(data.purchase),
-                            formattedDate = purchaseDate.format(
-                                "MMMM DD, YYYY hh:mm A"
-                            );
-                        $("#pruchase_date").val(
-                            formattedDate.charAt(0).toUpperCase() +
-                                formattedDate.slice(1)
-                        );
-                        $("#admission_date").val(data.income);
-                        $("#sure").val(sure[data.sure].title);
-                        localStorage.setItem("document", data.document);
-                    } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: "Número de ticket no encontrado",
-                        });
-                    }
-                })
-                .fail(function (error) {
-                    console.error("error:", error.responseText);
-                })
-                .always(function (response) {
-                    $.unblockUI();
+            if (ticketExists) {
+                Toast.fire({
+                    icon: "error",
+                    title: "La Entrada ya se encuentra en la lista",
                 });
+            } else {
+                $.blockUI({
+                    message:
+                        '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+                    css: { backgroundColor: "transparent", border: "0" },
+                    overlayCSS: { opacity: 0.5 },
+                });
+                $.ajax({
+                    url: "viewTicket",
+                    method: "POST",
+                    data: { ticket: ticket, _token: csrfToken },
+                    dataType: "json",
+                })
+                    .done(function (response) {
+                        console.log(response);
+                        if (response.success) {
+                            var data = response.ticket;
+
+                            if (data.status === 1) {
+                                $("#dni").attr("disabled", true);
+                                $("#validate_message").show();
+                                $("#date_use").text(data.used);
+                            } else {
+                                $("#dni").removeAttr("disabled", true);
+                                $("#validate_message").attr(
+                                    "style",
+                                    "display: none !important;"
+                                );
+                                $("#date_use").text("");
+                                $("#dni").focus();
+                            }
+
+                            $("#names").val(data.name);
+                            $("#shift").val(shift[data.shift].title);
+                            $("#device").val(device[data.device].title);
+                            $("#price").val(data.price);
+
+                            var purchaseDate = moment(data.purchase),
+                                formattedDate = purchaseDate.format(
+                                    "MMMM DD, YYYY hh:mm A"
+                                );
+                            $("#pruchase_date").val(
+                                formattedDate.charAt(0).toUpperCase() +
+                                    formattedDate.slice(1)
+                            );
+                            $("#admission_date").val(data.income);
+                            $("#sure").val(sure[data.sure].title);
+                            localStorage.setItem("document", data.document);
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: "Número de ticket no encontrado",
+                            });
+                        }
+                    })
+                    .fail(function (error) {
+                        console.error("error:", error.responseText);
+                    })
+                    .always(function (response) {
+                        $.unblockUI();
+                    });
+            }
         }
     });
 
@@ -314,13 +333,13 @@ $(() => {
         resetForm();
     });
 
-    $(".send-data").on("click", function () {
+    $(".send-data").on("click", function 
+    () {
         if (e.rows().count() === 0) {
             Toast.fire({
                 icon: "error",
                 title: "No hay entradas en la lista",
             });
-            $("#twoFactorAuth").modal("show");
         } else {
             var ids = e.column(1).data().toArray().join(",");
             $("#twoFactorAuth").modal("show");
@@ -394,6 +413,12 @@ $(() => {
             .always(() => {
                 $.unblockUI();
             });
+    });
+
+    $(".btn-finish").on("click", function () {
+        e.clear().draw();
+        $("#twoFactorAuth").modal("hide");
+        $("#twoFactorAuthOne").modal("hide");
     });
 
     function resetForm() {

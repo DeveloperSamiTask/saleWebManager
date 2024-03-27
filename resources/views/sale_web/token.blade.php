@@ -12,7 +12,7 @@
     <title>QR Entradas | La Granja Villa</title>
 
 
-    <meta name="description" content="En esta web visualizar el QR para poder validar tus entradas e ingresar.">
+    <meta name="description" content="En esta web podras visualizar el QR para poder validar tus entradas e ingresar.">
     <meta name="keywords" content="entradas, qr, la granja villa">
     <!-- Canonical SEO -->
     <link rel="canonical" href="https://1.envato.market/materialize_admin">
