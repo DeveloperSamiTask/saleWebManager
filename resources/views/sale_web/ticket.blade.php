@@ -252,8 +252,5 @@
 @endsection()
 
 @section('scripts')
-<script src="{{ asset('js/pdfmake.min.js') }}"></script>
-<script src="{{ asset('js/vfs_fonts.js') }}"></script>
-
     <script src="{{ asset('js/app-generate-coupon-permission.js') }}"></script>
 @endsection

@@ -342,7 +342,7 @@ $(() => {
         })
             .done((response) => {
                 var url =
-                    "https://es.stackoverflow.com/questions/382919/laravel-documentaci%C3%B3n-de-baconqrcode";
+                    "https://web.lagranjavilla.com/token/" + response.token;
                 var message =
                     "¡Hola! Para acceder al QR y visitar La Granja Villa, por favor haz clic en el siguiente enlace:\n\n" +
                     url;

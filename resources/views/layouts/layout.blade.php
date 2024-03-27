@@ -11,13 +11,14 @@
     <title>GV BACKEND</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="title" content="La Granja Villa (Valida tus entradas webs)">
 
     <meta name="description"
-        content="Materialize – is the most developer friendly &amp; highly customizable Admin Dashboard Template.">
-    <meta name="keywords"
-        content="dashboard, material, material design, bootstrap 5 dashboard, bootstrap 5 design, bootstrap 5">
+        content="¡Bienvenido al Parque Recreativo Tropical! Sumérgete en la diversión con una variedad de juegos y atracciones emocionantes para toda la familia. Disfruta de la belleza y la tranquilidad de nuestra exhibición de peces tropicales, donde podrás admirar una amplia variedad de especies exóticas. Además, acércate a nuestros amigables caballos y experimenta la alegría de acariciar y alimentar a estos majestuosos animales. En el Parque Recreativo Tropical, la aventura y la naturaleza se unen para crear recuerdos inolvidables para ti y tus seres queridos.">
+        <meta property="og:image" content="{{ asset('img/logo.png') }}">
+
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('img/favicon/favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.png') }}">
 
 
     <!-- Fonts -->
@@ -34,8 +35,7 @@
 
     <!-- Core CSS -->
     <link rel="stylesheet" href="{{ asset('vendor/css/rtl/core.css') }}" class="template-customizer-core-css">
-    <link rel="stylesheet" href="{{ asset('vendor/css/rtl/theme-default.css') }}"
-        class="template-customizer-theme-css">
+    <link rel="stylesheet" href="{{ asset('vendor/css/rtl/theme-default.css') }}" class="template-customizer-theme-css">
     <link rel="stylesheet" href="{{ asset('css/demo.css') }}">
 
     <!-- Vendors CSS -->
@@ -183,46 +183,6 @@
                         </div>
                         <!-- /Search -->
                         <ul class="navbar-nav flex-row align-items-center ms-auto">
-                            <!-- Language -->
-                            <li class="nav-item dropdown-language dropdown me-1 me-xl-0">
-                                <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
-                                    href="javascript:void(0);" data-bs-toggle="dropdown">
-                                    <i class='mdi mdi-translate mdi-24px'></i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item" href="javascript:void(0);" data-language="es"
-                                            data-text-direction="ltr">
-                                            <span class="align-middle">Español</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="javascript:void(0);" data-language="en"
-                                            data-text-direction="ltr">
-                                            <span class="align-middle">English</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="javascript:void(0);" data-language="fr"
-                                            data-text-direction="ltr">
-                                            <span class="align-middle">French</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="javascript:void(0);" data-language="ar"
-                                            data-text-direction="rtl">
-                                            <span class="align-middle">Arabic</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="javascript:void(0);" data-language="de"
-                                            data-text-direction="ltr">
-                                            <span class="align-middle">German</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!--/ Language -->
 
                             <!-- Style Switcher -->
                             <li class="nav-item dropdown-style-switcher dropdown me-1 me-xl-0">
