@@ -1,0 +1,4 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/ep3s6easy863/web.lagranjavilla.com/
+    - /bin/rsync -a --exclude 'index.php' public/ $DEPLOYPATH
