@@ -15,7 +15,7 @@
 
     <meta name="description"
         content="¡Bienvenido al Parque Recreativo Tropical! Sumérgete en la diversión con una variedad de juegos y atracciones emocionantes para toda la familia. Disfruta de la belleza y la tranquilidad de nuestra exhibición de peces tropicales, donde podrás admirar una amplia variedad de especies exóticas. Además, acércate a nuestros amigables caballos y experimenta la alegría de acariciar y alimentar a estos majestuosos animales. En el Parque Recreativo Tropical, la aventura y la naturaleza se unen para crear recuerdos inolvidables para ti y tus seres queridos.">
-        <meta property="og:image" content="{{ asset('img/logo.png') }}">
+    <meta property="og:image" content="{{ asset('img/logo.png') }}">
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.png') }}">
@@ -155,7 +155,13 @@
                     <li class="menu-item">
                         <a href="{{ route('Boleteria') }}" class="menu-link">
                             <i class="menu-icon tf-icons mdi mdi-cart-arrow-down"></i>
-                            <div data-i18n="Generate Coupon">Generar Cupón</div>
+                            <div data-i18n="Generate Coupon">Generar Lista Entradas</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ route('validateList') }}" class="menu-link">
+                            <i class="menu-icon tf-icons mdi mdi-playlist-check"></i>
+                            <div data-i18n="Validate Coupon">Validar Lista Entradas</div>
                         </a>
                     </li>
                 </ul>

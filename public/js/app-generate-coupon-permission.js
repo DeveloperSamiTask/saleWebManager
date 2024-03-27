@@ -215,11 +215,8 @@ $(() => {
             $(".datatables-permissions tbody tr").each(function () {
                 
                 var ticketEnTabla = $(this).find("td:eq(1)").text(); // Suponiendo que el ticket está en la segunda columna
-                console.log("Ticket en tabla:", ticketEnTabla);
-                console.log("Ticket ingresado:", ticket);
                 if (ticketEnTabla === ticket) {
                     ticketExists = true;
-                    console.log("Ticket encontrado en la tabla");
                     return false;
                 }
             });

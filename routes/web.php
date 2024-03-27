@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\SaleWebs;
+use App\Http\Controllers\ValidateWebs;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +29,12 @@ Route::controller(SaleWebs::class)->group(function ($route) {
     Route::get('/token/{token}', 'generateQr');
     Route::post('/printQR', 'print');
 });
+
+Route::controller(ValidateWebs::class)->group(function ($route) {
+
+    Route::get('/Validar_Lista', 'index')->name('validateList');
+    Route::post('/viewList', 'getList');
+    Route::post('/printTickets', 'print');
+
+});
+
