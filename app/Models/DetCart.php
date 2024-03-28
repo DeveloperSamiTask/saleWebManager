@@ -12,6 +12,7 @@ class DetCart extends Model
     protected $table = 'cartdet';
     protected $primaryKey = 'intCartdetId';
     protected $fillable = ['ticketstatus', 'ticketdateuse'];
+    public $timestamps = false;
 
 
     public function cart()

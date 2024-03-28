@@ -231,6 +231,10 @@ $(() => {
                 })
                 .fail(function (error) {
                     console.error(error.responseText);
+                    Toast.fire({
+                        icon: "error",
+                        title: "No existe Ticket",
+                    });
                 })
                 .always(() => {
                     $.unblockUI();

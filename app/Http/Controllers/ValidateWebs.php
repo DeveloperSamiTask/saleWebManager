@@ -82,22 +82,53 @@ class ValidateWebs extends Controller
         // Inicializar un array para almacenar los datos
         $data = [];
 
+        $ticketModel = Ticket::where('code', $ticket)->first();
+        if ($ticketModel) {
+            $ticketModel->status_coupon = 1;
+            $ticketModel->date_used = now();
+            $ticketModel->save();
+        }
+
+        foreach ($ticketCodesArray as $id) {
+            $detCartModel = DetCart::find($id);
+            if ($detCartModel) {
+                $detCartModel->ticketstatus = 1;
+                $detCartModel->ticketdateuse = now(); // O la fecha y hora actual
+                $detCartModel->save();
+            }
+        }
+        $shiftOptions = [
+            1 => "TURNO COMPLETO",
+            2 => "AFTER SCHOOL",
+        ];
+        $deviceOptions = [
+            "Seleccione" => "SIN DISPOSITIVO",
+            "Tarjeta" => "TARJETA",
+            "Portatarjeta" => "TARJETA + LANGER",
+            "Pulserasilicona" => "PULSERA SILICONA",
+            "Pulserafashion" => "PULSERA SILICONA AJUSTABLE",
+        ];
+
         // Iterar sobre cada ID de entrada y obtener los datos de DetCart
         foreach ($ticketCodesArray as $id) {
             $cartDetRecord = DetCart::find($id);
 
             // Verificar si se encontró el registro
             if ($cartDetRecord) {
-                // Formatear los datos según el formato requerido
-                $device = isset($dispositivos[$cartDetRecord->deviceCart]) ? strtoupper($dispositivos[$cartDetRecord->deviceCart]) : "SIN DISPOSITIVO";
-                $shift = isset($opciones[$cartDetRecord->shiftCart]) ? strtoupper($opciones[$cartDetRecord->shiftCart]) : "SIN TURNO";
 
-                if ($cartDetRecord->deviceCart != null) {
-                    $producto = $device . " " . $shift;
-                } else {
-                    $producto = $cartDetRecord->producto;
-                }
 
+                // Obtener los valores de shift y device del registro actual
+                $shiftValue = $cartDetRecord->shiftCart;
+                $deviceValue = $cartDetRecord->deviceCart;
+
+                // Formatear los valores según las definiciones
+                $shift = isset($shiftOptions[$shiftValue]) ? strtoupper($shiftOptions[$shiftValue]) : "SIN TURNO";
+                $device = isset($deviceOptions[$deviceValue]) ? strtoupper($deviceOptions[$deviceValue]) : "SIN DISPOSITIVO";
+
+                // Concatenar device y shift en producto
+                $producto = $shift . " " . $device;
+
+                // Agregar los datos formateados al array de datos
                 $data[] = [
                     'id' => $cartDetRecord->intCartdetId,
                     'producto' => $producto,
@@ -123,7 +154,7 @@ class ValidateWebs extends Controller
                     </style>
                 </head>
                 <body>
-                    <h3>Validación de Ventas Web</h3>
+                    <h4>Validación de Ventas Web</h4>
                     <p>Fecha: ' . date('Y-m-d H:i:s') . '</p>
                     <table border="1">
                         <thead>
@@ -157,7 +188,7 @@ class ValidateWebs extends Controller
         // Configurar opciones de Dompdf
         $options = new \Dompdf\Options();
         $options->set('isRemoteEnabled', true);
-        
+
         // Establecer el tamaño del papel
 
         // Crear una instancia de Dompdf
