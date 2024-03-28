@@ -275,6 +275,12 @@ $(() => {
 
     // Función para validar los tickets
     function validarTickets(ticket, ids) {
+        $.blockUI({
+            message:
+                '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+            css: { backgroundColor: "transparent", border: "0" },
+            overlayCSS: { opacity: 0.5 },
+        });
         $.ajax({
             url: "printTickets",
             method: "POST",
@@ -292,16 +298,15 @@ $(() => {
                 newWindow.onload = function () {
                     newWindow.print();
                 };
+                e.clear().draw();
+                $("#qrCode").val("").focus();
             })
             .fail((response) => {
                 console.log(response.responseText);
+            })
+            .always(() => {
+                $.unblockUI();
             });
-    }
-
-    function resetForm() {
-        let f = document.getElementById("validate_cupon");
-
-        f.reset();
     }
 
     const Toast = Swal.mixin({

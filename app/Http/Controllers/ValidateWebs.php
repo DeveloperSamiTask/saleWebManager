@@ -147,7 +147,7 @@ class ValidateWebs extends Controller
                     <style>
                     @page { margin-left: 23px; }
                     *	  		{ font-family: "century gothic"; }
-                    table 		{ margin: 5px; padding: 5px; font-size:12px; border-collapse: collapse; }
+                    table 		{ margin: 5px; font-size:12px; border-collapse: collapse; }
                     thead tr td { background-color: #00BCD4; text-align: center; padding: 5px; color: white; }
                     thead 		{ border-bottom: 1px solid #000; border-style: dotted; }
                     tbody tr td	{ padding: 1em; }
@@ -168,6 +168,7 @@ class ValidateWebs extends Controller
                         <tbody>';
 
         // Agregar filas de datos al HTML
+        $total = array_sum(array_column($data, 'precio'));
         $contador = 0;
         foreach ($data as $row) {
             $contador++;
@@ -179,11 +180,13 @@ class ValidateWebs extends Controller
                 </tr>';
         }
 
-        // Cerrar etiquetas HTML
-        $html .= '</tbody>
-            </table>
-            </body>
-            </html>';
+        $html .= '<tr>
+        <th colspan="3" class="grand total" style="text-align: right !important;">TOTAL </th>
+        <th class="grand total"> S/. ' . $total . '</th>
+    </tr>';
+
+        // Cerrar el cuerpo y la tabla HTML
+        $html .= '</tbody></table></body></html>';
 
         // Configurar opciones de Dompdf
         $options = new \Dompdf\Options();
@@ -203,7 +206,10 @@ class ValidateWebs extends Controller
         // Obtener el contenido del PDF como una cadena
         $pdfContent = $dompdf->output();
 
-        $pdfPath = public_path('temp/' . $ticket . '.pdf');
+        // Obtener la ruta deseada para guardar el PDF
+        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/validate/' . $ticket . '.pdf';
+
+        // Guardar el PDF en la ruta especificada
         file_put_contents($pdfPath, $pdfContent);
 
         // Devolver la URL del PDF como respuesta a la solicitud AJAX
