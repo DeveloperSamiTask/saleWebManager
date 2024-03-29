@@ -213,6 +213,6 @@ class ValidateWebs extends Controller
         file_put_contents($pdfPath, $pdfContent);
 
         // Devolver la URL del PDF como respuesta a la solicitud AJAX
-        return response()->json(['pdfUrl' => asset('temp/' . $ticket . '.pdf')]);
+        return response()->json(['pdfUrl' => asset('validate/' . $ticket . '.pdf')]);
     }
 }
