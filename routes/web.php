@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\SaleWebs;
+use App\Http\Controllers\TableEntries;
 use App\Http\Controllers\ValidateWebs;
 
 /*
@@ -35,6 +36,14 @@ Route::controller(ValidateWebs::class)->group(function ($route) {
     Route::get('/Validar_Lista', 'index')->name('validateList');
     Route::post('/viewList', 'getList');
     Route::post('/printTickets', 'print');
+
+});
+
+
+Route::controller(TableEntries::class)->group(function ($route) {
+
+    Route::get('/Lista_Entradas', 'index')->name('listEntries');
+    Route::get('/Tabla_Entradas', 'tableEntries');
 
 });
 

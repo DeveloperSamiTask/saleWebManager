@@ -8,7 +8,7 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-    <title>GV BACKEND</title>
+    <title>Sistema de Validacion</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="title" content="La Granja Villa (Valida tus entradas webs)">
@@ -163,6 +163,30 @@
                             <i class="menu-icon tf-icons mdi mdi-playlist-check"></i>
                             <div data-i18n="Validate Coupon">Validar Lista Entradas</div>
                         </a>
+                    </li>
+
+                    <!-- Apps & Pages -->
+                    <li class="menu-header fw-medium mt-4">
+                        <span class="menu-header-text" data-i18n="Reports">Reports</span>
+                    </li>
+
+                    <li class="menu-item">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon tf-icons mdi mdi-chart-box-outline"></i>
+                            <div>Reportes Entradas</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('Dashboard') }}" class="menu-link">
+                                    <div data-i18n="sale webs">Ventas Web</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ route('listEntries') }}" class="menu-link">
+                                    <div data-i18n="detail entries">Detalle Entrada</div>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </aside>
@@ -574,31 +598,7 @@
                                             <span class="align-middle">Settings</span>
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="dropdown-item" href="pages-account-settings-billing.html">
-                                            <span class="d-flex align-items-center align-middle">
-                                                <i class="flex-shrink-0 mdi mdi-credit-card-outline me-2"></i>
-                                                <span class="flex-grow-1 align-middle ms-1">Billing</span>
-                                                <span
-                                                    class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <div class="dropdown-divider"></div>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="pages-faq.html">
-                                            <i class="mdi mdi-help-circle-outline me-2"></i>
-                                            <span class="align-middle">FAQ</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="pages-pricing.html">
-                                            <i class="mdi mdi-currency-usd me-2"></i>
-                                            <span class="align-middle">Pricing</span>
-                                        </a>
-                                    </li>
+
                                     <li>
                                         <div class="dropdown-divider"></div>
                                     </li>

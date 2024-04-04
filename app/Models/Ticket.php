@@ -31,4 +31,8 @@ class Ticket extends Model
         // Retorna los registros
         return $tickets;
     }
+
+    public static function tableEntries(){
+
+    }
 }

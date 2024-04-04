@@ -32,7 +32,7 @@ class DetCart extends Model
                 'document' => $cartdet->charCartdetDni,
                 'name' => $fullName,
                 'price' => $cartdet->decCartdetStotal,
-                'purchase' => optional($cartdet->cart)->dateCartFreg, // Ajuste aquí
+                'purchase' => optional($cartdet->cart)->dateCartFreg,
                 'income' => $cartdet->dateCartdetFreg,
                 'sure' => $cartdet->varCartdetseguro,
             ];
@@ -63,5 +63,38 @@ class DetCart extends Model
             'status' => $cartdet->ticketstatus,
             'used' => $cartdet->ticketdateuse,
         ];
+    }
+
+    public static function getTableEntries($startDate, $endDate)
+    {
+        $query = self::with('cart');
+
+        if ($startDate && $endDate) {
+            $query->whereHas('cart', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('dateCartFreg', [$startDate, $endDate]);
+            });
+        }
+
+        $cartdets = $query->orderByDesc('dateCartdetFreg')->get();
+        $data = [];
+        foreach ($cartdets as $cartDet) {
+            $fullName = implode(' ', [$cartDet->varCartdetApepat, $cartDet->varCartdetApemat, $cartDet->varCartdetNombres]);
+
+            $data[] = [
+                'id' => $cartDet->intCartdetId,
+                'price' => $cartDet->decCartdetStotal,
+                'shift' => $cartDet->shiftCart,
+                'nameP' => $fullName,
+                'name' => optional($cartDet->cart)->varCartTitulo,
+                'device' => $cartDet->deviceCart,
+                'code' => optional($cartDet->cart)->varCartCreserva,
+                'purchase' => optional($cartDet->cart)->dateCartFreg,
+                'income' => $cartDet->dateCartdetFreg,
+                'sure' => $cartDet->varCartdetseguro,
+                'status' => $cartDet->ticketstatus,
+                'used' => $cartDet->ticketdateuse,
+            ];
+        }
+        return $data;
     }
 }

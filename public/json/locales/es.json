@@ -1,6 +1,6 @@
 {
   "Dashboards": "Dashboards",
-  "Generate Coupon" : "Lista Entradas",
+  "Generate Coupon": "Lista Entradas",
   "Validate Coupon": "Validar Lista Entradas",
   "Dashboard": "Dashboard",
   "eCommerce": "eCommerce",
@@ -18,6 +18,10 @@
   "Blank": "Blank",
   "Apps": "Apps",
   "Email": "Email",
+  "Reports": "Reports",
+  "sale webs": "Ventas Webs",
+  "Validated Entries": "Entradas Validadas",
+  "detail entries": "Detalle Entrada",
   "Chat": "Chat",
   "Calendar": "Calendar",
   "Kanban": "Kanban",
