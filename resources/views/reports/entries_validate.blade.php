@@ -2,8 +2,83 @@
 
 @section('content')
     <!-- Content -->
-
     <div class="container-xxl flex-grow-1 container-p-y">
+
+        <div class="card mb-4">
+            <div class="card-widget-separator-wrapper">
+                <div class="card-body card-widget-separator"  id="stadistics">
+                    <div class="row gy-4 gy-sm-1">
+                        <div class="col-sm-6 col-lg-3">
+                            <div
+                                class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0">
+                                <div>
+                                    <p class="mb-2">Total de Entradas</p>
+                                    <h4 class="mb-2" id="total"></h4>
+
+                                </div>
+                                <div class="avatar me-sm-4">
+                                    <span class="avatar-initial rounded bg-label-secondary">
+                                        <i class="mdi mdi-ticket mdi-24px"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <hr class="d-none d-sm-block d-lg-none me-4">
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                            <div
+                                class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0">
+                                <div>
+                                    <p class="mb-2">Turno Completo</p>
+                                    <h4 class="mb-2" id="shift1"></h4>
+
+                                </div>
+                                <div class="avatar me-lg-4">
+                                    <span class="avatar-initial rounded bg-label-secondary">
+                                        <i class="mdi mdi-timer-sand-complete mdi-24px"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <hr class="d-none d-sm-block d-lg-none">
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                            <div
+                                class="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3">
+                                <div>
+                                    <p class="mb-2">After School</p>
+                                    <h4 class="mb-2" id="shift2"></h4>
+                                </div>
+                                <div class="avatar me-sm-4">
+                                    <span class="avatar-initial rounded bg-label-secondary">
+                                        <i class="mdi mdi-school mdi-24px"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="mb-2">Filtra por: </p>
+                                    <label class="switch switch-square">
+                                      <input type="checkbox" class="switch-input">
+                                      <span class="switch-toggle-slider">
+                                        <span class="switch-on"></span>
+                                        <span class="switch-off"></span>
+                                      </span>
+                                      <span class="switch-label">Fecha de Entrada</span>
+                                    </label>
+                                </div>
+                                <div class="avatar">
+                                    <span class="avatar-initial rounded bg-label-secondary">
+                                        <i class="mdi mdi-filter-cog mdi-24px"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header border-bottom">
                 <h5 class="card-title">Filtro de búsqueda</h5>

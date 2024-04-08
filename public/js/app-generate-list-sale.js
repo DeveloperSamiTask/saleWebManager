@@ -12,6 +12,13 @@ $(function () {
     ).headingColor;
     var today = new Date();
 
+    $("#stadistics").block({
+        message:
+            '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+        css: { backgroundColor: "transparent", color: "#fff", border: "0" },
+        overlayCSS: { opacity: 0.5 },
+    });
+
     // Obtener la fecha exactamente un mes atrás
     var oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
@@ -68,20 +75,41 @@ $(function () {
                     css: { backgroundColor: "transparent", border: "0" },
                     overlayCSS: { opacity: 0.5 },
                 });
+                var Checked = $(".switch-input").prop("checked");
+
+                var isChecked = Checked ? "1" : "0";
+
+                console.log(isChecked);
+
                 var startDate = selectedDates[0].toISOString();
                 var endDate = selectedDates[1].toISOString();
-
-                // Realizar la solicitud AJAX al controlador
+console.log(startDate, endDate);
                 $.ajax({
                     url: "Tabla_Entradas",
                     type: "GET",
                     data: {
                         start_date: startDate,
                         end_date: endDate,
+                        isChecked: isChecked,
                     },
                 })
                     .done((response) => {
-                        e.clear().rows.add(response.data).draw();
+                        const arr = response.data;
+
+                        var contadorShift1 = 0;
+                        var contadorShift2 = 0;
+
+                        arr.forEach(function (registro) {
+                            if (registro.shift === "1") {
+                                contadorShift1++;
+                            } else if (registro.shift === "2") {
+                                contadorShift2++;
+                            }
+                        });
+                        $("#total").text(arr.length);
+                        $("#shift1").text(contadorShift1);
+                        $("#shift2").text(contadorShift2);
+                        e.clear().rows.add(arr).draw();
                     })
                     .fail(function (error) {
                         console.error("error:", error.responseText);
@@ -153,13 +181,13 @@ $(function () {
                     {
                         targets: 5,
                         render: function (a, e, t, s) {
-                            return shift[a].title;
+                            return shift[a]?.title ?? "Turno Completo";
                         },
                     },
                     {
                         targets: 6,
                         render: function (a, e, t, s) {
-                            return device[a].title;
+                            return device[a]?.title ?? "No seleccionado";
                         },
                     },
                     {
@@ -363,7 +391,6 @@ $(function () {
                             },
                         ],
                     },
-
                 ],
                 responsive: {
                     details: {
@@ -395,6 +422,22 @@ $(function () {
                     },
                 },
                 initComplete: function () {
+                    var array = s.DataTable().rows().data();
+
+                    var contadorShift1 = 0;
+                    var contadorShift2 = 0;
+
+                    array.each(function (registro) {
+                        if (registro.shift === "1") {
+                            contadorShift1++;
+                        } else if (registro.shift === "2") {
+                            contadorShift2++;
+                        }
+                    });
+
+                    $("#total").text(array.length);
+                    $("#shift1").text(contadorShift1);
+                    $("#shift2").text(contadorShift2);
                     this.api()
                         .columns(5)
                         .every(function () {
@@ -490,6 +533,7 @@ $(function () {
                                         );
                                     });
                             });
+                    $("#stadistics").unblock();
                 },
             })),
         setTimeout(() => {

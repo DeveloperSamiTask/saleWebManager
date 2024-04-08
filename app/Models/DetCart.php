@@ -65,14 +65,22 @@ class DetCart extends Model
         ];
     }
 
-    public static function getTableEntries($startDate, $endDate)
+    public static function getTableEntries($startDate, $endDate, $column)
     {
         $query = self::with('cart');
 
-        if ($startDate && $endDate) {
-            $query->whereHas('cart', function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('dateCartFreg', [$startDate, $endDate]);
-            });
+        if ($column === 'entrance') {
+            // Filtrar por la columna 'dateCartdetFreg' si $column es 'entrance'
+            if ($startDate && $endDate) {
+                $query->whereBetween('dateCartdetFreg', [$startDate, $endDate]);
+            }
+        } elseif ($column === 'shop') {
+            // Filtrar por la columna 'dateCartFreg' si $column es 'shop'
+            if ($startDate && $endDate) {
+                $query->whereHas('cart', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('dateCartFreg', [$startDate, $endDate]);
+                });
+            }
         }
 
         $cartdets = $query->orderByDesc('dateCartdetFreg')->get();

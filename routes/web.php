@@ -29,15 +29,15 @@ Route::middleware('auth')->group(function () {
 
     // Rutas para SaleWebs
     Route::get('/Boleteria', [SaleWebs::class, 'index'])->name('Boleteria');
-    Route::post('/Boleteria/viewTicket', [SaleWebs::class, 'getTicket']);
-    Route::post('/Boleteria/sendWhatsapp', [SaleWebs::class, 'whatsapp']);
-    Route::get('/Boleteria/token/{token}', [SaleWebs::class, 'generateQr']);
-    Route::post('/Boleteria/printQR', [SaleWebs::class, 'print']);
+    Route::post('viewTicket', [SaleWebs::class, 'getTicket']);
+    Route::post('sendWhatsapp', [SaleWebs::class, 'whatsapp']);
+    Route::get('token/{token}', [SaleWebs::class, 'generateQr']);
+    Route::post('printQR', [SaleWebs::class, 'print']);
 
     // Rutas para ValidateWebs
     Route::get('/Validar_Lista', [ValidateWebs::class, 'index'])->name('validateList');
-    Route::post('/Validar_Lista/viewList', [ValidateWebs::class, 'getList']);
-    Route::post('/Validar_Lista/printTickets', [ValidateWebs::class, 'print']);
+    Route::post('viewList', [ValidateWebs::class, 'getList']);
+    Route::post('printTickets', [ValidateWebs::class, 'print']);
 
     // Rutas para TableEntries
     Route::get('/Lista_Entradas', [TableEntries::class, 'index'])->name('listEntries');

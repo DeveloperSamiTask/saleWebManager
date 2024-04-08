@@ -131,7 +131,7 @@
 
                                 <div class="col-12 text-center">
                                     <button type="submit" class="btn btn-primary me-sm-3 me-1 btn_validate"
-                                        disabled>Validar</button>
+                                        disabled>Agregar</button>
                                     <button type="reset" class="btn btn-outline-danger"
                                         onclick="resetForm()">LIMPIAR</button>
                                 </div>

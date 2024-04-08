@@ -17,9 +17,17 @@ class TableEntries extends Controller
 
     public function tableEntries(Request $request)
     {
-        if ($request->filled('start_date') && $request->filled('end_date')) {
+        if ($request->filled('start_date') && $request->filled('end_date') && $request->input('isChecked') == '0') {
             $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
             $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
+            $column = "shop";
+        } else if ($request->filled('start_date') && $request->filled('end_date') && $request->input('isChecked') == '1') {
+            $startDateFormatted  = Carbon::parse($request->input('start_date'))->startOfDay();
+            $endDateFormatted  = Carbon::parse($request->input('end_date'))->endOfDay();
+            
+            $startDate  = $startDateFormatted->toDateString();
+            $endDate  = $endDateFormatted ->toDateString();
+            $column = "entrance";
         } else {
             // Fecha de hoy
             $endDate = new DateTime();
@@ -34,9 +42,10 @@ class TableEntries extends Controller
 
             $startDate = $startDateString;
             $endDate = $endDateString;
+            $column = "shop";
         }
 
-        $data = DetCart::getTableEntries($startDate, $endDate);
+        $data = DetCart::getTableEntries($startDate, $endDate, $column);
         return response()->json(['data' => $data]);
     }
 }

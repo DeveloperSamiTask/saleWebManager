@@ -48,7 +48,7 @@ $(() => {
                         return "";
                     },
                 },
-                { targets: 1, searchable: !1},
+                { targets: 1, searchable: !1 },
 
                 {
                     targets: 2,
@@ -135,7 +135,7 @@ $(() => {
             lengthMenu: [7, 10, 25, 50, 75, 100],
             buttons: [
                 {
-                    text: "Verificar Cupon",
+                    text: "Agregar Entrada",
                     className:
                         "add-new btn rounded-pill btn-info waves-effect waves-light mt-3",
                     attr: {
@@ -213,7 +213,6 @@ $(() => {
         var ticketExists = false;
         if (ticket.length > 5) {
             $(".datatables-permissions tbody tr").each(function () {
-                
                 var ticketEnTabla = $(this).find("td:eq(1)").text(); // Suponiendo que el ticket está en la segunda columna
                 if (ticketEnTabla === ticket) {
                     ticketExists = true;
@@ -330,8 +329,7 @@ $(() => {
         resetForm();
     });
 
-    $(".send-data").on("click", function 
-    () {
+    $(".send-data").on("click", function () {
         if (e.rows().count() === 0) {
             Toast.fire({
                 icon: "error",
@@ -379,7 +377,7 @@ $(() => {
             });
     });
 
-    $("#print_qr").one("click", function () {
+    $("#print_qr").on("click", function () {
         $.blockUI({
             message:
                 '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
@@ -393,13 +391,10 @@ $(() => {
             data: { ids: ids, _token: csrfToken, method: 2 },
         })
             .done((response) => {
-                // Obtener la URL del PDF desde la respuesta JSON
                 var pdfUrl = response.pdfUrl;
 
-                // Abrir una nueva ventana con el PDF generado
                 var newWindow = window.open(pdfUrl);
 
-                // Cuando el PDF se cargue en la nueva ventana, imprimir automáticamente
                 newWindow.onload = function () {
                     newWindow.print();
                 };

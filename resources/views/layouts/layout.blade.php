@@ -161,13 +161,13 @@
                     <li class="menu-item">
                         <a href="{{ route('validateList') }}" class="menu-link">
                             <i class="menu-icon tf-icons mdi mdi-playlist-check"></i>
-                            <div data-i18n="Validate Coupon"></div>
+                            <div data-i18n="Validate Coupon">Valir Lista Entradas</div>
                         </a>
                     </li>
 
                     <!-- Apps & Pages -->
                     <li class="menu-header fw-medium mt-4">
-                        <span class="menu-header-text" data-i18n="Reports"></span>
+                        <span class="menu-header-text" data-i18n="Reports">Reports</span>
                     </li>
 
                     <li class="menu-item">
@@ -178,7 +178,7 @@
                         <ul class="menu-sub">
                             <li class="menu-item">
                                 <a href="{{ route('Dashboard') }}" class="menu-link">
-                                    <div data-i18n="sale webs"></div>
+                                    <div data-i18n="sale webs">Ventas Webs</div>
                                 </a>
                             </li>
                             <li class="menu-item">
