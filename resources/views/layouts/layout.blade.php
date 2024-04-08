@@ -161,13 +161,13 @@
                     <li class="menu-item">
                         <a href="{{ route('validateList') }}" class="menu-link">
                             <i class="menu-icon tf-icons mdi mdi-playlist-check"></i>
-                            <div data-i18n="Validate Coupon">Validar Lista Entradas</div>
+                            <div data-i18n="Validate Coupon"></div>
                         </a>
                     </li>
 
                     <!-- Apps & Pages -->
                     <li class="menu-header fw-medium mt-4">
-                        <span class="menu-header-text" data-i18n="Reports">Reports</span>
+                        <span class="menu-header-text" data-i18n="Reports"></span>
                     </li>
 
                     <li class="menu-item">
@@ -178,7 +178,7 @@
                         <ul class="menu-sub">
                             <li class="menu-item">
                                 <a href="{{ route('Dashboard') }}" class="menu-link">
-                                    <div data-i18n="sale webs">Ventas Web</div>
+                                    <div data-i18n="sale webs"></div>
                                 </a>
                             </li>
                             <li class="menu-item">
@@ -603,9 +603,9 @@
                                         <div class="dropdown-divider"></div>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
+                                        <a class="dropdown-item" href="{{ route('logout') }}">
                                             <i class="mdi mdi-logout me-2"></i>
-                                            <span class="align-middle">Log Out</span>
+                                            <span class="align-middle">Cerrar Sessión</span>
                                         </a>
                                     </li>
                                 </ul>

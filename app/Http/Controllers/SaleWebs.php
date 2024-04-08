@@ -113,17 +113,15 @@ class SaleWebs extends Controller
 
         // Cargar el HTML en Dompdf
         $dompdf->loadHtml($html);
-
+        $dompdf->setPaper([0, 0, 200, 426]);
         // Renderizar el PDF
         $dompdf->render();
 
         // Obtener el contenido del PDF como una cadena
         $pdfContent = $dompdf->output();
 
-        // Obtener la ruta deseada para guardar el PDF
-        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/temp/' . $code . '.pdf';
-        
-        // Guardar el PDF en la ruta especificada
+        // Guardar el PDF temporalmente en el servidor
+        $pdfPath = public_path('temp/' . $code . '.pdf');
         file_put_contents($pdfPath, $pdfContent);
 
         // Devolver la URL del PDF como respuesta a la solicitud AJAX
