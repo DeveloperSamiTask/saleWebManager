@@ -1,4 +1,4 @@
-@extends('layouts/layout')
+|@extends('layouts/layout')
 
 @section('content')
     <!-- Content -->
@@ -25,15 +25,12 @@
                     <thead class="table-light">
                         <tr>
                             <th></th>
-                            <th>codigo</th>
-                            <th>Entrada</th>
-                            <th>Pasante</th>
+                            <th>Codigo</th>
+                            <th>N°Compra</th>
                             <th>Comprador</th>
-                            <th>Turno</th>
-                            <th>Dispositivo</th>
-                            <th>Precio</th>
-                            <th>Fecha de Compra</th>
-                            <th>Fecha de Ingreso</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                            <th>Fecha Compra</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
@@ -50,5 +47,5 @@
 
 @section('scripts')
     <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
-    <script src="{{ asset('js/app-generate-list-sale.js') }}"></script>
+    <script src="{{ asset('js/app-generate-list-web.js') }}"></script>
 @endsection

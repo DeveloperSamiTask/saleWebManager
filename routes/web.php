@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SaleWebs;
 use App\Http\Controllers\TableEntries;
 use App\Http\Controllers\ValidateWebs;
+use App\Http\Controllers\CashierReport;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,4 +43,10 @@ Route::middleware('auth')->group(function () {
     // Rutas para TableEntries
     Route::get('/Lista_Entradas', [TableEntries::class, 'index'])->name('listEntries');
     Route::get('/Tabla_Entradas', [TableEntries::class, 'tableEntries']);
+
+
+    // Rutas para TableEntries
+    Route::get('/Ventas_Web', [CashierReport::class, 'index'])->name('saleWeb');
+    Route::get('/Tabla_Cajeras', [CashierReport::class, 'tableCashier']);
+    Route::get('/Factura/{id}', [CashierReport::class, 'invoice']);
 });

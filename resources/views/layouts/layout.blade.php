@@ -177,8 +177,8 @@
                         </a>
                         <ul class="menu-sub">
                             <li class="menu-item">
-                                <a href="{{ route('Dashboard') }}" class="menu-link">
-                                    <div data-i18n="sale webs">Ventas Webs</div>
+                                <a href="{{ route('saleWeb') }}" class="menu-link">
+                                    <div data-i18n="sale web">Ventas Web</div>
                                 </a>
                             </li>
                             <li class="menu-item">
