@@ -19,12 +19,6 @@ $(function () {
     var endDate = formatDate(today);
     var e,
         s = $(".datatables-entries"),
-        i = $(".select2"),
-        o = {
-            1: { title: "Pending", class: "bg-label-warning" },
-            2: { title: "Active", class: "bg-label-success" },
-            3: { title: "Inactive", class: "bg-label-secondary" },
-        },
         status = {
             1: {
                 title: "PEDIDO",
@@ -36,7 +30,7 @@ $(function () {
             },
             3: {
                 title: "CANCELADO",
-                class: "badge rounded-pill bg-label-danger"
+                class: "badge rounded-pill bg-label-danger",
             },
         };
 
@@ -84,304 +78,290 @@ $(function () {
             }
         },
     });
-    i.length &&
-        i.length &&
-        i.each(function () {
-            var i = $(this);
-            select2Focus(i),
-                i.wrap('<div class="position-relative"></div>').select2({
-                    dropdownParent: i.parent(),
-                    placeholder: i.data("placeholder"),
-                });
-        }),
-        s.length &&
-            (e = s.DataTable({
-                ajax: "Tabla_Cajeras",
-                columns: [
-                    { data: "" },
-                    { data: "id" },
-                    { data: "code" },
-                    { data: "buyer" },
-                    { data: "quantity" },
-                    { data: "dinner" },
-                    { data: "purchase" },
-                    { data: "status" },
-                ],
-                columnDefs: [
-                    {
-                        className: "control",
-                        searchable: !1,
-                        orderable: !1,
-                        responsivePriority: 2,
-                        targets: 0,
-                        render: function (e, t, a, n) {
-                            return "";
-                        },
-                    },
 
-                    {
-                        targets: 1,
-                        render: function (e, t, a, n) {
-                            return `<a href="Factura/${e}" target="_blank"><span>${e}</span></a>`;
-                        },
+    s.length &&
+        (e = s.DataTable({
+            ajax: "Tabla_Cajeras",
+            columns: [
+                { data: "" },
+                { data: "id" },
+                { data: "code" },
+                { data: "buyer" },
+                { data: "quantity" },
+                { data: "dinner" },
+                { data: "purchase" },
+                { data: "status" },
+            ],
+            columnDefs: [
+                {
+                    className: "control",
+                    searchable: !1,
+                    orderable: !1,
+                    responsivePriority: 2,
+                    targets: 0,
+                    render: function (e, t, a, n) {
+                        return "";
                     },
-
-                    {
-                        targets: 2,
-                        render: function (e, t, a, n) {
-                            return `<a href="Factura/${a.id}"  target="_blank"><span>${e}</span></a>`;
-                        },
-                    },
-                    {
-                        targets: 3,
-                        render: function (e, t, a, n) {
-                            return e;
-                        },
-                    },
-                    {
-                        targets: 4,
-                        render: function (a, e, t, s) {
-                            return a;
-                        },
-                    },
-                    {
-                        targets: 5,
-                        render: function (a, e, t, s) {
-                            return a;
-                        },
-                    },
-                    {
-                        targets: -1,
-                        render: function (a) {
-                            return (
-                                '<span class="' +
-                                status[a].class +
-                                '" text-capitalized="">' +
-                                status[a].title +
-                                "</span>"
-                            );
-                        },
-                    },
-                ],
-                order: [[6, "desc"]],
-                dom: '<"row mx-2"<"col-md-2"<"me-3"l>><"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0 gap-3"fB>>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-                language: {
-                    sLengthMenu: "Mostrar _MENU_",
-                    search: "",
-                    searchPlaceholder: "Buscar..",
                 },
-                buttons: [
-                    {
-                        extend: "collection",
-                        className:
-                            "btn btn-label-secondary dropdown-toggle me-3 waves-effect waves-light",
-                        text: '<i class="mdi mdi-export-variant me-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
-                        buttons: [
-                            {
-                                extend: "print",
-                                text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
-                                className: "dropdown-item",
-                                exportOptions: {
-                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
-                                    format: {
-                                        body: function (e, t, a) {
-                                            var n;
-                                            return e.length <= 0
-                                                ? e
-                                                : ((e = $.parseHTML(e)),
-                                                  (n = ""),
-                                                  $.each(e, function (e, t) {
-                                                      void 0 !== t.classList &&
-                                                      t.classList.contains(
-                                                          "user-name"
-                                                      )
-                                                          ? (n +=
-                                                                t.lastChild
-                                                                    .firstChild
-                                                                    .textContent)
-                                                          : void 0 ===
-                                                            t.innerText
-                                                          ? (n += t.textContent)
-                                                          : (n += t.innerText);
-                                                  }),
-                                                  n);
-                                        },
+
+                {
+                    targets: 1,
+                    render: function (e, t, a, n) {
+                        return `<a href="Factura/${e}" target="_blank"><span>${e}</span></a>`;
+                    },
+                },
+
+                {
+                    targets: 2,
+                    render: function (e, t, a, n) {
+                        return `<a href="Factura/${a.id}"  target="_blank"><span>${e}</span></a>`;
+                    },
+                },
+                {
+                    targets: 3,
+                    render: function (e, t, a, n) {
+                        return e;
+                    },
+                },
+                {
+                    targets: 4,
+                    render: function (a, e, t, s) {
+                        return a;
+                    },
+                },
+                {
+                    targets: 5,
+                    render: function (a, e, t, s) {
+                        return a;
+                    },
+                },
+                {
+                    targets: -1,
+                    render: function (a) {
+                        return (
+                            '<span class="' +
+                            status[a].class +
+                            '" text-capitalized="">' +
+                            status[a].title +
+                            "</span>"
+                        );
+                    },
+                },
+            ],
+            order: [[6, "desc"]],
+            dom: '<"row mx-2"<"col-md-2"<"me-3"l>><"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0 gap-3"fB>>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+            language: {
+                sLengthMenu: "Mostrar _MENU_",
+                search: "",
+                searchPlaceholder: "Buscar..",
+            },
+            buttons: [
+                {
+                    extend: "collection",
+                    className:
+                        "btn btn-label-secondary dropdown-toggle me-3 waves-effect waves-light",
+                    text: '<i class="mdi mdi-export-variant me-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
+                    buttons: [
+                        {
+                            extend: "print",
+                            text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
+                            className: "dropdown-item",
+                            exportOptions: {
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                                format: {
+                                    body: function (e, t, a) {
+                                        var n;
+                                        return e.length <= 0
+                                            ? e
+                                            : ((e = $.parseHTML(e)),
+                                              (n = ""),
+                                              $.each(e, function (e, t) {
+                                                  void 0 !== t.classList &&
+                                                  t.classList.contains(
+                                                      "user-name"
+                                                  )
+                                                      ? (n +=
+                                                            t.lastChild
+                                                                .firstChild
+                                                                .textContent)
+                                                      : void 0 === t.innerText
+                                                      ? (n += t.textContent)
+                                                      : (n += t.innerText);
+                                              }),
+                                              n);
                                     },
                                 },
-                                customize: function (e) {
+                            },
+                            customize: function (e) {
+                                $(e.document.body)
+                                    .css("color", n)
+                                    .css("border-color", t)
+                                    .css("background-color", a),
                                     $(e.document.body)
-                                        .css("color", n)
-                                        .css("border-color", t)
-                                        .css("background-color", a),
-                                        $(e.document.body)
-                                            .find("table")
-                                            .addClass("compact")
-                                            .css("color", "inherit")
-                                            .css("border-color", "inherit")
-                                            .css("background-color", "inherit");
-                                },
+                                        .find("table")
+                                        .addClass("compact")
+                                        .css("color", "inherit")
+                                        .css("border-color", "inherit")
+                                        .css("background-color", "inherit");
                             },
-                            {
-                                extend: "csv",
-                                text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
-                                className: "dropdown-item",
-                                exportOptions: {
-                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
-                                    format: {
-                                        body: function (e, t, a) {
-                                            var n;
-                                            return e.length <= 0
-                                                ? e
-                                                : ((e = $.parseHTML(e)),
-                                                  (n = ""),
-                                                  $.each(e, function (e, t) {
-                                                      void 0 !== t.classList &&
-                                                      t.classList.contains(
-                                                          "user-name"
-                                                      )
-                                                          ? (n +=
-                                                                t.lastChild
-                                                                    .firstChild
-                                                                    .textContent)
-                                                          : void 0 ===
-                                                            t.innerText
-                                                          ? (n += t.textContent)
-                                                          : (n += t.innerText);
-                                                  }),
-                                                  n);
-                                        },
-                                    },
-                                },
-                            },
-                            {
-                                extend: "excel",
-                                text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
-                                className: "dropdown-item",
-                                exportOptions: {
-                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
-                                    format: {
-                                        body: function (e, t, a) {
-                                            var n;
-                                            return e.length <= 0
-                                                ? e
-                                                : ((e = $.parseHTML(e)),
-                                                  (n = ""),
-                                                  $.each(e, function (e, t) {
-                                                      void 0 !== t.classList &&
-                                                      t.classList.contains(
-                                                          "user-name"
-                                                      )
-                                                          ? (n +=
-                                                                t.lastChild
-                                                                    .firstChild
-                                                                    .textContent)
-                                                          : void 0 ===
-                                                            t.innerText
-                                                          ? (n += t.textContent)
-                                                          : (n += t.innerText);
-                                                  }),
-                                                  n);
-                                        },
-                                    },
-                                },
-                            },
-                            {
-                                extend: "pdf",
-                                text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
-                                className: "dropdown-item",
-                                exportOptions: {
-                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
-                                    format: {
-                                        body: function (e, t, a) {
-                                            var n;
-                                            return e.length <= 0
-                                                ? e
-                                                : ((e = $.parseHTML(e)),
-                                                  (n = ""),
-                                                  $.each(e, function (e, t) {
-                                                      void 0 !== t.classList &&
-                                                      t.classList.contains(
-                                                          "user-name"
-                                                      )
-                                                          ? (n +=
-                                                                t.lastChild
-                                                                    .firstChild
-                                                                    .textContent)
-                                                          : void 0 ===
-                                                            t.innerText
-                                                          ? (n += t.textContent)
-                                                          : (n += t.innerText);
-                                                  }),
-                                                  n);
-                                        },
-                                    },
-                                },
-                            },
-                            {
-                                extend: "copy",
-                                text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
-                                className: "dropdown-item",
-                                exportOptions: {
-                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
-                                    format: {
-                                        body: function (e, t, a) {
-                                            var n;
-                                            return e.length <= 0
-                                                ? e
-                                                : ((e = $.parseHTML(e)),
-                                                  (n = ""),
-                                                  $.each(e, function (e, t) {
-                                                      void 0 !== t.classList &&
-                                                      t.classList.contains(
-                                                          "user-name"
-                                                      )
-                                                          ? (n +=
-                                                                t.lastChild
-                                                                    .firstChild
-                                                                    .textContent)
-                                                          : void 0 ===
-                                                            t.innerText
-                                                          ? (n += t.textContent)
-                                                          : (n += t.innerText);
-                                                  }),
-                                                  n);
-                                        },
-                                    },
-                                },
-                            },
-                        ],
-                    },
-                ],
-                responsive: {
-                    details: {
-                        display: $.fn.dataTable.Responsive.display.modal({
-                            header: function (e) {
-                                return "Details of " + e.data().full_name;
-                            },
-                        }),
-                        type: "column",
-                        renderer: function (e, t, a) {
-                            a = $.map(a, function (e, t) {
-                                return "" !== e.title
-                                    ? '<tr data-dt-row="' +
-                                          e.rowIndex +
-                                          '" data-dt-column="' +
-                                          e.columnIndex +
-                                          '"><td>' +
-                                          e.title +
-                                          ":</td> <td>" +
-                                          e.data +
-                                          "</td></tr>"
-                                    : "";
-                            }).join("");
-                            return (
-                                !!a &&
-                                $('<table class="table"/><tbody />').append(a)
-                            );
                         },
+                        {
+                            extend: "csv",
+                            text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
+                            className: "dropdown-item",
+                            exportOptions: {
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                                format: {
+                                    body: function (e, t, a) {
+                                        var n;
+                                        return e.length <= 0
+                                            ? e
+                                            : ((e = $.parseHTML(e)),
+                                              (n = ""),
+                                              $.each(e, function (e, t) {
+                                                  void 0 !== t.classList &&
+                                                  t.classList.contains(
+                                                      "user-name"
+                                                  )
+                                                      ? (n +=
+                                                            t.lastChild
+                                                                .firstChild
+                                                                .textContent)
+                                                      : void 0 === t.innerText
+                                                      ? (n += t.textContent)
+                                                      : (n += t.innerText);
+                                              }),
+                                              n);
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            extend: "excel",
+                            text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
+                            className: "dropdown-item",
+                            exportOptions: {
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                                format: {
+                                    body: function (e, t, a) {
+                                        var n;
+                                        return e.length <= 0
+                                            ? e
+                                            : ((e = $.parseHTML(e)),
+                                              (n = ""),
+                                              $.each(e, function (e, t) {
+                                                  void 0 !== t.classList &&
+                                                  t.classList.contains(
+                                                      "user-name"
+                                                  )
+                                                      ? (n +=
+                                                            t.lastChild
+                                                                .firstChild
+                                                                .textContent)
+                                                      : void 0 === t.innerText
+                                                      ? (n += t.textContent)
+                                                      : (n += t.innerText);
+                                              }),
+                                              n);
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            extend: "pdf",
+                            text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
+                            className: "dropdown-item",
+                            exportOptions: {
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                                format: {
+                                    body: function (e, t, a) {
+                                        var n;
+                                        return e.length <= 0
+                                            ? e
+                                            : ((e = $.parseHTML(e)),
+                                              (n = ""),
+                                              $.each(e, function (e, t) {
+                                                  void 0 !== t.classList &&
+                                                  t.classList.contains(
+                                                      "user-name"
+                                                  )
+                                                      ? (n +=
+                                                            t.lastChild
+                                                                .firstChild
+                                                                .textContent)
+                                                      : void 0 === t.innerText
+                                                      ? (n += t.textContent)
+                                                      : (n += t.innerText);
+                                              }),
+                                              n);
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            extend: "copy",
+                            text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
+                            className: "dropdown-item",
+                            exportOptions: {
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                                format: {
+                                    body: function (e, t, a) {
+                                        var n;
+                                        return e.length <= 0
+                                            ? e
+                                            : ((e = $.parseHTML(e)),
+                                              (n = ""),
+                                              $.each(e, function (e, t) {
+                                                  void 0 !== t.classList &&
+                                                  t.classList.contains(
+                                                      "user-name"
+                                                  )
+                                                      ? (n +=
+                                                            t.lastChild
+                                                                .firstChild
+                                                                .textContent)
+                                                      : void 0 === t.innerText
+                                                      ? (n += t.textContent)
+                                                      : (n += t.innerText);
+                                              }),
+                                              n);
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+            ],
+            responsive: {
+                details: {
+                    display: $.fn.dataTable.Responsive.display.modal({
+                        header: function (e) {
+                            return "Details of " + e.data().full_name;
+                        },
+                    }),
+                    type: "column",
+                    renderer: function (e, t, a) {
+                        a = $.map(a, function (e, t) {
+                            return "" !== e.title
+                                ? '<tr data-dt-row="' +
+                                      e.rowIndex +
+                                      '" data-dt-column="' +
+                                      e.columnIndex +
+                                      '"><td>' +
+                                      e.title +
+                                      ":</td> <td>" +
+                                      e.data +
+                                      "</td></tr>"
+                                : "";
+                        }).join("");
+                        return (
+                            !!a &&
+                            $('<table class="table"/><tbody />').append(a)
+                        );
                     },
                 },
-            })),
+            },
+        })),
         setTimeout(() => {
             $(".dataTables_filter .form-control").removeClass(
                 "form-control-sm"

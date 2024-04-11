@@ -121,7 +121,7 @@ class SaleWebs extends Controller
         $pdfContent = $dompdf->output();
 
         // Guardar el PDF temporalmente en el servidor
-        $pdfPath = public_path('temp/' . $code . '.pdf');
+        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/temp/' . $code . '.pdf';
         file_put_contents($pdfPath, $pdfContent);
 
         // Devolver la URL del PDF como respuesta a la solicitud AJAX

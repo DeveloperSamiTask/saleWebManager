@@ -141,7 +141,7 @@
                         <ul class="menu-sub">
                             <li class="menu-item">
                                 <a href="{{ route('Dashboard') }}" class="menu-link">
-                                    <div data-i18n="eCommerce">eCommerce</div>
+                                    <div data-i18n="Sale web">Ventas Web</div>
                                 </a>
                             </li>
                         </ul>
@@ -172,7 +172,7 @@
 
                     <li class="menu-item">
                         <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon tf-icons mdi mdi-chart-box-outline"></i>
+                            <i class="menu-icon tf-icons mdi mdi-file-chart"></i>
                             <div>Reportes Entradas</div>
                         </a>
                         <ul class="menu-sub">

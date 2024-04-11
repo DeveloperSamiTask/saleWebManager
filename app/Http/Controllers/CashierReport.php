@@ -44,11 +44,13 @@ class CashierReport extends Controller
 
         // Llama al método findTicketById() del modelo Cart
         $ticket = Cart::findTicketById($id);
+        $entries = Cart::findEntriesById($id);
 
         if (!$ticket) {
             return abort(404);
         }
         $data['ticket'] = $ticket;
+        $data['entries'] = $entries;
 
 
         return view('reports.invoice', $data);

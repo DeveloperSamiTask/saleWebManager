@@ -208,7 +208,7 @@ class ValidateWebs extends Controller
 
 
         // Guardar el PDF temporalmente en el servidor
-        $pdfPath = public_path('validate/' . $ticket . '.pdf');
+        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/validate/' . $ticket . '.pdf';
         file_put_contents($pdfPath, $pdfContent);
 
         // Devolver la URL del PDF como respuesta a la solicitud AJAX

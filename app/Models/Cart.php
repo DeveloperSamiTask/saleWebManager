@@ -62,7 +62,7 @@ class Cart extends Model
             'client' => $cart->varCartTitulo,
             'type_doc' => $cart->intCartTdoc,
             'dni' => optional($cart->client)->charClienteDni,
-            'ruc' => $cart->charCartRuc        ,
+            'ruc' => $cart->charCartRuc,
             'rs' => $cart->varCartRsocial,
             'address' => $cart->varCartDirec,
             'subtotal' => $cart->decCartStotal,
@@ -71,5 +71,40 @@ class Cart extends Model
             'code' => $cart->varCartCreserva,
             'purchase' => $cart->dateCartFreg,
         ];
+    }
+
+    public static function findEntriesById($id)
+    {
+        // Buscar el carrito basado en el código de compra
+        $cart = Cart::where('intCartId', $id)->first();
+
+        if (!$cart) {
+            return null; // El carrito no fue encontrado
+        }
+
+        // Obtener las entradas asociadas al carrito
+        $entries = $cart->detCart;
+
+        // Procesar las entradas y construir el arreglo de datos
+        $data = [];
+        foreach ($entries as $entry) {
+            $fullName = implode(' ', [$entry->varCartdetApepat, $entry->varCartdetApemat, $entry->varCartdetNombres]);
+
+            $data[] = [
+                'id' => $entry->intCartdetId,
+                'document' => $entry->charCartdetDni,
+                'name' => $fullName,
+                'price' => $entry->decCartdetStotal,
+                'shift' => $entry->shiftCart,
+                'device' => $entry->deviceCart,
+                'purchase' => optional($entry->cart)->dateCartFreg,
+                'income' => $entry->dateCartdetFreg,
+                'sure' => $entry->varCartdetseguro,
+                'status' => $entry->ticketstatus,
+                'used' => $entry->ticketdateuse,
+            ];
+        }
+
+        return $data;
     }
 }
