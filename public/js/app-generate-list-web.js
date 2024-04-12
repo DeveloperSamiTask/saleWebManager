@@ -32,8 +32,17 @@ $(function () {
                 title: "CANCELADO",
                 class: "badge rounded-pill bg-label-danger",
             },
+        },
+        invoice = {
+            0: {
+                title: "PENDITE",
+                class: "badge rounded-pill bg-label-warning",
+            },
+            1: {
+                title: "GENERADO",
+                class: "badge rounded-pill bg-label-success",
+            },
         };
-
     $("#flatpickr-range").flatpickr({
         mode: "range",
         dateFormat: "Y-m-d",
@@ -91,6 +100,7 @@ $(function () {
                 { data: "dinner" },
                 { data: "purchase" },
                 { data: "status" },
+                { data: "invoice" },
             ],
             columnDefs: [
                 {
@@ -136,13 +146,25 @@ $(function () {
                     },
                 },
                 {
-                    targets: -1,
+                    targets: 7,
                     render: function (a) {
                         return (
                             '<span class="' +
                             status[a].class +
                             '" text-capitalized="">' +
                             status[a].title +
+                            "</span>"
+                        );
+                    },
+                },
+                {
+                    targets: -1,
+                    render: function (a) {
+                        return (
+                            '<span class="' +
+                            invoice[a].class +
+                            '" text-capitalized="">' +
+                            invoice[a].title +
                             "</span>"
                         );
                     },

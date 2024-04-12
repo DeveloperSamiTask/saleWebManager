@@ -141,7 +141,7 @@
                         <ul class="menu-sub">
                             <li class="menu-item">
                                 <a href="{{ route('Dashboard') }}" class="menu-link">
-                                    <div data-i18n="Sale web">Ventas Web</div>
+                                    <div data-i18n="sale web">Ventas Web</div>
                                 </a>
                             </li>
                         </ul>

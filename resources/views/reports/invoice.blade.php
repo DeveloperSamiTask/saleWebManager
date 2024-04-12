@@ -8,6 +8,7 @@
             'Portatarjeta' => ['name' => 'Tarjeta + Langer', 'price' => 10],
             'Pulserasilicona' => ['name' => 'Pulsera Silicona', 'price' => 14],
             'Pulserafashion' => ['name' => 'Pulsera Silicona Ajustable', 'price' => 20],
+            'Seleccione' => ['name' => 'Sin Dispositivo', 'price' => 0],
         ];
 
         $shifts = [
@@ -28,8 +29,6 @@
     <div class="content-wrapper">
 
         <div class="container-xxl flex-grow-1 container-p-y">
-
-
 
             <div class="row invoice-preview">
                 <!-- Invoice -->
@@ -178,6 +177,7 @@
                                                     {{ $use['label'] }}
                                                 </span>
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -208,52 +208,34 @@
                             </div>
                         </div>
                         <hr class="my-0">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-md-0 mb-3">
 
+                                </div>
+                                <div class="col-md-6 d-flex justify-content-md-end mt-2">
+                                    <div class="invoice-calculations">
+                                        <button class="btn btn-primary d-grid w-100 mb-3 waves-effect waves-light"
+                                            data-bs-toggle="offcanvas" data-bs-target="#sendInvoiceOffcanvas">
+                                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i
+                                                    class="mdi mdi-invoice scaleX-n1-rtl me-1"></i>Generado</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
-                <!-- /Invoice -->
-
-                <!-- Invoice Actions
-                                        <div class="col-xl-2 col-md-4 col-12 invoice-actions">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <button class="btn btn-primary d-grid w-100 mb-3" data-bs-toggle="offcanvas"
-                                                        data-bs-target="#sendInvoiceOffcanvas">
-                                                        <span class="d-flex align-items-center justify-content-center text-nowrap"><i
-                                                                class="mdi mdi-send-outline scaleX-n1-rtl me-1"></i>Send Invoice</span>
-                                                    </button>
-                                                    <button class="btn btn-outline-secondary d-grid w-100 mb-3">
-                                                        Download
-                                                    </button>
-                                                    <a class="btn btn-outline-secondary d-grid w-100 mb-3" target="_blank"
-                                                        href="app-invoice-print.html">
-                                                        Print
-                                                    </a>
-                                                    <a href="app-invoice-edit.html" class="btn btn-outline-secondary d-grid w-100 mb-3">
-                                                        Edit Invoice
-                                                    </a>
-                                                    <button class="btn btn-success d-grid w-100" data-bs-toggle="offcanvas"
-                                                        data-bs-target="#addPaymentOffcanvas">
-                                                        <span class="d-flex align-items-center justify-content-center text-nowrap"><i
-                                                                class="mdi mdi-currency-usd me-1"></i>Add Payment</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                 /Invoice Actions -->
             </div>
-
-
+            <div class="content-backdrop fade"></div>
 
         </div>
-        <div class="content-backdrop fade"></div>
+        <!-- / Content -->
+    @endsection()
 
-    </div>
-    <!-- / Content -->
-@endsection()
+    @section('styles')
+    @endsection()
 
-@section('styles')
-@endsection()
-
-@section('scripts')
-@endsection
+    @section('scripts')
+    @endsection

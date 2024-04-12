@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Carbon\Carbon;
 class Cart extends Model
 {
     use HasFactory;
@@ -43,6 +43,7 @@ class Cart extends Model
                 'quantity' => $row->intCartCant,
                 'dinner' => $row->decCartTotal,
                 'purchase' => $row->dateCartFreg,
+                'invoice' => $row->invoice,
                 // Aquí estás accediendo a la relación detCart usando optional() para manejar casos en los que detCart es null
                 'status' => $row->intCartSt,
             ];
@@ -102,8 +103,32 @@ class Cart extends Model
                 'sure' => $entry->varCartdetseguro,
                 'status' => $entry->ticketstatus,
                 'used' => $entry->ticketdateuse,
+                'invoice' => $entry->invoice,
             ];
         }
+
+        return $data;
+    }
+
+    public static function chartEntries($startDate, $endDate)
+    {
+        $query = Cart::query();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('dateCartFreg', [$startDate, $endDate]);
+        }
+
+        $carts = $query->orderBy('dateCartFreg')->get();
+
+        // Procesar los resultados y construir el arreglo de datos
+        $data = $carts->groupBy(function ($cart) {
+            return Carbon::parse($cart->dateCartFreg)->format('Y-m-d');
+        })->map(function ($group) {
+            return [
+                'total_quantity' => $group->sum('intCartCant'),
+                'total_dinner' => $group->sum('decCartTotal'),
+            ];
+        });
 
         return $data;
     }

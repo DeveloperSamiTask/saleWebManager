@@ -27,6 +27,7 @@ Route::get('/Logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/Inicio', [Dashboard::class, 'index'])->name('Dashboard');
+    Route::get('/chartEntries', [Dashboard::class, 'chartEntries']);
 
     // Rutas para SaleWebs
     Route::get('/Boleteria', [SaleWebs::class, 'index'])->name('Boleteria');

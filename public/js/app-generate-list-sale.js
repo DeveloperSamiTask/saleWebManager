@@ -83,7 +83,7 @@ $(function () {
 
                 var startDate = selectedDates[0].toISOString();
                 var endDate = selectedDates[1].toISOString();
-console.log(startDate, endDate);
+                console.log(startDate, endDate);
                 $.ajax({
                     url: "Tabla_Entradas",
                     type: "GET",

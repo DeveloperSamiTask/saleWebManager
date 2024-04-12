@@ -32,6 +32,7 @@
                             <th>Total</th>
                             <th>Fecha Compra</th>
                             <th>Estado</th>
+                            <th>Facturado</th>
                         </tr>
                     </thead>
                 </table>
