@@ -96,7 +96,7 @@
                     <div class="card">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <div class="card-title mb-0">
-                                <h5 class="m-0 me-2 mb-1">Entradas Compradas</h5>
+                                <h5 class="m-0 me-2 mb-1">Entradas Vendidas</h5>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-floating form-floating-outline">

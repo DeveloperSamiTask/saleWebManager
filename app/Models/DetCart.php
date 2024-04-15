@@ -19,6 +19,10 @@ class DetCart extends Model
     {
         return $this->belongsTo(Cart::class, 'intCartId');
     }
+    public function ticket()
+    {
+        return $this->belongsTo(Entries::class, 'intBoletoId');
+    }
 
 
     public static function getAllCombos()
@@ -63,6 +67,40 @@ class DetCart extends Model
             'status' => $cartdet->ticketstatus,
             'used' => $cartdet->ticketdateuse,
         ];
+    }
+
+    public static function findEntriesById($id)
+    {
+        // Buscar todas las entradas relacionadas con el ID del carrito
+        $entries = self::where('intCartId', $id)->get();
+
+        // Verificar si se encontraron entradas
+        if ($entries->isEmpty()) {
+            return null; // No se encontraron entradas para el carrito especificado
+        }
+
+        // Procesar las entradas y construir el arreglo de datos
+        $data = [];
+        foreach ($entries as $entry) {
+            $fullName = implode(' ', [$entry->varCartdetApepat, $entry->varCartdetApemat, $entry->varCartdetNombres]);
+
+            $data[] = [
+                'id' => $entry->intCartdetId,
+                'document' => $entry->charCartdetDni,
+                'name' => $fullName,
+                'price' => $entry->decCartdetStotal,
+                'entrie' => optional($entry->ticket)->varBoletoTitulo,
+                'shift' => $entry->shiftCart,
+                'device' => $entry->deviceCart,
+                'income' => $entry->dateCartdetFreg,
+                'sure' => $entry->varCartdetseguro,
+                'status' => $entry->ticketstatus,
+                'used' => $entry->ticketdateuse,
+                'invoice' => $entry->invoice,
+            ];
+        }
+
+        return $data;
     }
 
     public static function getTableEntries($startDate, $endDate, $column)

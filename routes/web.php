@@ -50,4 +50,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/Ventas_Web', [CashierReport::class, 'index'])->name('saleWeb');
     Route::get('/Tabla_Cajeras', [CashierReport::class, 'tableCashier']);
     Route::get('/Factura/{id}', [CashierReport::class, 'invoice']);
+    Route::post('/Factura/checkInvoice', [CashierReport::class, 'check']);
 });

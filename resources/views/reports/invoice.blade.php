@@ -81,7 +81,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 class="fw-medium">N° PEDIDO #{{ $ticket['id'] }}</h4>
+                                    <h4 class="fw-medium">N° PEDIDO # <b id="ticket">{{ $ticket['id'] }}</b></h4>
                                     <div class="mb-1">
                                         <span>Fecha Registro:</span>
                                         <span>
@@ -140,6 +140,7 @@
                                         <th>N° Entrada</th>
                                         <th>Beneficiado</th>
                                         <th>Entrada</th>
+                                        <th>Horario</th>
                                         <th>Dispositivo</th>
                                         <th>Precio</th>
                                         <th>Fecha Ingreso</th>
@@ -159,11 +160,12 @@
                                             <td>{{ $entry['id'] }}</td>
                                             <td>{{ $entry['name'] }}</td>
                                             <td>
-                                                <p>{{ $shifts[$entry['shift']] }}
+                                                <p>{{$entry['entrie'] }}
                                                     <b class="d-flex align-items-center text-success">({{ $entrie }})
                                                     </b>
                                                 </p>
                                             </td>
+                                            <td>{{ $shifts[$entry['shift']] }}</td>
                                             <td>{{ $devices[$entry['device']]['name'] }}</td>
                                             <td>{{ $entry['price'] }}</td>
                                             <td>{{ date('d/m/Y', strtotime($entry['income'])) }}</td>
@@ -208,22 +210,26 @@
                             </div>
                         </div>
                         <hr class="my-0">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-md-0 mb-3">
-
-                                </div>
-                                <div class="col-md-6 d-flex justify-content-md-end mt-2">
-                                    <div class="invoice-calculations">
-                                        <button class="btn btn-primary d-grid w-100 mb-3 waves-effect waves-light"
-                                            data-bs-toggle="offcanvas" data-bs-target="#sendInvoiceOffcanvas">
-                                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i
-                                                    class="mdi mdi-invoice scaleX-n1-rtl me-1"></i>Generado</span>
-                                        </button>
+                        @if (!$ticket['invoice'])
+                            <div class="card-body" id="
+                            ">
+                                <div class="row">
+                                    <div class="col-md-6 mb-md-0 mb-3">
+                                        <!-- Contenido aquí -->
+                                    </div>
+                                    <div class="col-md-6 d-flex justify-content-md-end mt-2">
+                                        <div class="invoice-calculations">
+                                            <button class="btn btn-primary d-grid w-100 mb-3 waves-effect waves-light"
+                                                id="btn-generate">
+                                                <span
+                                                    class="d-flex align-items-center justify-content-center text-nowrap"><i
+                                                        class="mdi mdi-invoice scaleX-n1-rtl me-1"></i>Generado</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
 
                 </div>
@@ -238,4 +244,5 @@
     @endsection()
 
     @section('scripts')
+        <script src="{{ asset('js/app-invoice.js') }}"></script>
     @endsection

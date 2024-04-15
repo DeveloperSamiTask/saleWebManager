@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use DateTime;
+
 use App\Models\Cart;
+use App\Models\DetCart;
 
 class CashierReport extends Controller
 {
@@ -44,7 +47,7 @@ class CashierReport extends Controller
 
         // Llama al método findTicketById() del modelo Cart
         $ticket = Cart::findTicketById($id);
-        $entries = Cart::findEntriesById($id);
+        $entries = DetCart::findEntriesById($id);
 
         if (!$ticket) {
             return abort(404);
@@ -54,5 +57,24 @@ class CashierReport extends Controller
 
 
         return view('reports.invoice', $data);
+    }
+    public function check(Request $request)
+    {
+        $id = intval($request->input('ticket'));
+        try {
+            $cart = Cart::find($id);
+
+            // Verificar si $cart es nulo
+            if (!$cart) {
+                return response()->json(['message' => 'El carrito no fue encontrado.'], 404);
+            }
+
+            $cart->invoice = 1;
+            $cart->save();
+            return response()->json(['message' => 'Se ha validado la venta.']);
+        } catch (\Exception $e) {
+            Log::error('Error al validar la venta: ' . $e->getMessage());
+            return response()->json(['message' => 'Ha ocurrido un error al validar la venta. Por favor, contacta al administrador.'], 500);
+        }
     }
 }
