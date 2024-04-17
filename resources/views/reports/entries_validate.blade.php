@@ -64,7 +64,7 @@
                                         <span class="switch-on"></span>
                                         <span class="switch-off"></span>
                                       </span>
-                                      <span class="switch-label">Fecha de Entrada</span>
+                                      <span class="switch-label">Fecha de Ingreso</span>
                                     </label>
                                 </div>
                                 <div class="avatar">

@@ -24,9 +24,9 @@ class TableEntries extends Controller
         } else if ($request->filled('start_date') && $request->filled('end_date') && $request->input('isChecked') == '1') {
             $startDateFormatted  = Carbon::parse($request->input('start_date'))->startOfDay();
             $endDateFormatted  = Carbon::parse($request->input('end_date'))->endOfDay();
-            
+
             $startDate  = $startDateFormatted->toDateString();
-            $endDate  = $endDateFormatted ->toDateString();
+            $endDate  = $endDateFormatted->toDateString();
             $column = "entrance";
         } else {
             // Fecha de hoy
@@ -46,6 +46,26 @@ class TableEntries extends Controller
         }
 
         $data = DetCart::getTableEntries($startDate, $endDate, $column);
+        return response()->json(['data' => $data]);
+    }
+
+    public function dashboardEntries()
+    {
+
+        $currentDateTime = new DateTime();
+
+        $startDate = clone $currentDateTime;
+        $startDate->setTime(0, 0, 0);
+
+        $endDate = clone $currentDateTime;
+        $endDate->setTime(23, 59, 59);
+
+        $startDateString = $startDate->format('Y-m-d H:i:s');
+        $endDateString = $endDate->format('Y-m-d H:i:s');
+
+        $column = "shop";
+
+        $data = DetCart::dashboardEntries($startDateString, $endDateString, $column);
         return response()->json(['data' => $data]);
     }
 }

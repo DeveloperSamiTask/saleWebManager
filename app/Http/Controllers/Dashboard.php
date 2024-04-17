@@ -36,6 +36,7 @@ class Dashboard extends Controller
         }
 
         $data = Cart::chartEntries($startDate, $endDate);
-        return response()->json(['data' => $data]);
+        $total = $data->sum('total_quantity');
+        return response()->json(['data' => $data, 'total' => $total]);
     }
 }

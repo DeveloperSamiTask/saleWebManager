@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     // Rutas para TableEntries
     Route::get('/Lista_Entradas', [TableEntries::class, 'index'])->name('listEntries');
     Route::get('/Tabla_Entradas', [TableEntries::class, 'tableEntries']);
+    Route::get('/Tabla_Dashboard', [TableEntries::class, 'dashboardEntries']);
 
 
     // Rutas para TableEntries

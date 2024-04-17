@@ -33,7 +33,8 @@
 
     fetch("chartEntries")
         .then((response) => response.json())
-        .then(({ data }) => {
+        .then((response) => {
+            let data = response.data;
             let labels = [];
             let entriesPerDay = [];
 
@@ -46,7 +47,7 @@
 
             let maxEntries = Math.max(...entriesPerDay);
 
-            renderChart(entriesPerDay, labels, maxEntries);
+            renderChart(entriesPerDay, labels, maxEntries, response.total);
         })
         .catch((error) => {
             console.error("Error al obtener los datos:", error);
@@ -106,8 +107,9 @@
         },
     });
 
-    function renderChart(entries, labels, max) {
+    function renderChart(entries, labels, max, total) {
         var a = document.querySelector("#shipmentStatisticsChart");
+        $("#total").text(total);
         var i = {
             series: [
                 {
@@ -242,133 +244,50 @@
     }
 })(),
     $(function () {
-        var e = $(".dt-route-vehicles");
+        const e = $(".dt-route-vehicles"),
+            shift = {
+                1: { title: "TURNO COMPLETO" },
+                2: { title: "AFTER SCHOOL" },
+            },
+            device = {
+                Seleccione: { title: "SIN DISPOSITIVO" },
+                Tarjeta: { title: "TARJETA" },
+                Portatarjeta: { title: "TARJETA + LANGER" },
+                Pulserasilicona: { title: "PULSERA SILICONA" },
+                Pulserafashion: { title: "PULSERA SILICONA AJUSTABLE" },
+            };
         e.length &&
             (e.DataTable({
-                ajax: assetsPath + "json/logistics-dashboard.json",
+                ajax: "Tabla_Dashboard",
                 columns: [
                     { data: "id" },
-                    { data: "id" },
-                    { data: "location" },
-                    { data: "start_city" },
-                    { data: "end_city" },
-                    { data: "warnings" },
-                    { data: "progress" },
+                    { data: "nameP" },
+                    { data: "shift" },
+                    { data: "device" },
+                    { data: "price" },
+                    { data: "used" },
                 ],
                 columnDefs: [
                     {
-                        className: "control",
-                        orderable: !1,
-                        searchable: !1,
-                        responsivePriority: 2,
-                        targets: 0,
-                        render: function (e, t, o, r) {
-                            return "";
-                        },
-                    },
-                    {
-                        targets: 1,
-                        orderable: !1,
-                        searchable: !1,
-                        checkboxes: !0,
-                        checkboxes: {
-                            selectAllRender:
-                                '<input type="checkbox" class="form-check-input">',
-                        },
-                        responsivePriority: 3,
-                        render: function () {
-                            return '<input type="checkbox" class="dt-checkboxes form-check-input">';
-                        },
-                    },
-                    {
                         targets: 2,
-                        responsivePriority: 1,
-                        render: function (e, t, o, r) {
-                            return (
-                                '<div class="d-flex justify-content-start align-items-center user-name"><div class="avatar-wrapper"><div class="avatar me-2"><span class="avatar-initial rounded-circle bg-label-secondary"><i class="mdi mdi-bus"></i></span></div></div><div class="d-flex flex-column"><a class="text-heading fw-medium" href="app-logistics-fleet.html">VOL-' +
-                                o.location +
-                                "</a></div></div>"
-                            );
+                        render: function (a, e, t, s) {
+                            return shift[a]?.title ?? "Turno Completo";
                         },
                     },
                     {
                         targets: 3,
-                        render: function (e, t, o, r) {
-                            return (
-                                '<div class="text-body">' +
-                                o.start_city +
-                                ", " +
-                                o.start_country +
-                                "</div >"
-                            );
-                        },
-                    },
-                    {
-                        targets: 4,
-                        render: function (e, t, o, r) {
-                            return (
-                                '<div class="text-body">' +
-                                o.end_city +
-                                ", " +
-                                o.end_country +
-                                "</div >"
-                            );
-                        },
-                    },
-                    {
-                        targets: -2,
-                        render: function (e, t, o, r) {
-                            var o = o.warnings,
-                                s = {
-                                    1: {
-                                        title: "No Warnings",
-                                        class: "bg-label-success",
-                                    },
-                                    2: {
-                                        title: "Temperature Not Optimal",
-                                        class: "bg-label-warning",
-                                    },
-                                    3: {
-                                        title: "Ecu Not Responding",
-                                        class: "bg-label-danger",
-                                    },
-                                    4: {
-                                        title: "Oil Leakage",
-                                        class: "bg-label-info",
-                                    },
-                                    5: {
-                                        title: "fuel problems",
-                                        class: "bg-label-primary",
-                                    },
-                                };
-                            return void 0 === s[o]
-                                ? e
-                                : '<span class="badge rounded-pill ' +
-                                      s[o].class +
-                                      '">' +
-                                      s[o].title +
-                                      "</span>";
-                        },
-                    },
-                    {
-                        targets: -1,
-                        render: function (e, t, o, r) {
-                            o = o.progress;
-                            return (
-                                '<div class="d-flex align-items-center"><div div class="progress w-100 rounded" style="height: 8px;"><div class="progress-bar" role="progressbar" style="width:' +
-                                o +
-                                '%;" aria-valuenow="' +
-                                o +
-                                '" aria-valuemin="0" aria-valuemax="100"></div></div><div class="text-body ms-3">' +
-                                o +
-                                "%</div></div>"
-                            );
+                        render: function (a, e, t, s) {
+                            return device[a]?.title ?? "No seleccionado";
                         },
                     },
                 ],
+                language: {
+                    url: "json/datatable-spanish.json",
+                },
                 order: [2, "asc"],
-                dom: '<"table-responsive"t><"row d-flex align-items-center"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-                displayLength: 5,
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+                displayLength: 10,
+                lengthMenu: [10, 25, 50, 75, 100],
                 responsive: {
                     details: {
                         display: $.fn.dataTable.Responsive.display.modal({

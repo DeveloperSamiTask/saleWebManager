@@ -71,15 +71,12 @@ class DetCart extends Model
 
     public static function findEntriesById($id)
     {
-        // Buscar todas las entradas relacionadas con el ID del carrito
         $entries = self::where('intCartId', $id)->get();
 
-        // Verificar si se encontraron entradas
         if ($entries->isEmpty()) {
-            return null; // No se encontraron entradas para el carrito especificado
+            return null;
         }
 
-        // Procesar las entradas y construir el arreglo de datos
         $data = [];
         foreach ($entries as $entry) {
             $fullName = implode(' ', [$entry->varCartdetApepat, $entry->varCartdetApemat, $entry->varCartdetNombres]);
@@ -108,12 +105,10 @@ class DetCart extends Model
         $query = self::with('cart');
 
         if ($column === 'entrance') {
-            // Filtrar por la columna 'dateCartdetFreg' si $column es 'entrance'
             if ($startDate && $endDate) {
                 $query->whereBetween('dateCartdetFreg', [$startDate, $endDate]);
             }
         } elseif ($column === 'shop') {
-            // Filtrar por la columna 'dateCartFreg' si $column es 'shop'
             if ($startDate && $endDate) {
                 $query->whereHas('cart', function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('dateCartFreg', [$startDate, $endDate]);
@@ -135,6 +130,35 @@ class DetCart extends Model
                 'device' => $cartDet->deviceCart,
                 'code' => optional($cartDet->cart)->varCartCreserva,
                 'purchase' => optional($cartDet->cart)->dateCartFreg,
+                'income' => $cartDet->dateCartdetFreg,
+                'sure' => $cartDet->varCartdetseguro,
+                'status' => $cartDet->ticketstatus,
+                'used' => $cartDet->ticketdateuse,
+            ];
+        }
+        return $data;
+    }
+    public static function dashboardEntries($startDate, $endDate)
+    {
+        $query = self::with('cart');
+        if ($startDate && $endDate) {
+            $query->whereHas('cart', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('ticketdateuse', [$startDate, $endDate]);
+            });
+        }
+        $cartdets = $query->orderByDesc('ticketdateuse')->get();
+        $data = [];
+        foreach ($cartdets as $cartDet) {
+            $fullName = implode(' ', [$cartDet->varCartdetApepat, $cartDet->varCartdetApemat, $cartDet->varCartdetNombres]);
+
+            $data[] = [
+                'id' => $cartDet->intCartdetId,
+                'price' => $cartDet->decCartdetStotal,
+                'shift' => $cartDet->shiftCart,
+                'nameP' => $fullName,
+                'name' => optional($cartDet->cart)->varCartTitulo,
+                'device' => $cartDet->deviceCart,
+                'code' => optional($cartDet->cart)->varCartCreserva,
                 'income' => $cartDet->dateCartdetFreg,
                 'sure' => $cartDet->varCartdetseguro,
                 'status' => $cartDet->ticketstatus,

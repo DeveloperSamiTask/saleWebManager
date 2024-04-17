@@ -82,23 +82,39 @@ class Cart extends Model
     public static function chartEntries($startDate, $endDate)
     {
         $query = Cart::query();
-
+    
         if ($startDate && $endDate) {
             $query->whereBetween('dateCartFreg', [$startDate, $endDate]);
         }
-
+    
         $carts = $query->orderBy('dateCartFreg')->get();
-
+    
         // Procesar los resultados y construir el arreglo de datos
         $data = $carts->groupBy(function ($cart) {
             return Carbon::parse($cart->dateCartFreg)->format('Y-m-d');
         })->map(function ($group) {
+            // Inicializar contadores para los valores de shiftCart
+            $shiftCartCount1 = 0;
+            $shiftCartCount2 = 0;
+    
+            // Contar los valores de shiftCart
+            foreach ($group as $item) {
+                if ($item->shiftCart == '1') {
+                    $shiftCartCount1++;
+                } elseif ($item->shiftCart == '2') {
+                    $shiftCartCount2++;
+                }
+            }
+    
             return [
                 'total_quantity' => $group->sum('intCartCant'),
                 'total_dinner' => $group->sum('decCartTotal'),
+                'shift_cart_count_1' => $shiftCartCount1,
+                'shift_cart_count_2' => $shiftCartCount2,
             ];
         });
-
+    
         return $data;
     }
+    
 }
