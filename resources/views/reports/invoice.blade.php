@@ -81,7 +81,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 class="fw-medium">N° PEDIDO # <b id="ticket">{{ $ticket['id'] }}</b></h4>
+                                    <h4 class="fw-medium">N° COMPRA # <b id="ticket">{{ $ticket['id'] }}</b></h4>
                                     <div class="mb-1">
                                         <span>Fecha Registro:</span>
                                         <span>
@@ -99,7 +99,11 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between flex-wrap">
                                 <div class="my-3">
-                                    <h6 class="pb-2">Facturar a:</h6>
+                                    @if ($ticket['type_doc'] === 1)
+                                        <h6 class="pb-2">Boletear a:</h6>
+                                    @else
+                                        <h6 class="pb-2">Facturar a:</h6>
+                                    @endif
                                     <table>
                                         <tbody>
                                             <tr>
@@ -121,6 +125,10 @@
                                                 <tr>
                                                     <td class="pe-3 fw-medium">RUC :</td>
                                                     <td>{{ $ticket['ruc'] }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="pe-3 fw-medium">Correo Electrónico :</td>
+                                                    <td>{{ $ticket['mail'] }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td class="pe-3 fw-medium">Dirección :</td>
@@ -160,7 +168,7 @@
                                             <td>{{ $entry['id'] }}</td>
                                             <td>{{ $entry['name'] }}</td>
                                             <td>
-                                                <p>{{$entry['entrie'] }}
+                                                <p>{{ $entry['entrie'] }}
                                                     <b class="d-flex align-items-center text-success">({{ $entrie }})
                                                     </b>
                                                 </p>

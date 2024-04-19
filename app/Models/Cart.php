@@ -67,6 +67,7 @@ class Cart extends Model
             'client' => $cart->varCartTitulo,
             'type_doc' => $cart->intCartTdoc,
             'dni' => optional($cart->client)->charClienteDni,
+            'mail' => optional($cart->client)->sClieMail,
             'ruc' => $cart->charCartRuc,
             'rs' => $cart->varCartRsocial,
             'address' => $cart->varCartDirec,
@@ -82,13 +83,13 @@ class Cart extends Model
     public static function chartEntries($startDate, $endDate)
     {
         $query = Cart::query();
-    
+
         if ($startDate && $endDate) {
             $query->whereBetween('dateCartFreg', [$startDate, $endDate]);
         }
-    
+
         $carts = $query->orderBy('dateCartFreg')->get();
-    
+
         // Procesar los resultados y construir el arreglo de datos
         $data = $carts->groupBy(function ($cart) {
             return Carbon::parse($cart->dateCartFreg)->format('Y-m-d');
@@ -96,7 +97,7 @@ class Cart extends Model
             // Inicializar contadores para los valores de shiftCart
             $shiftCartCount1 = 0;
             $shiftCartCount2 = 0;
-    
+
             // Contar los valores de shiftCart
             foreach ($group as $item) {
                 if ($item->shiftCart == '1') {
@@ -105,7 +106,7 @@ class Cart extends Model
                     $shiftCartCount2++;
                 }
             }
-    
+
             return [
                 'total_quantity' => $group->sum('intCartCant'),
                 'total_dinner' => $group->sum('decCartTotal'),
@@ -113,8 +114,7 @@ class Cart extends Model
                 'shift_cart_count_2' => $shiftCartCount2,
             ];
         });
-    
+
         return $data;
     }
-    
 }
