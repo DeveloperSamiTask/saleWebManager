@@ -127,6 +127,7 @@ class DetCart extends Model
                 'shift' => $cartDet->shiftCart,
                 'nameP' => $fullName,
                 'name' => optional($cartDet->cart)->varCartTitulo,
+                'entrie' => $cartDet->intBoletoId,
                 'device' => $cartDet->deviceCart,
                 'code' => optional($cartDet->cart)->varCartCreserva,
                 'purchase' => optional($cartDet->cart)->dateCartFreg,

@@ -104,6 +104,7 @@
                             <th>Entrada</th>
                             <th>Pasante</th>
                             <th>Comprador</th>
+                            <th>Entrada</th>
                             <th>Turno</th>
                             <th>Dispositivo</th>
                             <th>Precio</th>

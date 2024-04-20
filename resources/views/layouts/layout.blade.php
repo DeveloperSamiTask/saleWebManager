@@ -595,7 +595,8 @@
                                                 <div class="flex-grow-1">
                                                     <span
                                                         class="fw-medium d-block">{{ session('user')['usuario'] }}</span>
-                                                    <small class="text-muted">{{obtenerNombreRol(session('user')['idrol']) }}</small>
+                                                    <small
+                                                        class="text-muted">{{ obtenerNombreRol(session('user')['idrol']) }}</small>
                                                 </div>
                                             </div>
                                         </a>

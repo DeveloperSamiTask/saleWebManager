@@ -1,4 +1,6 @@
 $(() => {
+
+    $("#selectBox").modal("show")
     $("#qrCode").focus();
     var t, a, s;
     var status = {
