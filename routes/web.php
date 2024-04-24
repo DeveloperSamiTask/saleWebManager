@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/Inicio', [Dashboard::class, 'index'])->name('Dashboard');
     Route::get('/chartEntries', [Dashboard::class, 'chartEntries']);
+    Route::post('/selectBox', [Dashboard::class, 'sessionBox']);
 
     // Rutas para SaleWebs
     Route::get('/Boleteria', [SaleWebs::class, 'index'])->name('Boleteria');
@@ -40,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/Validar_Lista', [ValidateWebs::class, 'index'])->name('validateList');
     Route::post('viewList', [ValidateWebs::class, 'getList']);
     Route::post('printTickets', [ValidateWebs::class, 'print']);
+    Route::get('/boxes', [ValidateWebs::class, 'viewBoxes']);
 
     // Rutas para TableEntries
     Route::get('/Lista_Entradas', [TableEntries::class, 'index'])->name('listEntries');

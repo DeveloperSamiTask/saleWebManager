@@ -1,7 +1,13 @@
 $(() => {
-
-    $("#selectBox").modal("show")
     $("#qrCode").focus();
+
+    var cashierValue = localStorage.getItem("cashier");
+    if (cashierValue === null) {
+        selectCashier();
+        $("#selectBox").modal("show");
+    } else {
+        $("#cashierName").html(cashierValue);
+    }
     var t, a, s;
     var status = {
         1: {
@@ -198,6 +204,50 @@ $(() => {
                 e.row($(this).parents("tr")).remove().draw();
             }
         );
+    $(document).on("click", ".notSelect", function () {
+        var cashier = $(this).data("name");
+        if ($(this).prop("checked")) {
+            $(".notSelect").not(this).prop("disabled", true);
+            Swal.fire({
+                title: "Estas seguro?",
+                text: `Estas eligiendo (${cashier})`,
+                icon: "warning",
+                showCancelButton: !0,
+                confirmButtonText: "Si, elegir CAJA!",
+                cancelButtonText: "Cancelar",
+                customClass: {
+                    confirmButton:
+                        "btn btn-primary me-3 waves-effect waves-light",
+                    cancelButton: "btn btn-outline-secondary waves-effect",
+                },
+                buttonsStyling: !1,
+            }).then(function (t) {
+                $.ajax({
+                    url: "selectBox",
+                    type: "post",
+                    data: { box: cashier, _token: csrfToken },
+                })
+                    .done((response) => {
+                        $("#selectBox").modal("hide");
+                        localStorage.setItem("cashier", cashier);
+                        $("#cashierName").html(cashier);
+                    })
+                    .fail((response) => {
+                        console.log(response.responseText);
+                    });
+                t.value &&
+                    Swal.fire({
+                        icon: "success",
+                        title: `${cashier} Seleccionado`,
+                        customClass: {
+                            confirmButton: "btn btn-success waves-effect",
+                        },
+                    });
+            });
+        } else {
+            $(".notSelect").not(this).prop("disabled", false);
+        }
+    });
 
     $("#qrCode").on("input", function () {
         var ticket = $(this).val();
@@ -322,4 +372,77 @@ $(() => {
             toast.onmouseleave = Swal.resumeTimer;
         },
     });
+
+    function selectCashier() {
+        $.ajax({
+            url: "boxes",
+            type: "GET",
+        }).done((response) => {
+            const boxes = response.boxes;
+            console.log(boxes);
+
+            for (let i = 0; i < 4; i++) {
+                const box = boxes[i];
+                const isChecked =
+                    box.cashier_box !== null && box.cashier_box !== "";
+                $("#cashiers1 .row").append(`
+                    <div class="col-md-6 mb-md-0 mb-2 gap-2 py-3">
+                        <div class="form-check custom-option custom-option-icon ${
+                            isChecked ? "checked" : ""
+                        } ">
+                            <label class="form-check-label custom-option-content" for="customCheckboxIcon${
+                                box.id_box
+                            }">
+                                <span class="custom-option-body">
+                                    <i class="mdi mdi-cash-register"></i>
+                                    <span class="custom-option-title">${
+                                        box.name_box
+                                    }</span>
+                                </span>
+                                <input class="form-check-input ${
+                                    isChecked ? "" : "notSelect"
+                                }" type="checkbox" value="" id="customCheckboxIcon${
+                    box.id_box
+                }"  ${isChecked ? "checked disabled" : ""} data-name="${
+                    box.name_box
+                }">
+                            </label>
+                        </div>
+                    </div>
+                `);
+            }
+
+            for (let i = 4; i < 8; i++) {
+                const box = boxes[i];
+                const isChecked =
+                    box.cashier_box !== null && box.cashier_box !== "";
+
+                $("#cashiers2 .row").append(`
+                <div class="col-md-6 mb-md-0 mb-2 gap-2 py-3">
+                    <div class="form-check custom-option custom-option-icon ${
+                        isChecked ? "checked" : ""
+                    }">
+                        <label class="form-check-label custom-option-content" for="customCheckboxIcon${
+                            box.id_box
+                        }">
+                            <span class="custom-option-body">
+                                <i class="mdi mdi-cash-register"></i>
+                                <span class="custom-option-title">${
+                                    box.name_box
+                                }</span>
+                            </span>
+                            <input class="form-check-input  ${
+                                isChecked ? "" : "notSelect"
+                            }" type="checkbox" value="" id="customCheckboxIcon${
+                    box.id_box
+                }" ${isChecked ? "checked disabled" : ""} data-name="${
+                    box.name_box
+                }">
+                        </label>
+                    </div>
+                </div>
+                `);
+            }
+        });
+    }
 });

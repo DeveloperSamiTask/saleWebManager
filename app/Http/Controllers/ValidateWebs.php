@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\DetCart;
 use App\Models\Ticket;
+use App\Models\Box;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +17,13 @@ class ValidateWebs extends Controller
         $data['title'] = "Boleteria";
         return view('tickets.validate', $data);
     }
+
+    public function viewBoxes()
+    {
+        $boxes = Box::all();
+        return response()->json(['boxes' => $boxes]);
+    }
+
     public function getList(Request $request)
     {
         // Obtener el código del ticket desde la solicitud

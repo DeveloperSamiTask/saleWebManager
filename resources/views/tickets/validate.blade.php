@@ -29,8 +29,25 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="row">
+                            <div class="col-6 d-flex align-items-center">
+                                <div class="card-body">
+                                    <div class="card-info mb-3 pb-2">
+                                        <h3 class="mb-3 text-nowrap" id="cashierName"></h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 d-flex align-items-end justify-content-end"> <!-- Cambié 'text-end' por 'justify-content-end' -->
+                                <div class="card-body pb-0 pt-3">
+                                    <img src="{{ asset('img/illustrations/card-session-illustration.png') }}" alt="Ratings" class="img-fluid" width="81">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- Permission Table -->
             <div class="card">
                 <div class="card-datatable table-responsive">
                     <table class="datatables-permissions table">
@@ -50,7 +67,6 @@
                     </table>
                 </div>
             </div>
-            <!--/ Permission Table -->
         </div>
         <!-- / Content -->
         <div class="content-backdrop fade"></div>
@@ -67,133 +83,23 @@
                         <h3 class="mb-2 pb-1">Seleccionar Caja</h3>
                     </div>
                     <div class="row mx-0 gy-3">
-                        <div class="col-xl mb-md-0 mb-4">
-                            <div class="card border rounded shadow-none">
+                        <div class="col-xl mb-md-0 mb-4" id="cashiers1">
+                            <div class="card border rounded shadow-none ">
                                 <div class="card-body">
                                     <h3 class="card-title text-center text-capitalize mb-1">CABAÑA 1</h3>
                                     <div class="row">
-                                        <div class="col-md-6 mb-md-0 mb-2  gap-2 py-3">
-                                            <div class="form-check custom-option custom-option-icon">
-                                                <label class="form-check-label custom-option-content"
-                                                    for="customCheckboxIcon1">
-                                                    <span class="custom-option-body">
-                                                        <i class="mdi mdi-cash-register"></i>
-                                                        <span class="custom-option-title"> CAJA ING 1 </span>
 
-                                                    </span>
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="customCheckboxIcon1" checked="">
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 mb-md-0 mb-2  gap-2 py-3">
-                                            <div class="form-check custom-option custom-option-icon">
-                                                <label class="form-check-label custom-option-content"
-                                                    for="customCheckboxIcon2">
-                                                    <span class="custom-option-body">
-                                                        <i class="mdi mdi-cash-register"></i>
-                                                        <span class="custom-option-title"> CAJA ING 2 </span>
-
-                                                    </span>
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="customCheckboxIcon2">
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-check custom-option custom-option-icon">
-                                                <label class="form-check-label custom-option-content"
-                                                    for="customCheckboxIcon3">
-                                                    <span class="custom-option-body">
-                                                        <i class="mdi mdi-cash-register"></i>
-                                                        <span class="custom-option-title"> CAJA ING 3 </span>
-
-                                                    </span>
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="customCheckboxIcon3">
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-check custom-option custom-option-icon">
-                                                <label class="form-check-label custom-option-content"
-                                                    for="customCheckboxIcon3">
-                                                    <span class="custom-option-body">
-                                                        <i class="mdi mdi-cash-register"></i>
-                                                        <span class="custom-option-title"> CAJA ING 4 </span>
-
-                                                    </span>
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="customCheckboxIcon3">
-                                                </label>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-xl mb-md-0 mb-4">
+                        <div class="col-xl mb-md-0 mb-4" id="cashiers2">
                             <div class="card border rounded shadow-none">
                                 <div class="card-body">
                                     <h3 class="card-title text-center text-capitalize mb-1">CABAÑA 2</h3>
                                     <div class="row">
-                                        <div class="col-md-6 mb-md-0 mb-2  gap-2 py-3">
-                                            <div class="form-check custom-option custom-option-icon">
-                                                <label class="form-check-label custom-option-content"
-                                                    for="customCheckboxIcon1">
-                                                    <span class="custom-option-body">
-                                                        <i class="mdi mdi-cash-register"></i>
-                                                        <span class="custom-option-title"> CAJA ING 5 </span>
 
-                                                    </span>
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="customCheckboxIcon1" checked="">
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 mb-md-0 mb-2  gap-2 py-3">
-                                            <div class="form-check custom-option custom-option-icon">
-                                                <label class="form-check-label custom-option-content"
-                                                    for="customCheckboxIcon2">
-                                                    <span class="custom-option-body">
-                                                        <i class="mdi mdi-cash-register"></i>
-                                                        <span class="custom-option-title"> CAJA ING 6 </span>
-
-                                                    </span>
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="customCheckboxIcon2">
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-check custom-option custom-option-icon">
-                                                <label class="form-check-label custom-option-content"
-                                                    for="customCheckboxIcon3">
-                                                    <span class="custom-option-body">
-                                                        <i class="mdi mdi-cash-register"></i>
-                                                        <span class="custom-option-title"> CAJA ING 7 </span>
-
-                                                    </span>
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="customCheckboxIcon3">
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-check custom-option custom-option-icon">
-                                                <label class="form-check-label custom-option-content"
-                                                    for="customCheckboxIcon3">
-                                                    <span class="custom-option-body">
-                                                        <i class="mdi mdi-cash-register"></i>
-                                                        <span class="custom-option-title"> CAJA ING 8 </span>
-
-                                                    </span>
-                                                    <input class="form-check-input" type="checkbox" value=""
-                                                        id="customCheckboxIcon3">
-                                                </label>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

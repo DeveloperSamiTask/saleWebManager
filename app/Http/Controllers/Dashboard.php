@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Cart;
+use App\Models\Box;
 use DateTime;
 
 class Dashboard extends Controller
@@ -38,5 +39,13 @@ class Dashboard extends Controller
         $data = Cart::chartEntries($startDate, $endDate);
         $total = $data->sum('total_quantity');
         return response()->json(['data' => $data, 'total' => $total]);
+    }
+    public function sessionBox(Request $request)
+    {
+        $idUsuario = session('user')['idusuario'];
+        $box =  $request->input('box');
+        $request->session()->put('box', $box);
+        Box::where('name_box', $box)->update(['cashier_box' => $idUsuario]);
+        return response()->json($request->session()->all());
     }
 }
