@@ -21,7 +21,7 @@
                             <div class="d-flex align-items-center mb-2 pb-1">
                                 <div class="avatar me-2">
                                     <span class="avatar-initial rounded bg-label-primary"><i
-                                            class="mdi mdi-bus-school mdi-20px"></i></span>
+                                            class="mdi mdi-ticket-confirmation mdi-20px"></i></span>
                                 </div>
                                 <h4 class="ms-1 mb-0 display-6" id="total"></h4>
                             </div>
@@ -30,7 +30,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-lg-3 mb-4">
+               <!-- <div class="col-sm-6 col-lg-3 mb-4">
                     <div class="card card-border-shadow-warning h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-2 pb-1">
@@ -75,7 +75,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
             <!--/ Card Border Shadow -->
             <div class="row">
                 <!-- Shipment statistics-->
@@ -118,6 +118,8 @@
                                         <th>Dispositivo</th>
                                         <th>Precio</th>
                                         <th class="w-20">Ingreso</th>
+                                        <th>Cajera</th>
+                                        <th>Caja</th>
                                     </tr>
                                 </thead>
                             </table>

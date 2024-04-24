@@ -11,7 +11,7 @@ class DetCart extends Model
 
     protected $table = 'cartdet';
     protected $primaryKey = 'intCartdetId';
-    protected $fillable = ['ticketstatus', 'ticketdateuse','cashier','box'];
+    protected $fillable = ['ticketstatus', 'ticketdateuse', 'cashier', 'box'];
     public $timestamps = false;
 
 
@@ -22,6 +22,10 @@ class DetCart extends Model
     public function ticket()
     {
         return $this->belongsTo(Entries::class, 'intBoletoId');
+    }
+    public function  user()
+    {
+        return $this->belongsTo(User::class, 'cashier');
     }
 
 
@@ -164,6 +168,8 @@ class DetCart extends Model
                 'sure' => $cartDet->varCartdetseguro,
                 'status' => $cartDet->ticketstatus,
                 'used' => $cartDet->ticketdateuse,
+                'cashier' => optional($cartDet->user)->usuario,
+                'box' => $cartDet->box,
             ];
         }
         return $data;

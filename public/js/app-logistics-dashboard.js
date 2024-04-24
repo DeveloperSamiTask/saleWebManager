@@ -266,6 +266,8 @@
                     { data: "device" },
                     { data: "price" },
                     { data: "used" },
+                    { data: "cashier" },
+                    { data: "box" },
                 ],
                 columnDefs: [
                     {
