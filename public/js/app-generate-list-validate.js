@@ -222,27 +222,30 @@ $(() => {
                 },
                 buttonsStyling: !1,
             }).then(function (t) {
-                $.ajax({
-                    url: "selectBox",
-                    type: "post",
-                    data: { box: cashier, _token: csrfToken },
-                })
-                    .done((response) => {
-                        $("#selectBox").modal("hide");
-                        localStorage.setItem("cashier", cashier);
-                        $("#cashierName").html(cashier);
+                if (t.value) {
+                    // Verificar si se hizo clic en el botón de confirmación
+                    $.ajax({
+                        url: "selectBox",
+                        type: "post",
+                        data: { box: cashier, _token: csrfToken },
                     })
-                    .fail((response) => {
-                        console.log(response.responseText);
-                    });
-                t.value &&
-                    Swal.fire({
-                        icon: "success",
-                        title: `${cashier} Seleccionado`,
-                        customClass: {
-                            confirmButton: "btn btn-success waves-effect",
-                        },
-                    });
+                        .done((response) => {
+                            $("#selectBox").modal("hide");
+                            localStorage.setItem("cashier", cashier);
+                            $("#cashierName").html(cashier);
+                            Swal.fire({
+                                icon: "success",
+                                title: `${cashier} Seleccionado`,
+                                customClass: {
+                                    confirmButton:
+                                        "btn btn-success waves-effect",
+                                },
+                            });
+                        })
+                        .fail((response) => {
+                            console.log(response.responseText);
+                        });
+                }
             });
         } else {
             $(".notSelect").not(this).prop("disabled", false);
