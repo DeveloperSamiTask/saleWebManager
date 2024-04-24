@@ -173,8 +173,7 @@ document.getElementById("layout-menu") &&
                             debug: !1,
                             fallbackLng: "es",
                             backend: {
-                                loadPath:
-                                    assetsPath + "json/locales/es.json",
+                                loadPath: assetsPath + "json/locales/es.json",
                             },
                             returnObjects: !0,
                         })
@@ -371,12 +370,12 @@ document.getElementById("layout-menu") &&
                 }),
                 $(document).on("keydown", function (e) {
                     var ctrlPressed = e.ctrlKey,
-                    altPressed = e.altKey,
-                    kPressed = 75 === e.which; // Código para la tecla "K"
-                if (ctrlPressed && altPressed && kPressed && o.length) {
-                    o.toggleClass("d-none");
-                    s.focus();
-                }
+                        altPressed = e.altKey,
+                        kPressed = 75 === e.which; // Código para la tecla "K"
+                    if (ctrlPressed && altPressed && kPressed && o.length) {
+                        o.toggleClass("d-none");
+                        s.focus();
+                    }
                 }),
                 setTimeout(function () {
                     var e = $(".twitter-typeahead");
@@ -555,4 +554,29 @@ document.getElementById("layout-menu") &&
                     s.on("keyup", function () {
                         e.update();
                     }));
+
+            $("#logout").click(function () {
+                var cashierValue = localStorage.getItem("cashier");
+                var csrfToken = $('meta[name="csrf-token"]').attr("content");
+                $.blockUI({
+                    message:
+                        '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+                    css: { backgroundColor: "transparent", border: "0" },
+                    overlayCSS: { opacity: 0.5 },
+                });
+                $.ajax({
+                    url: "Logout",
+                    method: "POST",
+                    data: { box: cashierValue, _token: csrfToken },
+                })
+                    .done((response) => {
+                        console.log(response);
+                        localStorage.removeItem("cashier");
+                        window.location.href = "/";
+
+                    })
+                    .always(() => {
+                        $.unblockUI();
+                    });
+            });
         });

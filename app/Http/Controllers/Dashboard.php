@@ -43,7 +43,7 @@ class Dashboard extends Controller
     public function sessionBox(Request $request)
     {
         $idUsuario = session('user')['idusuario'];
-        $box =  $request->input('box');
+        $box = $request->input('box');
         $request->session()->put('box', $box);
         Box::where('name_box', $box)->update(['cashier_box' => $idUsuario]);
         return response()->json($request->session()->all());

@@ -80,6 +80,9 @@ class ValidateWebs extends Controller
 
     public function print(Request $request)
     {
+        $boxValue = session('box');
+        $idUsuario = session('user')['idusuario'];
+
         // Obtener los datos del formulario
         $ids = $request->input('ids');
         $ticket = $request->input('ticket');
@@ -102,6 +105,8 @@ class ValidateWebs extends Controller
             if ($detCartModel) {
                 $detCartModel->ticketstatus = 1;
                 $detCartModel->ticketdateuse = now(); // O la fecha y hora actual
+                $detCartModel->cashier = $idUsuario;
+                $detCartModel->box = $boxValue;
                 $detCartModel->save();
             }
         }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
+use App\Models\Box;
 
 class LoginController extends Controller
 {
@@ -38,10 +39,12 @@ class LoginController extends Controller
             return response()->json(['icon' => 'error', 'message' => 'Contraseña incorrecta']);
         }
     }
-    public function logout()
+    public function logout(Request $request)
     {
+        $boxValue = session('box');
+        Box::where('name_box', $boxValue)->update(['cashier_box' => '']);
         Auth::logout();
-        session::forget('user');
-        return redirect('/')->with('success', 'Has cerrado sesión exitosamente.');
+        session::forget(['user', 'box']);
+        return response()->json(['status' => '200','box' => $boxValue]);
     }
 }

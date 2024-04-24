@@ -621,7 +621,7 @@
                                         <div class="dropdown-divider"></div>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="{{ route('logout') }}">
+                                        <a class="dropdown-item" href="javascript:void(0)" id="logout">
                                             <i class="mdi mdi-logout me-2"></i>
                                             <span class="align-middle">Cerrar Sessión</span>
                                         </a>

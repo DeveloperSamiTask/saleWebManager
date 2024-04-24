@@ -21,7 +21,7 @@ use App\Http\Controllers\CashierReport;
 
 Route::get('/', [LoginController::class, 'index'])->name('login');
 Route::post('/initLogin', [LoginController::class, 'login']);
-Route::get('/Logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('/Logout', [LoginController::class, 'logout'])->name('logout');
 
 // Agrupar todas las rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {

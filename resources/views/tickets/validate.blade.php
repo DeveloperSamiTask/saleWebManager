@@ -74,7 +74,7 @@
     <!-- Content wrapper -->
 
     <!-- Select Cashier -->
-    <div class="modal fade" id="selectBox" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="selectBox" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-simple modal-upgrade-plan">
             <div class="modal-content p-3 p-md-5">
                 <div class="modal-body p-1">
