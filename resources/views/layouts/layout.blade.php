@@ -163,9 +163,9 @@
                         </ul>
                     </li>
 
-                    <!-- Apps & Pages -->
+                    <!-- Boxes -->
                     <li class="menu-header fw-medium mt-4">
-                        <span class="menu-header-text" data-i18n="Apps & Pages">Apps &amp; Paginas</span>
+                        <span class="menu-header-text" data-i18n="Boxes">Cajas</span>
                     </li>
 
                     <li class="menu-item">
@@ -181,9 +181,21 @@
                         </a>
                     </li>
 
-                    <!-- Apps & Pages -->
+                    <!-- Controller -->
                     <li class="menu-header fw-medium mt-4">
-                        <span class="menu-header-text" data-i18n="Reports">Reports</span>
+                        <span class="menu-header-text" data-i18n="Controllers">Controllers</span>
+                    </li>
+
+                    <li class="menu-item">
+                        <a href="{{ route('cambioDNI') }}" class="menu-link">
+                            <i class="menu-icon tf-icons mdi mdi-card-account-details-outline"></i>
+                            <div data-i18n="ID rectification">Rectificación de DNI</div>
+                        </a>
+                    </li>
+
+                    <!-- Reports -->
+                    <li class="menu-header fw-medium mt-4">
+                        <span class="menu-header-text" data-i18n="Reports">Reportes</span>
                     </li>
 
                     <li class="menu-item">

@@ -16,6 +16,7 @@ $(() => {
               (a = config.colors_dark.bodyBg),
               config.colors_dark)
             : ((t = config.colors.borderColor),
+              (r = config.colors.headingColor),
               (a = config.colors.bodyBg),
               config.colors)
     ).headingColor;
@@ -238,7 +239,6 @@ $(() => {
                     dataType: "json",
                 })
                     .done(function (response) {
-                        console.log(response);
                         if (response.success) {
                             var data = response.ticket;
 
@@ -291,7 +291,12 @@ $(() => {
 
     $("#dni").on("input", function (e) {
         const dniValue = $(this).val();
-        const isValidLength = dniValue.length === 8;
+        const dniLength = dniValue.length;
+        const isValidLength =
+            dniLength === 8 ||
+            dniLength === 9 ||
+            dniLength === 10 ||
+            dniLength === 12;
 
         if (isValidLength) {
             const isValidDNI = dniValue === localStorage.getItem("document");
@@ -303,10 +308,102 @@ $(() => {
                     : "Número de DNI inválido",
             });
 
+            if (isValidDNI) {
+                $(".btnChangeDNI").prop("style", "display:none");
+            } else {
+                $(".btnChangeDNI").prop("style", "display:block");
+            }
+
             $(".btn_validate").prop("disabled", !isValidDNI);
         } else {
+            $(".btnChangeDNI").prop("style", "display:none");
             Toast.close();
             $(".btn_validate").prop("disabled", true);
+        }
+    });
+
+    $("#btnDNI").on("click", function () {
+        $("#addPermissionModal").modal("hide");
+
+        $("#appName").text($("#names").val());
+        $("#appCodeEntrie").text("#" + $("#ticket").val());
+        $("#appID").val($("#ticket").val());
+        $("#appINames").val($("#names").val());
+
+        $("#modalDNI").modal("show");
+    });
+
+    const overview = document.querySelector("#overviewChart");
+    let chartInstance = null;
+
+    $("#appDNI").on("input", function (e) {
+        const document = $(this).val();
+        const sessiondoc = localStorage.getItem("document");
+        const dniLength = document.length;
+        const isValidLength = dniLength === 8;
+
+        if (isValidLength) {
+            let percentage = percentMatch(document, sessiondoc);
+            $("#appDNIBefore").val(sessiondoc);
+            if (chartInstance) {
+                // Destruir el gráfico existente antes de crear uno nuevo
+                chartInstance.destroy();
+            }
+
+            if (percentage >= 75) {
+                Toast.fire({
+                    icon: "success",
+                    title: "Puedes enviar la solicitud",
+                });
+                $("#appBtnSend").prop("disabled", false);
+            } else {
+                Toast.fire({
+                    icon: "warning",
+                    title: "Llama a un supervisor",
+                });
+                $("#appBtnSend").prop("disabled", true);
+            }
+
+            v = {
+                chart: {
+                    height: 134,
+                    type: "radialBar",
+                    sparkline: { enabled: !0 },
+                },
+                plotOptions: {
+                    radialBar: {
+                        hollow: { size: "55%" },
+                        dataLabels: {
+                            name: { show: !1 },
+                            value: {
+                                show: !0,
+                                offsetY: 5,
+                                fontWeight: 500,
+                                fontSize: "1rem",
+                                fontFamily: "Inter",
+                                color: config.colors.primary,
+                            },
+                        },
+                        track: {
+                            background: config.colors_label.secondary,
+                        },
+                    },
+                },
+                states: {
+                    hover: { filter: { type: "none" } },
+                    active: { filter: { type: "none" } },
+                },
+                stroke: { lineCap: "round" },
+                colors: [config.colors.primary],
+                grid: { padding: { bottom: -15 } },
+                series: [percentage],
+                labels: ["Progress"],
+            };
+
+            chartInstance = new ApexCharts(overview, v);
+            chartInstance.render();
+        } else {
+            $("#appBtnSend").prop("disabled", true);
         }
     });
 
@@ -412,6 +509,29 @@ $(() => {
         $("#twoFactorAuth").modal("hide");
         $("#twoFactorAuthOne").modal("hide");
     });
+    $("#formChangeDNI").on("submit", function (event) {
+        event.preventDefault();
+
+        let requestData = $(this).serialize() + "&_token=" + csrfToken;
+
+        $.ajax({
+            url: "requestChangeDni",
+            method: "POST",
+            data: requestData,
+        })
+            .done((response) => {
+                Toast.fire({
+                    icon: response.icon,
+                    title: response.message,
+                });
+                $("#appBtnSend").prop("disabled", true);
+                resetApp();
+            })
+            .fail((error) => {
+                console.log(error.responseText);
+            })
+            .always(() => {});
+    });
 
     function resetForm() {
         let f = document.getElementById("validate_cupon");
@@ -422,6 +542,26 @@ $(() => {
         $(".btn_validate").prop("disabled", true);
         localStorage.removeItem("document");
         $("#ticket").focus();
+    }
+
+    function percentMatch(str1, str2) {
+        const longitud = Math.max(str1.length, str2.length);
+        let coincidencias = 0;
+        for (let i = 0; i < longitud; i++) {
+            if (str1[i] && str2[i] && str1[i] === str2[i]) {
+                coincidencias++;
+            }
+        }
+        return (coincidencias / longitud) * 100;
+    }
+    function resetApp() {
+        $("#formChangeDNI").trigger("reset");
+        $("#modalDNI").modal("hide");
+        $("#addPermissionModal").modal("show");
+        $("#appBtnSend").prop("disabled", true);
+        $(".btnChangeDNI").prop("style", "display:none");
+
+        resetForm();
     }
 
     const Toast = Swal.mixin({

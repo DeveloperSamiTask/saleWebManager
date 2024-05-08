@@ -196,7 +196,7 @@ class ValidateWebs extends Controller
         $html .= '<tr>
         <th colspan="3" class="grand total" style="text-align: right !important;">TOTAL </th>
         <th class="grand total"> S/. ' . $total . '</th>
-    </tr>';
+        </tr>';
 
         // Cerrar el cuerpo y la tabla HTML
         $html .= '</tbody></table></body></html>';
@@ -226,5 +226,10 @@ class ValidateWebs extends Controller
 
         // Devolver la URL del PDF como respuesta a la solicitud AJAX
         return response()->json(['pdfUrl' => asset('validate/' . $ticket . '.pdf')]);
+    }
+
+    public function viewLogsDNI(){
+        $data['title'] = "Rectificación de DNI";
+        return view('tickets.dni', $data);
     }
 }

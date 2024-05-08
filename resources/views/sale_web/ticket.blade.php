@@ -128,6 +128,14 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-12 col-md-5 btnChangeDNI" style="display: none">
+                                    <div class="input-group input-group-merge">
+                                        <button type="button" class="btn btn-lg btn-danger" id="btnDNI">
+                                            <span class="tf-icons mdi mdi-badge-account-alert-outline me-1"></span>Sol.
+                                            Cambio DNI
+                                        </button>
+                                    </div>
+                                </div>
 
                                 <div class="col-12 text-center">
                                     <button type="submit" class="btn btn-primary me-sm-3 me-1 btn_validate"
@@ -245,6 +253,61 @@
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="modalDNI" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-simple modal-enable-otp modal-dialog-centered">
+                    <div class="modal-content p-3 p-md-5">
+                        <form id="formChangeDNI" class="row g-3">
+                            <input type="hidden" id="appID" name="appID">
+                            <input type="hidden" id="appDNIBefore" name="appDNIBefore">
+                            <input type="hidden" id="appINames" name="appINames">
+                            <div class="modal-body p-md-0">
+                                <div class="text-center mb-4">
+                                    <h3 class="mb-2 pb-1">Solicitud de Cambio de DNI</h3>
+                                </div>
+                                <p>Envia una solicitud para rectificar el N° DNI del cliente, siempre y cuando Nombres y
+                                    Apellidos del DNI presentado, sean iguales a los datos que se encuentren en la entrada.
+                                </p>
+                                <ul class="p-0 m-0">
+                                    <li class="d-flex mb-4 pb-1">
+                                        <div
+                                            class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                            <div class="me-2">
+                                                <h6 class="mb-0" id="appName"></h6>
+                                            </div>
+                                            <span class="badge rounded-pill bg-label-success" id="appCodeEntrie"></span>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div class="col-12">
+                                    <div class="input-group input-group-merge">
+                                        <span class="input-group-text"><i
+                                                class="mdi mdi-card-account-details-outline"></i></span>
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" name="appDNI"
+                                                class="form-control phone-number-otp-mask" placeholder="75241414"
+                                                id="appDNI" name="appDNI">
+                                            <label for="modalEnableOTPPhone">N° DNI</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex justify-content-center align-items-center">
+                                    <div class="input-group">
+                                        <div id="overviewChart" class="d-flex align-items-center "></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary waves-effect"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary waves-effect waves-light" id="appBtnSend"
+                                    disabled>Enviar</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- / Content -->
 
@@ -258,8 +321,11 @@
 @endsection()
 
 @section('styles')
+    <link rel="stylesheet" href="{{ asset('vendor/libs/apex-charts/apex-charts.css') }}">
 @endsection()
 
 @section('scripts')
+    <script src="{{ asset('vendor/libs/apex-charts/apexcharts.js') }}"></script>
+
     <script src="{{ asset('js/app-generate-coupon-permission.js') }}"></script>
 @endsection
