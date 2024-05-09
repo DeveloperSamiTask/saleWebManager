@@ -507,4 +507,23 @@ $(function () {
         },
     });
 }),
-    (function () {})();
+    (function () {
+        if ("Notification" in window) {
+            // Solicitar permiso al usuario para mostrar notificaciones
+            Notification.requestPermission().then(function (permission) {
+                // Si el usuario acepta, creamos y mostramos la notificación
+                if (permission === "granted") {
+                    var notification = new Notification("¡Hola!", {
+                        body: "¡Esta es una notificación de ejemplo!",
+                        icon: "https://lagranjavilla.com/img/logo.png" // URL del icono de la notificación
+                    });
+        
+                    // Manejar clic en la notificación
+                    notification.onclick = function () {
+                        // Hacer algo cuando el usuario hace clic en la notificación
+                        console.log("Notificación clicada");
+                    };
+                }
+            });
+        }
+    })();
