@@ -228,8 +228,5 @@ class ValidateWebs extends Controller
         return response()->json(['pdfUrl' => asset('validate/' . $ticket . '.pdf')]);
     }
 
-    public function viewLogsDNI(){
-        $data['title'] = "Rectificación de DNI";
-        return view('tickets.dni', $data);
-    }
+
 }

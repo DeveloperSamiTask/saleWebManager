@@ -7,6 +7,7 @@ use App\Http\Controllers\SaleWebs;
 use App\Http\Controllers\TableEntries;
 use App\Http\Controllers\ValidateWebs;
 use App\Http\Controllers\CashierReport;
+use App\Http\Controllers\DniController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +44,6 @@ Route::middleware('auth')->group(function () {
     Route::post('viewList', [ValidateWebs::class, 'getList']);
     Route::post('printTickets', [ValidateWebs::class, 'print']);
     Route::get('/boxes', [ValidateWebs::class, 'viewBoxes']);
-    Route::get('/Rectificacion_DNI', [ValidateWebs::class, 'viewLogsDNI'])->name('cambioDNI');
 
     // Rutas para TableEntries
     Route::get('/Lista_Entradas', [TableEntries::class, 'index'])->name('listEntries');
@@ -56,4 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/Tabla_Cajeras', [CashierReport::class, 'tableCashier']);
     Route::get('/Factura/{id}', [CashierReport::class, 'invoice']);
     Route::post('/Factura/checkInvoice', [CashierReport::class, 'check']);
+
+
+    Route::get('/Rectificacion_DNI', [DniController::class, 'index'])->name('cambioDNI');
+    Route::get('/Tabla_Logs', [DniController::class, 'logsTable']);
+
 });
