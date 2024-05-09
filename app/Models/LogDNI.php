@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class LogDNI extends Model
 {
@@ -45,11 +46,11 @@ class LogDNI extends Model
                 'names' => $row->names_ticket,
                 'user_send' => optional($row->userSend)->usuario,
                 'dniBefore' => $row->dni_before,
-                'dniAfeter' => $row->dni_after,
+                'dniAfter' => $row->dni_after,
                 'status' => $row->status_change,
                 'user_acepted' => optional($row->userAcepted)->usuario,
-                'dateInsert' => $row->created_date,
-                'dateAcepted' => $row->updated_date,
+                'dateInsert' => Carbon::parse($row->created_at)->formatLocalized('%d %B %Y %H:%M:%S'), // Cambiar el formato de la fecha de inserción
+                'dateAcepted' => Carbon::parse($row->updated_at)->formatLocalized('%d %B %Y %H:%M:%S'), // Cambiar el formato de la fecha de aceptación
             ];
         }
 

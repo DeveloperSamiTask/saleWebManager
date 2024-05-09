@@ -37,7 +37,6 @@ Route::middleware('auth')->group(function () {
     Route::post('sendWhatsapp', [SaleWebs::class, 'whatsapp']);
     Route::get('token/{token}', [SaleWebs::class, 'generateQr']);
     Route::post('printQR', [SaleWebs::class, 'print']);
-    Route::post('requestChangeDni', [SaleWebs::class, 'changeDNI']);
 
     // Rutas para ValidateWebs
     Route::get('/Validar_Lista', [ValidateWebs::class, 'index'])->name('validateList');
@@ -60,5 +59,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/Rectificacion_DNI', [DniController::class, 'index'])->name('cambioDNI');
     Route::get('/Tabla_Logs', [DniController::class, 'logsTable']);
+    Route::post('/requestChangeDni', [DniController::class, 'changeDNI']);
+    Route::post('/updatedDocument', [DniController::class, 'update']);
 
 });

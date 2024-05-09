@@ -11,7 +11,7 @@ class DetCart extends Model
 
     protected $table = 'cartdet';
     protected $primaryKey = 'intCartdetId';
-    protected $fillable = ['ticketstatus', 'ticketdateuse', 'cashier', 'box'];
+    protected $fillable = ['charCartdetDni','ticketstatus', 'ticketdateuse', 'cashier', 'box'];
     public $timestamps = false;
 
 

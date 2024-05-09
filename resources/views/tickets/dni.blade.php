@@ -4,7 +4,7 @@
     <!-- Content -->
 
 
-   <!-- Content -->
+    <!-- Content -->
 
     <div class="container-xxl flex-grow-1 container-p-y">
         <div class="card">
@@ -28,14 +28,15 @@
                     <thead class="table-light">
                         <tr>
                             <th></th>
-                            <th>Codigo</th>
-                            <th>N°Compra</th>
-                            <th>Comprador</th>
-                            <th>Cantidad</th>
-                            <th>Total</th>
-                            <th>Fecha Compra</th>
+                            <th>Entrada</th>
+                            <th>Nombres y Apelldios</th>
+                            <th>Enviado Por</th>
+                            <th>Doc. Erroneo</th>
+                            <th>Doc. Correcto</th>
                             <th>Estado</th>
-                            <th>Facturado</th>
+                            <th>Aceptado Por</th>
+                            <th>Fecha de Solicitud</th>
+                            <th>Fecha de Cambio</th>
                         </tr>
                     </thead>
                 </table>
@@ -47,10 +48,10 @@
 @endsection()
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('vendor/libs/flatpickr/flatpickr.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/libs/flatpickr/flatpickr.css') }}">
 @endsection()
 
 @section('scripts')
-<script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
-<script src="{{ asset('js/app-generate-list-logs.js') }}"></script>
+    <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
+    <script src="{{ asset('js/app-generate-list-logs.js') }}"></script>
 @endsection

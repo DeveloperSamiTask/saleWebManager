@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\QueryException;
 use Carbon\Carbon;
 use DateTime;
 
+use App\Models\DetCart;
 use App\Models\LogDNI;
 
 
@@ -40,5 +42,45 @@ class DniController extends Controller
 
         $data = LogDNI::getTableLogs($startDate, $endDate);
         return response()->json(['data' => $data]);
+    }
+
+    public function changeDNI(Request $request)
+    {
+        try {
+            $user = session('user')['idusuario'];
+            $detcart = $request->input("appID");
+            $names = $request->input("appINames");
+            $dniBefore = $request->input("appDNIBefore");
+            $dniAfter = $request->input("appDNI");
+
+            $logDNI = new LogDNI();
+            $logDNI->detcart_id = $detcart;
+            $logDNI->names_ticket = $names;
+            $logDNI->user_send = $user;
+            $logDNI->dni_before = $dniBefore;
+            $logDNI->dni_after = $dniAfter;
+            $logDNI->status_change = 0;
+            $logDNI->user_acepted = null;
+
+            $logDNI->save();
+
+            return response()->json(['message' => 'Solicitud de cambio de DNI enviado', 'icon' => 'success']);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Error al enviar la solicitud de cambio de DNI', 'icon' => 'error']);
+        }
+    }
+
+    public function update(Request $request)
+    {
+        $log = LogDNI::find($request->input('id'));
+        $log->status_change = 1;
+        $log->user_acepted = session('user')['idusuario'];
+        $log->save();
+
+        $entrie = DetCart::find($request->input('detcart'));
+        $entrie->charCartdetDni = $request->input('document');
+        $entrie->save();
+
+        return response()->json(['message' => 'Se cambio DNI', 'icon' => 'success']);
     }
 }

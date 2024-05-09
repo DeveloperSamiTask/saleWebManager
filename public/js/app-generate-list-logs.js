@@ -10,7 +10,8 @@ $(function () {
               (a = config.colors.bodyBg),
               config.colors)
     ).headingColor;
-    var today = new Date();
+    var today = new Date(),
+        csrfToken = $('meta[name="csrf-token"]').attr("content");
 
     var oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
@@ -39,8 +40,12 @@ $(function () {
                 class: "badge rounded-pill bg-label-warning",
             },
             1: {
-                title: "GENERADO",
+                title: "ACEPTADO",
                 class: "badge rounded-pill bg-label-success",
+            },
+            2: {
+                title: "ANULADO",
+                class: "badge rounded-pill bg-label-danger",
             },
         };
     $("#flatpickr-range").flatpickr({
@@ -67,7 +72,7 @@ $(function () {
                 var startDate = selectedDates[0].toISOString();
                 var endDate = selectedDates[1].toISOString();
                 $.ajax({
-                    url: "Tabla_Cajeras",
+                    url: "Tabla_Logs",
                     type: "GET",
                     data: {
                         start_date: startDate,
@@ -90,17 +95,18 @@ $(function () {
 
     s.length &&
         (e = s.DataTable({
-            ajax: "Tabla_Cajeras",
+            ajax: "Tabla_Logs",
             columns: [
-                { data: "" },
                 { data: "id" },
-                { data: "code" },
-                { data: "buyer" },
-                { data: "quantity" },
-                { data: "dinner" },
-                { data: "purchase" },
+                { data: "detcart" },
+                { data: "names" },
+                { data: "user_send" },
+                { data: "dniBefore" },
+                { data: "dniAfter" },
                 { data: "status" },
-                { data: "invoice" },
+                { data: "user_acepted" },
+                { data: "dateInsert" },
+                { data: "dateAcepted" },
             ],
             columnDefs: [
                 {
@@ -124,7 +130,7 @@ $(function () {
                 {
                     targets: 2,
                     render: function (e, t, a, n) {
-                        return `<a href="Factura/${a.id}"  target="_blank"><span>${e}</span></a>`;
+                        return `${e}`;
                     },
                 },
                 {
@@ -136,30 +142,15 @@ $(function () {
                 {
                     targets: 4,
                     render: function (a, e, t, s) {
-                        return a;
+                        return `<h6 class="text-truncate d-flex align-items-center mb-0">${highlightIncorrectDigits(
+                            a,
+                            t.dniAfter
+                        )}</h6>`;
                     },
                 },
                 {
-                    targets: 5,
+                    targets: 6,
                     render: function (a, e, t, s) {
-                        return a;
-                    },
-                },
-                {
-                    targets: 7,
-                    render: function (a) {
-                        return (
-                            '<span class="' +
-                            status[a].class +
-                            '" text-capitalized="">' +
-                            status[a].title +
-                            "</span>"
-                        );
-                    },
-                },
-                {
-                    targets: -1,
-                    render: function (a) {
                         return (
                             '<span class="' +
                             invoice[a].class +
@@ -167,6 +158,30 @@ $(function () {
                             invoice[a].title +
                             "</span>"
                         );
+                    },
+                },
+
+                {
+                    targets: 7,
+                    className: "text-center",
+                    render: function (a) {
+                        if (a == null) {
+                            return `<button type="button" class="btn rounded-pill btn-google-plus waves-effect waves-light btn-acepted">
+                            Pendiente
+                          </button>`;
+                        } else {
+                            return a;
+                        }
+                    },
+                },
+                {
+                    targets: -1,
+                    render: function (a, e, t, s) {
+                        if (a == t.dateInsert) {
+                            return "";
+                        } else {
+                            return a;
+                        }
                     },
                 },
             ],
@@ -392,6 +407,63 @@ $(function () {
                     "form-select-sm"
                 );
         }, 300);
+
+    e.on("click", ".btn-acepted", function () {
+        let row = $(this).closest("tr");
+        let rowData = $(this).closest("table").DataTable().row(row).data();
+        Swal.fire({
+            title: "Estas seguro?",
+            text: `Aceptaras el Cambio de Documento de la Entrada: ${rowData.detcart}`,
+            icon: "warning",
+            showCancelButton: !0,
+            confirmButtonText: "Si, aceptar",
+            cancelButtonText: "Cancelar",
+            customClass: {
+                confirmButton: "btn btn-primary me-3 waves-effect waves-light",
+                cancelButton: "btn btn-outline-secondary waves-effect",
+            },
+            buttonsStyling: !1,
+        }).then(function (t) {
+            if (t.value) {
+                $.blockUI({
+                    message:
+                        '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+                    css: { backgroundColor: "transparent", border: "0" },
+                    overlayCSS: { opacity: 0.5 },
+                });
+                $.ajax({
+                    url: "updatedDocument",
+                    type: "post",
+                    data: {
+                        id: rowData.id,
+                        detcart: rowData.detcart,
+                        document: rowData.dniAfter,
+                        _token: csrfToken,
+                    },
+                })
+                    .done((response) => {
+                        console.log(response);
+                        e.ajax.reload();
+
+                        Toast.fire({
+                            icon: "success",
+                            title: "Se ha cambiad el Documento",
+                        });
+                    })
+                    .fail((response) => {
+                        Toast.fire({
+                            icon: "error",
+                            title: "Error al cambiar documento, contactar con SISTEMAS",
+                        });
+                        console.log(response.responseText);
+                    })
+                    .always(() => {
+                        $.unblockUI();
+                    });
+            }
+        });
+    });
+
     function formatDate(date) {
         var year = date.getFullYear();
         var month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -401,5 +473,38 @@ $(function () {
         var seconds = date.getSeconds().toString().padStart(2, "0");
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
     }
+
+    function highlightIncorrectDigits(incorrectNumber, correctNumber) {
+        let strIncorrect = incorrectNumber.toString();
+        let strCorrect = correctNumber.toString();
+        let result = "";
+
+        for (let i = 0; i < strIncorrect.length; i++) {
+            const digit = strIncorrect[i];
+            const isCorrect = strCorrect.includes(digit);
+
+            if (!isCorrect) {
+                result += `<span style="color: #ff6347">${digit}</span>`;
+            } else {
+                result += digit;
+                // Remove the first occurrence of digit from strCorrect to handle duplicates
+                strCorrect = strCorrect.replace(digit, "");
+            }
+        }
+
+        return result;
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top",
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        },
+    });
 }),
     (function () {})();
