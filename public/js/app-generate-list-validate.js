@@ -1,6 +1,6 @@
 $(() => {
     $("#qrCode").focus();
-
+    entriesAmount();
     var cashierValue = localStorage.getItem("cashier");
     if (cashierValue === null) {
         selectCashier();
@@ -362,6 +362,27 @@ $(() => {
             .always(() => {
                 $.unblockUI();
             });
+    }
+
+    function entriesAmount() {
+        $(".card-numbers-tickets").block({
+            message:
+                '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+            css: { backgroundColor: "transparent", color: "#fff", border: "0" },
+            overlayCSS: { opacity: 0.5 },
+        });
+        $.ajax({
+            url: "ticketsValidate",
+            method: "get",
+            data: { _token: csrfToken },
+            dataType: "json",
+        }).done(function (response) {
+            $("#totalTicky").text(response[0].total);
+            $("#validateTicky").text(response[0].active);
+            $("#noValidateTicky").text(response[0].inactive);
+            $(".card-numbers-tickets").unblock();
+
+        });
     }
 
     const Toast = Swal.mixin({

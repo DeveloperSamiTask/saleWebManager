@@ -58,6 +58,12 @@ class SaleWebs extends Controller
         return response()->json(['token' => $hashed_code]);
     }
 
+    public function tickets()
+    {
+        $tickets = DetCart::countTicketsForToday();
+        return response()->json([$tickets]);
+    }
+
     public function generateQr(Request $request, $token)
     {
         // La desencriptación no es necesaria para hashing
@@ -142,6 +148,4 @@ class SaleWebs extends Controller
         // Enviar los datos de imagen base64 al cliente como parte de la respuesta
         return $qrCodeBase64;
     }
-
-
 }

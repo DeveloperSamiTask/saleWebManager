@@ -11,7 +11,7 @@ class DetCart extends Model
 
     protected $table = 'cartdet';
     protected $primaryKey = 'intCartdetId';
-    protected $fillable = ['charCartdetDni','ticketstatus', 'ticketdateuse', 'cashier', 'box'];
+    protected $fillable = ['charCartdetDni', 'ticketstatus', 'ticketdateuse', 'cashier', 'box'];
     public $timestamps = false;
 
 
@@ -173,5 +173,25 @@ class DetCart extends Model
             ];
         }
         return $data;
+    }
+
+    public static function countTicketsForToday()
+    {
+        // Obtener la fecha actual
+        $today = now()->format('Y-m-d');
+
+        // Obtener todos los combos para la fecha actual
+        $combosForToday = self::whereDate('dateCartdetFreg', $today)->get(['ticketstatus']);
+
+        // Contar el número total de combos, combos activos e inactivos
+        $totalCount = $combosForToday->count();
+        $activeCount = $combosForToday->where('ticketstatus', 1)->count();
+        $inactiveCount = $combosForToday->where('ticketstatus', 0)->count();
+
+        return [
+            'total' => $totalCount,
+            'active' => $activeCount,
+            'inactive' => $inactiveCount,
+        ];
     }
 }

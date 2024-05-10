@@ -1,5 +1,6 @@
 $(() => {
     var t, a, s;
+    entriesAmount();
     var status = {
         ACTIVO: {
             title: "ACTIVO",
@@ -209,6 +210,7 @@ $(() => {
     $("#addPermissionModal").on("shown.bs.modal", function () {
         $("#ticket").focus();
     });
+
     $("#ticket").on("input", function (e) {
         var ticket = $(this).val();
         var ticketExists = false;
@@ -246,9 +248,19 @@ $(() => {
                                 $("#dni").attr("disabled", true);
                                 $("#validate_message").show();
                                 $("#date_use").text(data.used);
+                            } else if (
+                                data.income != getCurrentDate() &&
+                                data.sure == 0
+                            ) {
+                                $("#dni").attr("disabled", true);
+                                $("#income_message").show();
                             } else {
                                 $("#dni").removeAttr("disabled", true);
                                 $("#validate_message").attr(
+                                    "style",
+                                    "display: none !important;"
+                                );
+                                $("#income_message").attr(
                                     "style",
                                     "display: none !important;"
                                 );
@@ -569,6 +581,33 @@ $(() => {
         $(".btnChangeDNI").prop("style", "display:none");
 
         resetForm();
+    }
+    function getCurrentDate() {
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = (today.getMonth() + 1).toString().padStart(2, "0");
+        var day = today.getDate().toString().padStart(2, "0");
+        return year + "-" + month + "-" + day;
+    }
+    function entriesAmount() {
+        $(".card-numbers-tickets").block({
+            message:
+                '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+            css: { backgroundColor: "transparent", color: "#fff", border: "0" },
+            overlayCSS: { opacity: 0.5 },
+        });
+        $.ajax({
+            url: "ticketsValidate",
+            method: "get",
+            data: { _token: csrfToken },
+            dataType: "json",
+        }).done(function (response) {
+            $("#totalTicky").text(response[0].total);
+            $("#validateTicky").text(response[0].active);
+            $("#noValidateTicky").text(response[0].inactive);
+            $(".card-numbers-tickets").unblock();
+
+        });
     }
 
     const Toast = Swal.mixin({

@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::post('sendWhatsapp', [SaleWebs::class, 'whatsapp']);
     Route::get('token/{token}', [SaleWebs::class, 'generateQr']);
     Route::post('printQR', [SaleWebs::class, 'print']);
+    Route::get('ticketsValidate', [SaleWebs::class, 'tickets']);
 
     // Rutas para ValidateWebs
     Route::get('/Validar_Lista', [ValidateWebs::class, 'index'])->name('validateList');

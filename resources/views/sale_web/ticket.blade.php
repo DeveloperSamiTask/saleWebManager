@@ -10,7 +10,61 @@
         <!-- Content -->
 
         <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="col-12 card-numbers-tickets">
+                <div class="card">
+                    <div class="card-widget-separator-wrapper">
+                        <div class="card-body card-widget-separator">
+                            <div class="row gy-4 gy-sm-1">
+                                <div class="col-sm-6 col-lg-3">
+                                    <div
+                                        class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0">
+                                        <div>
+                                            <h3 class="mb-1" id="totalTicky"></h3>
+                                            <p class="mb-0">Total</p>
+                                        </div>
+                                        <div class="avatar me-sm-4">
+                                            <span class="avatar-initial rounded bg-label-secondary">
+                                                <i class="mdi mdi-account-outline text-heading mdi-20px"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <hr class="d-none d-sm-block d-lg-none me-4">
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <div
+                                        class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0">
+                                        <div>
+                                            <h3 class="mb-1" id="validateTicky"></h3>
+                                            <p class="mb-0">Validados</p>
+                                        </div>
+                                        <div class="avatar  me-lg-4">
+                                            <span class="avatar-initial rounded bg-label-secondary">
+                                                <i class="mdi mdi-content-paste text-heading mdi-20px"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <hr class="d-none d-sm-block d-lg-none">
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <div
+                                        class="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3">
+                                        <div>
+                                            <h3 class="mb-1" id="noValidateTicky"></h3>
+                                            <p class="mb-0">No Validados</p>
+                                        </div>
+                                        <div class="avatar me-sm-4">
+                                            <span class="avatar-initial rounded bg-label-secondary">
+                                                <i class="mdi mdi-currency-usd text-heading mdi-20px"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <h4 class="py-3 mb-2">TICKETERA WEB</h4>
 
@@ -57,6 +111,12 @@
                                 <i class="mdi mdi-alert-circle-outline me-2"></i>
                                 Este ticket ya fue usado el dia <b id="date_use"></b>
                             </div>
+
+                            <div class="alert alert-solid-danger d-flex align-items-center" style="display:none !important"
+                                role="alert" id="income_message">
+                                <i class="mdi mdi-alert-circle-outline me-2"></i>
+                                Aun no se puede validar por que no es el dia ingresado.</b>
+                            </div>
                             <form class="row g-4" id="validate_cupon" onsubmit="return false">
                                 <div class="col-12 col-md-4">
                                     <div class="input-group input-group-merge">
@@ -91,15 +151,15 @@
                                 </div>
                                 <div class="col-12 col-md-5">
                                     <div class="form-floating form-floating-outline">
-                                        <input type="text" id="pruchase_date" name="pruchase_date" class="form-control"
-                                            placeholder="john.doe.007" disabled>
+                                        <input type="text" id="pruchase_date" name="pruchase_date"
+                                            class="form-control" placeholder="john.doe.007" disabled>
                                         <label for="pruchase_date">Fecha de Compra</label>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-4">
                                     <div class="form-floating form-floating-outline">
-                                        <input type="text" id="admission_date" name="admission_date" class="form-control"
-                                            placeholder="john.doe.007" disabled>
+                                        <input type="text" id="admission_date" name="admission_date"
+                                            class="form-control" placeholder="john.doe.007" disabled>
                                         <label for="admission_date">Fecha de Ingreso</label>
                                     </div>
                                 </div>
