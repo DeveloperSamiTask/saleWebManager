@@ -1,7 +1,6 @@
 $(function () {
     let csrfToken = $('meta[name="csrf-token"]').attr("content");
     let rol = $(".label-rol").text();
-    console.log(rol);
     function viewNotifyAndPush() {
         // Realizar la solicitud AJAX para obtener las notificaciones
         $.ajax({
@@ -22,10 +21,10 @@ $(function () {
                             var allowedRoles = [];
 
                             // Determinar qué roles pueden ver esta notificación
-                            if (notification.type_notify == '1') {
+                            if (notification.type_notify == "1") {
                                 allowedRoles = ["ADMIN", "CONTROLLER"];
-                            } else if (notification.type_notify == '2') {
-                                allowedRoles = ["CAJA"];
+                            } else if (notification.type_notify == "2") {
+                                allowedRoles = ["CAJA", "COLEGIOS"];
                             }
 
                             // Verificar si el rol actual tiene permiso para ver la notificación
@@ -77,6 +76,7 @@ $(function () {
                     var formattedDate = moment(
                         notification.created_at
                     ).fromNow(); // Formatear la fecha y hora
+                    
                     var innerHTML = `
                     <div class="d-flex gap-2">
                         <div class="d-flex flex-column flex-grow-1 overflow-hidden w-px-200">
