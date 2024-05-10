@@ -506,27 +506,5 @@ $(function () {
             toast.onmouseleave = Swal.resumeTimer;
         },
     });
-
-    function showNotification() {
-        // Comprobar si el navegador soporta notificaciones
-        if ("Notification" in window) {
-            // Solicitar permiso para mostrar notificaciones
-            Notification.requestPermission().then(function (permission) {
-                // Si el permiso es concedido, mostrar la notificación
-                if (permission === "granted") {
-                    var notification = new Notification("¡Hola!", {
-                        body: "¡Esta es una notificación de ejemplo! ✉️",
-                        icon: "https://lagranjavilla.com/img/logo.png", // URL del icono de la notificación
-                    });
-
-                    // Manejar clic en la notificación
-                    notification.onclick = function () {
-                        // Acción a realizar cuando el usuario hace clic en la notificación
-                        console.log("Notificación clicada");
-                    };
-                }
-            });
-        }
-    }
 }),
     (function () {})();

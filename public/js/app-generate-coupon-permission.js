@@ -511,7 +511,12 @@ $(() => {
     });
     $("#formChangeDNI").on("submit", function (event) {
         event.preventDefault();
-
+        $.blockUI({
+            message:
+                '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+            css: { backgroundColor: "transparent", border: "0" },
+            overlayCSS: { opacity: 0.5 },
+        });
         let requestData = $(this).serialize() + "&_token=" + csrfToken;
 
         $.ajax({
@@ -530,7 +535,9 @@ $(() => {
             .fail((error) => {
                 console.log(error.responseText);
             })
-            .always(() => {});
+            .always(() => {
+                $.unblockUI();
+            });
     });
 
     function resetForm() {

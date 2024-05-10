@@ -65,7 +65,7 @@ class DniController extends Controller
 
             $logDNI->save();
 
-            Notification::newNotify($logDNI->id_logdni, 'Nueva Solicitud 🪪', 'Cambiar Documento para entrada: ' . $detcart);
+            Notification::newNotify($logDNI->id_logdni, 'Nueva Solicitud 🪪', 'Cambiar Doc. Entrada: ' . $detcart, 1);
 
 
             return response()->json(['message' => 'Solicitud de cambio de DNI enviado', 'icon' => 'success']);
@@ -86,7 +86,7 @@ class DniController extends Controller
         $entrie->save();
 
 
-        Notification::newNotify('Solicitud Aceptada 🪪', 'Se acepto el cambio de documento: ' . $request->input('detcart'));
+        Notification::newNotify($log->id_logdni, 'Solicitud Aceptada 🪪', 'Aceptado cambio de Doc. ' . $request->input('detcart'), 2);
 
         return response()->json(['message' => 'Se cambio DNI', 'icon' => 'success']);
     }

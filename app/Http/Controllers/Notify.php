@@ -13,4 +13,9 @@ class Notify extends Controller
         $data = Notification::all();
         return response()->json($data);
     }
+    public function modify_view(Request $request)
+    {
+        $id = $request->input('id');
+        Notification::updateNotify($id);
+    }
 }

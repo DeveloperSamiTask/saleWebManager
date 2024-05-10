@@ -10,7 +10,7 @@ class Notification extends Model
     use HasFactory;
     protected $table = 'notify';
     protected $primaryKey = 'id_notify';
-    protected $fillable = ['code','title_notify', 'body_notify', 'url_notify', 'statusview_notify', 'statusclick_notify'];
+    protected $fillable = ['code','title_notify', 'body_notify', 'url_notify', 'statusview_notify', 'statusclick_notify', 'type_notify'];
 
     public static function getNotify()
     {
@@ -18,7 +18,7 @@ class Notification extends Model
         return $notifications;
     }
 
-    public static function newNotify($code,$title, $body)
+    public static function newNotify($code, $title, $body, $type)
     {
         $notify = new Notification();
         $notify->code = $code;
@@ -26,13 +26,15 @@ class Notification extends Model
         $notify->body_notify = $body;
         $notify->statusview_notify = 0;
         $notify->statusclick_notify = 0;
+        $notify->type_notify = $type;
         $notify->save();
     }
 
-    public static function updateNotify(){
+    public static function updateNotify($id){
 
-        $notify = Notification::find();
-
+        $notify = Notification::find($id);
+        $notify->statusview_notify = 1;
+        $notify->save();
     }
 
 
