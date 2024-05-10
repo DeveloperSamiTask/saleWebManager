@@ -369,7 +369,7 @@
                             </li>
                             <!-- Quick links -->
 
-                            <!-- Notification
+
                             <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
                                 <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
                                     href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside"
@@ -381,7 +381,7 @@
                                 <ul class="dropdown-menu dropdown-menu-end py-0">
                                     <li class="dropdown-menu-header border-bottom">
                                         <div class="dropdown-header d-flex align-items-center py-3">
-                                            <h6 class="mb-0 me-auto">Notification</h6>
+                                            <h6 class="mb-0 me-auto">Notificaciones</h6>
                                             <span class="badge rounded-pill bg-label-primary">8 New</span>
                                         </div>
                                     </li>
@@ -583,7 +583,6 @@
                                     </li>
                                 </ul>
                             </li>
-                            <!--/ Notification -->
 
                             <!-- User -->
                             <li class="nav-item navbar-dropdown dropdown-user dropdown">

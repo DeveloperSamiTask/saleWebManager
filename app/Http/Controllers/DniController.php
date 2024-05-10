@@ -10,6 +10,7 @@ use DateTime;
 
 use App\Models\DetCart;
 use App\Models\LogDNI;
+use App\Models\Notification;
 
 
 class DniController extends Controller
@@ -64,6 +65,9 @@ class DniController extends Controller
 
             $logDNI->save();
 
+            Notification::newNotify($logDNI->id_logdni, 'Nueva Solicitud 🪪', 'Cambiar Documento para entrada: ' . $detcart);
+
+
             return response()->json(['message' => 'Solicitud de cambio de DNI enviado', 'icon' => 'success']);
         } catch (QueryException $e) {
             return response()->json(['message' => 'Error al enviar la solicitud de cambio de DNI', 'icon' => 'error']);
@@ -80,6 +84,9 @@ class DniController extends Controller
         $entrie = DetCart::find($request->input('detcart'));
         $entrie->charCartdetDni = $request->input('document');
         $entrie->save();
+
+
+        Notification::newNotify('Solicitud Aceptada 🪪', 'Se acepto el cambio de documento: ' . $request->input('detcart'));
 
         return response()->json(['message' => 'Se cambio DNI', 'icon' => 'success']);
     }

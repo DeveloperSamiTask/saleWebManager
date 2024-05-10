@@ -8,6 +8,7 @@ use App\Http\Controllers\TableEntries;
 use App\Http\Controllers\ValidateWebs;
 use App\Http\Controllers\CashierReport;
 use App\Http\Controllers\DniController;
+use App\Http\Controllers\Notify;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,5 +62,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/Tabla_Logs', [DniController::class, 'logsTable']);
     Route::post('/requestChangeDni', [DniController::class, 'changeDNI']);
     Route::post('/updatedDocument', [DniController::class, 'update']);
+
+
+    Route::get('/Result_Notify', [Notify::class, 'index']);
+
 
 });
