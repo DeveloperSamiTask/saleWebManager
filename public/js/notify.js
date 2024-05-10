@@ -1,7 +1,7 @@
 $(function () {
     let csrfToken = $('meta[name="csrf-token"]').attr("content");
     let rol = $(".label-rol").text();
-
+    console.log(rol);
     function viewNotifyAndPush() {
         // Realizar la solicitud AJAX para obtener las notificaciones
         $.ajax({
@@ -12,7 +12,6 @@ $(function () {
             },
         })
             .done(function (response) {
-                // Verificar si el navegador soporta notificaciones push
                 if (
                     "Notification" in window &&
                     Notification.permission === "granted"
@@ -20,11 +19,17 @@ $(function () {
                     // Iterar sobre las notificaciones recibidas
                     $.each(response, function (index, notification) {
                         if (notification.statusview_notify === 0) {
-                            if (
-                                rol === "ADMIN" ||
-                                (rol === "CONTROLLER" &&
-                                notification.type_notify === 1)
-                            ) {
+                            var allowedRoles = [];
+
+                            // Determinar qué roles pueden ver esta notificación
+                            if (notification.type_notify == '1') {
+                                allowedRoles = ["ADMIN", "CONTROLLER"];
+                            } else if (notification.type_notify == '2') {
+                                allowedRoles = ["CAJA"];
+                            }
+
+                            // Verificar si el rol actual tiene permiso para ver la notificación
+                            if (allowedRoles.includes(rol)) {
                                 var newNotification = new Notification(
                                     notification.title_notify,
                                     {
@@ -36,39 +41,21 @@ $(function () {
                                 // Manejar clic en la notificación
                                 newNotification.onclick = function () {
                                     window.open(
-                                        "https://web.lagranjavilla.com/Rectificacion_DNI",
+                                        "https://web.lagranjavilla.com/Inicio",
                                         "_blank"
                                     );
                                 };
-                            } else if (
-                                rol === "CAJA" &&
-                                title_notify === "Solicitud Aceptada 🪪"
-                            ) {
-                                var newNotification = new Notification(
-                                    notification.type_notify === 2,
-                                    {
-                                        body: notification.body_notify,
-                                        icon: "https://lagranjavilla.com/img/logo.png", // URL del icono de la notificación
-                                    }
-                                );
 
-                                // Manejar clic en la notificación
-                                newNotification.onclick = function () {
-                                    window.open(
-                                        "https://web.lagranjavilla.com/Boleteria",
-                                        "_blank"
-                                    );
-                                };
+                                // Marcar la notificación como vista
+                                $.ajax({
+                                    url: "Modify_View_Notification",
+                                    type: "POST",
+                                    data: {
+                                        _token: csrfToken,
+                                        id: notification.id_notify,
+                                    },
+                                }).done((e) => {});
                             }
-
-                            $.ajax({
-                                url: "Modify_View_Notification",
-                                type: "POST",
-                                data: {
-                                    _token: csrfToken,
-                                    id: notification.id_notify,
-                                },
-                            }).done((e) => {});
                         }
                     });
                 }
