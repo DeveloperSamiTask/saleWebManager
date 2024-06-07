@@ -85,11 +85,9 @@ $(function () {
 
                 var isChecked = Checked ? "1" : "0";
 
-                console.log(isChecked);
-
                 var startDate = selectedDates[0].toISOString();
                 var endDate = selectedDates[1].toISOString();
-                console.log(startDate, endDate);
+
                 $.ajax({
                     url: "Tabla_Entradas",
                     type: "GET",
