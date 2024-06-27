@@ -243,6 +243,32 @@ $(() => {
                     .done(function (response) {
                         if (response.success) {
                             var data = response.ticket;
+                            if (data.shift == 2) {
+                                console.log("after school");
+                                var now = new Date();
+                                var currentHour = now.getHours();
+                                var currentMinutes = now.getMinutes();
+
+                                var startHour = 14; // 2 PM en formato 24 horas
+                                var startMinute = 58; // 2:58 PM
+                                var endHour = 18; // 6 PM en formato 24 horas
+                                var endMinute = 0; // 6:00 PM
+
+                                if (
+                                    currentHour < startHour ||
+                                    (currentHour === startHour &&
+                                        currentMinutes < startMinute) ||
+                                    currentHour > endHour ||
+                                    (currentHour === endHour &&
+                                        currentMinutes > endMinute)
+                                ) {
+                                    Toast.fire({
+                                        icon: "error",
+                                        title: "La entrada es After School no está dentro del rango de hora",
+                                    });
+                                    return false;
+                                }
+                            }
 
                             if (data.status === 1) {
                                 $("#dni").attr("disabled", true);
@@ -606,7 +632,6 @@ $(() => {
             $("#validateTicky").text(response[0].active);
             $("#noValidateTicky").text(response[0].inactive);
             $(".card-numbers-tickets").unblock();
-
         });
     }
 
@@ -614,7 +639,7 @@ $(() => {
         toast: true,
         position: "top",
         showConfirmButton: false,
-        timer: 4000,
+        timer: 4500,
         timerProgressBar: true,
         didOpen: (toast) => {
             toast.onmouseenter = Swal.stopTimer;
