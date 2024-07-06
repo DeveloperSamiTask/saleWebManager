@@ -2,7 +2,7 @@ $(() => {
     var t, a, s;
     entriesAmount();
     var status = {
-        ACTIVO: {
+        ACTIVADO: {
             title: "ACTIVO",
             class: "badge rounded-pill bg-label-success",
         },
