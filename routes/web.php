@@ -67,6 +67,4 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/Result_Notify', [Notify::class, 'index']);
     Route::post('/Modify_View_Notification', [Notify::class, 'modify_view']);
-
-
 });

@@ -135,9 +135,10 @@
                                                     <td>{{ $ticket['address'] }}</td>
                                                 </tr>
                                             @endif
-
+                                            
                                         </tbody>
                                     </table>
+
                                 </div>
                             </div>
                         </div>
