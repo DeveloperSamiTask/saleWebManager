@@ -139,6 +139,7 @@ class DetCart extends Model
                 'sure' => $cartDet->varCartdetseguro,
                 'status' => $cartDet->ticketstatus,
                 'used' => $cartDet->ticketdateuse,
+                'coupon' => optional($cartDet->cart)->coupon,
             ];
         }
         return $data;

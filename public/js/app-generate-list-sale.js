@@ -64,6 +64,7 @@ $(function () {
             2: { title: "Entrada Dinamica" },
             6: { title: "Entrada VIP Terror" },
             11: { title: "Entrada General Terror" },
+            17: { title: "Entrada Light Terror" },
         };
 
     $("#flatpickr-range").flatpickr({
@@ -186,7 +187,12 @@ $(function () {
                     {
                         targets: 5,
                         render: function (e, t, a, n) {
-                            return entrie[e].title;
+                            // Verifica si t.coupon es diferente de null
+                            const couponText =
+                                a.coupon != null ? ` (${a.coupon})` : "";
+
+                            // Devuelve el título más el texto del cupón si existe
+                            return `${entrie[e].title} ${couponText}`;
                         },
                     },
                     {
