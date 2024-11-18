@@ -179,13 +179,19 @@ $(function () {
                         },
                     },
                     {
-                        targets: [3,5],
+                        targets: 3,
                         visible: !1,
                         render: function (e, t, a, n) {
                             return e;
                         },
                     },
-                    
+                    {
+                        targets: 5,
+                        visible: !1,
+                        render: function (e, t, a, n) {
+                            return e;
+                        },
+                    },
                     {
                         targets: 6,
                         render: function (e, t, a, n) {

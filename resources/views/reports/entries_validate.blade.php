@@ -98,7 +98,7 @@
             <div class="card-datatable table-responsive">
                 <table class="datatables-entries table">
                     <thead class="table-light">
-                        <tr>
+                        <tr>    
                             <th></th>
                             <th>codigo</th>
                             <th>Entrada</th>
