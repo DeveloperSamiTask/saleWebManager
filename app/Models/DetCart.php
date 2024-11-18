@@ -27,6 +27,10 @@ class DetCart extends Model
     {
         return $this->belongsTo(User::class, 'cashier');
     }
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'cliente_cClieCode', 'cClieCode');
+    }
 
 
     public static function getAllCombos()
@@ -106,7 +110,7 @@ class DetCart extends Model
 
     public static function getTableEntries($startDate, $endDate, $column)
     {
-        $query = self::with('cart');
+        $query = self::with(['cart', 'client']);
 
         if ($column === 'entrance') {
             if ($startDate && $endDate) {
@@ -140,6 +144,7 @@ class DetCart extends Model
                 'status' => $cartDet->ticketstatus,
                 'used' => $cartDet->ticketdateuse,
                 'coupon' => optional($cartDet->cart)->coupon,
+                'dni' => optional($cartDet->client)->charClienteDni, // Aquí obtenemos el campo charClientdni
             ];
         }
         return $data;

@@ -6,7 +6,7 @@
 
         <div class="card mb-4">
             <div class="card-widget-separator-wrapper">
-                <div class="card-body card-widget-separator"  id="stadistics">
+                <div class="card-body card-widget-separator" id="stadistics">
                     <div class="row gy-4 gy-sm-1">
                         <div class="col-sm-6 col-lg-3">
                             <div
@@ -59,12 +59,12 @@
                                 <div>
                                     <p class="mb-2">Filtra por: </p>
                                     <label class="switch switch-square">
-                                      <input type="checkbox" class="switch-input">
-                                      <span class="switch-toggle-slider">
-                                        <span class="switch-on"></span>
-                                        <span class="switch-off"></span>
-                                      </span>
-                                      <span class="switch-label">Fecha de Ingreso</span>
+                                        <input type="checkbox" class="switch-input">
+                                        <span class="switch-toggle-slider">
+                                            <span class="switch-on"></span>
+                                            <span class="switch-off"></span>
+                                        </span>
+                                        <span class="switch-label">Fecha de Ingreso</span>
                                     </label>
                                 </div>
                                 <div class="avatar">
@@ -104,6 +104,7 @@
                             <th>Entrada</th>
                             <th>Pasante</th>
                             <th>Comprador</th>
+                            <th>DNI del Comprador</th>
                             <th>Entrada</th>
                             <th>Turno</th>
                             <th>Dispositivo</th>

@@ -144,6 +144,7 @@ $(function () {
                     { data: "id" },
                     { data: "nameP" },
                     { data: "name" },
+                    { data: "dni" },
                     { data: "entrie" },
                     { data: "shift" },
                     { data: "device" },
@@ -178,14 +179,15 @@ $(function () {
                         },
                     },
                     {
-                        targets: 3,
+                        targets: [3,5],
                         visible: !1,
                         render: function (e, t, a, n) {
                             return e;
                         },
                     },
+                    
                     {
-                        targets: 5,
+                        targets: 6,
                         render: function (e, t, a, n) {
                             // Verifica si t.coupon es diferente de null
                             const couponText =
@@ -196,13 +198,13 @@ $(function () {
                         },
                     },
                     {
-                        targets: 6,
+                        targets: 7,
                         render: function (a, e, t, s) {
                             return shift[a]?.title ?? "Turno Completo";
                         },
                     },
                     {
-                        targets: 7,
+                        targets: 8,
                         render: function (a, e, t, s) {
                             return device[a]?.title ?? "No seleccionado";
                         },
@@ -240,7 +242,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -286,7 +288,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -320,7 +322,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -354,7 +356,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -388,7 +390,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -466,7 +468,7 @@ $(function () {
                     $("#shift1").text(contadorShift1);
                     $("#shift2").text(contadorShift2);
                     this.api()
-                        .columns(6)
+                        .columns(7)
                         .every(function () {
                             var t = this,
                                 a = $(
@@ -497,7 +499,7 @@ $(function () {
                                 });
                         }),
                         this.api()
-                            .columns(7)
+                            .columns(8)
                             .every(function () {
                                 var t = this,
                                     a = $(
@@ -529,7 +531,7 @@ $(function () {
                                     });
                             }),
                         this.api()
-                            .columns(11)
+                            .columns(12)
                             .every(function () {
                                 var t = this,
                                     a = $(
