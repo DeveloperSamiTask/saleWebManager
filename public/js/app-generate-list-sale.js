@@ -186,6 +186,12 @@ $(function () {
                         },
                     },
                     {
+                        targets: 4,
+                        render: function (e, t, a, n) {
+                            return e;
+                        },
+                    },
+                    {
                         targets: 5,
                         visible: !1,
                         render: function (e, t, a, n) {
@@ -228,7 +234,7 @@ $(function () {
                         },
                     },
                 ],
-                order: [[9, "desc"]],
+                order: [[3, "desc"]],
                 dom: '<"row mx-2"<"col-md-2"<"me-3"l>><"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0 gap-3"fB>>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
                 language: {
                     sLengthMenu: "Mostrar _MENU_",
@@ -248,7 +254,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -294,7 +300,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -328,7 +334,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -362,7 +368,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -396,7 +402,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
