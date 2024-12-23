@@ -175,6 +175,7 @@ $(function () {
                 $(".account-file-input")
                     .off("change")
                     .on("change", function (event) {
+                        blockUI();
                         const file = event.target.files[0];
                         if (file) {
                             const $row = $(this).closest("tr"); // Encuentra la fila de la tabla
@@ -196,9 +197,12 @@ $(function () {
                             })
                                 .then((response) => response.json())
                                 .then((data) => {
-                                    console.log(data);
+                                    e.ajax.reload();
                                     if (data.icon == "success") {
-                                        alert("Imagen subida exitosamente");
+                                        Toast.fire({
+                                            icon: data.icon,
+                                            title: data.message,
+                                        });
                                     } else {
                                         alert("Error al subir la imagen");
                                     }
@@ -206,6 +210,9 @@ $(function () {
                                 .catch((error) => {
                                     console.error("Error:", error);
                                     alert("Error al subir la imagen");
+                                })
+                                .finally(() => {
+                                    $.unblockUI();
                                 });
                         }
                     });
@@ -561,12 +568,8 @@ $(function () {
     });
 
     $(document).on("click", ".view-image-btn", function () {
-        const imageUrl = $(this).data("image"); // Obtener la URL de la imagen
-        console.log("asdasd");
-
-        console.log(imageUrl);
-
-        $("#imagePreview").attr("src", imageUrl); // Establecer la imagen en el modal
+        const imageUrl = $(this).data("image");
+        $("#imagePreview").attr("src", imageUrl);
     });
 
     fv.on("core.form.valid", function () {
