@@ -63,7 +63,7 @@ class CouponsController extends Controller
     {
         try {
             $file = request()->file('file');
-            $path = public_path('files/');
+            $path = '/home/ep3s6easy863/web.lagranjavilla.com/files/';
 
             // Verifica que el directorio exista, si no, lo crea
             if (!file_exists($path)) {
