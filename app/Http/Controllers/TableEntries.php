@@ -24,7 +24,7 @@ class TableEntries extends Controller
         } else if ($request->filled('start_date') && $request->filled('end_date') && $request->input('isChecked') == '1') {
             $startDateFormatted  = Carbon::parse($request->input('start_date'))->startOfDay();
             $endDateFormatted  = Carbon::parse($request->input('end_date'))->endOfDay();
-
+            
             $startDate  = $startDateFormatted->toDateString();
             $endDate  = $endDateFormatted->toDateString();
             $column = "entrance";

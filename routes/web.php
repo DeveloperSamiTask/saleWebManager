@@ -7,6 +7,7 @@ use App\Http\Controllers\SaleWebs;
 use App\Http\Controllers\TableEntries;
 use App\Http\Controllers\ValidateWebs;
 use App\Http\Controllers\CashierReport;
+use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\DniController;
 use App\Http\Controllers\Notify;
 
@@ -67,4 +68,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/Result_Notify', [Notify::class, 'index']);
     Route::post('/Modify_View_Notification', [Notify::class, 'modify_view']);
+
+    Route::get('/Cupones_Internos', [CouponsController::class, 'index'])->name('coupons');
+    Route::get('/coupons_table', [CouponsController::class, 'logsTable']);
+    Route::post('/insertCoupon', [CouponsController::class, 'insert']);
+    Route::post('/uploadCoupon', [CouponsController::class, 'upload']);
 });

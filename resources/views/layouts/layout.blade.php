@@ -194,6 +194,13 @@
                         </a>
                     </li>
 
+                    <li class="menu-item">
+                        <a href="{{ route('coupons') }}" class="menu-link">
+                            <i class="menu-icon tf-icons mdi mdi-ticket-percent-outline"></i>
+                            <div data-i18n="Internal coupons">Cupones Internos</div>
+                        </a>
+                    </li>
+
                     <!-- Reports -->
                     <li class="menu-header fw-medium mt-4">
                         <span class="menu-header-text" data-i18n="Reports">Reportes</span>

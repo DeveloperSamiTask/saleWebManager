@@ -23,6 +23,7 @@ class LogDNI extends Model
     {
         return $this->belongsTo(User::class, 'user_send');
     }
+    
     public function userAcepted()
     {
         return $this->belongsTo(User::class, 'user_acepted');
