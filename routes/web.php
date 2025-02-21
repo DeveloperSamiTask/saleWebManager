@@ -10,6 +10,7 @@ use App\Http\Controllers\CashierReport;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\DniController;
 use App\Http\Controllers\Notify;
+use App\Http\Controllers\PartnerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,4 +74,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/coupons_table', [CouponsController::class, 'logsTable']);
     Route::post('/insertCoupon', [CouponsController::class, 'insert']);
     Route::post('/uploadCoupon', [CouponsController::class, 'upload']);
+
+    Route::get('/Socios', [PartnerController::class, 'index'])->name('partners');
 });

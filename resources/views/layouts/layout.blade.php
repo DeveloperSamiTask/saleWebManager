@@ -188,6 +188,13 @@
                     </li>
 
                     <li class="menu-item">
+                        <a href="{{ route('partners') }}" class="menu-link">
+                            <i class="menu-icon tf-icons mdi mdi-card-account-details-star-outline"></i>
+                            <div data-i18n="Partners">Socios</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item">
                         <a href="{{ route('cambioDNI') }}" class="menu-link">
                             <i class="menu-icon tf-icons mdi mdi-card-account-details-outline"></i>
                             <div data-i18n="ID rectification">Rectificación de DNI</div>
