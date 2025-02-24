@@ -91,7 +91,7 @@
                         <div class="col-4">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
-                                    name=birthdate>
+                                    name="birthdate">
                                 <label for="birthdate">Fecha de Nacimiento</label>
                             </div>
                         </div>
@@ -138,6 +138,81 @@
                                 <input type="text" id="mail" name="mail" class="form-control"
                                     placeholder="E-mail">
                                 <label for="mail">E-mail</label>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-primary me-sm-3 me-1">Agregar</button>
+                            <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                aria-label="Close">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="renew-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-simple modal-dialog-centered">
+            <div class="modal-content p-3 p-md-5">
+                <div class="modal-body p-md-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="text-center mb-4">
+                        <h3 class="address-title mb-2 pb-1">Agregar Socio</h3>
+                    </div>
+                    <form id="renew" class="row g-4" onsubmit="return false">
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="codeRenew" name="codeRenew" class="form-control"
+                                    placeholder="Código" disabled>
+                                <label for="codeRenew">Código</label>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="namesRenew" name="namesRenew" class="form-control"
+                                    placeholder="Nombres">
+                                <label for="namesRenew">Socio</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="docRenew" name="docRenew" class="form-control"
+                                    placeholder="Número de Documento">
+                                <label for="docRenew">Número Documento</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                                    name="birthdateRenew">
+                                <label for="birthdate">Fecha de Nacimiento</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="renewAffiliation" name="renewAffiliation" class="form-control"
+                                    placeholder="Ficha Renovación">
+                                <label for="affiliation">Ficha Renovación</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                                    name="renewInitdate" id="renewInitdate">
+                                <label for="renewInitdate">Renovación Socio</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                                    name="renewEnddate" id="renewEnddate">
+                                <label for="renewEnddate">Vencimiento</label>
                             </div>
                         </div>
                         <div class="col-12 text-center">

@@ -393,7 +393,7 @@ $(function () {
                     title: "Acciones",
                     render: function (a, e, t, s) {
                         return `<div class="d-flex align-items-center">
-                            <a href="javascript:;" data-bs-toggle="tooltip" class="text-body delete-record" data-bs-placement="top" title="Renovar Socio">
+                            <a href="javascript:;" data-bs-toggle="tooltip" class="text-body renew" data-bs-placement="top" title="Renovar Socio">
                                 <i class="mdi mdi-credit-card-sync-outline fs-3 mx-1"></i>
                             </a>
                             <a href="javascript:;" data-bs-toggle="tooltip" class="text-body edit-record" data-bs-placement="top" title="Editar Socio">
@@ -693,6 +693,15 @@ $(function () {
                     });
             }
         });
+    });
+
+    e.on("click", ".renew", function () {
+        let row = $(this).closest("tr");
+        let rowData = $(this).closest("table").DataTable().row(row).data();
+
+        $("#")
+
+        $("#renew-modal").modal("show");
     });
 
     const f = document.getElementById("partnerForm");
