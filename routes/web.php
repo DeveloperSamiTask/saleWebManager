@@ -76,4 +76,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/uploadCoupon', [CouponsController::class, 'upload']);
 
     Route::get('/Socios', [PartnerController::class, 'index'])->name('partners');
+    Route::get('/partners_table', [PartnerController::class, 'show']);
 });

@@ -131,5 +131,5 @@
 
 @section('scripts')
     <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
-    <script src="{{ asset('js/app-list-icoupons.js') }}"></script>
+    <script src="{{ asset('js/partners.js') }}"></script>
 @endsection

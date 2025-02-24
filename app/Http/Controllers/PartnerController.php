@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Partner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class PartnerController extends Controller
 {
@@ -44,9 +46,20 @@ class PartnerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-        //
+        $startDate = $request->get('startDate', '2025-01-01');
+        $endDate = $request->get('endDate', '2025-01-15');
+
+        $startDate = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+        $partners = Partner::getAllPartners($startDate->toDateTimeString(), $endDate->toDateTimeString());
+        return response()->json([
+            'data' => $partners,
+            'startDate' => $startDate->toDateString(),
+            'endDate' => $endDate->toDateString(),
+        ]);
     }
 
     /**
