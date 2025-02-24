@@ -11,5 +11,4 @@ class Client extends Model
     protected $table = 'CLIENTE';
     protected $primaryKey = 'cClieCode';
     public $timestamps = false;
-
 }

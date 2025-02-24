@@ -30,11 +30,11 @@
                             <th></th>
                             <th>CODIGO</th>
                             <th>Nombres y Apellidos</th>
-                            <th>Tipo Doc.</th>
                             <th>Numero Doc.</th>
                             <th>Fecha Inicio</th>
                             <th>Fecha Vencimiento</th>
-                            <th>Acciones</th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                 </table>
@@ -49,59 +49,103 @@
                 <div class="modal-body p-md-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     <div class="text-center mb-4">
-                        <h3 class="address-title mb-2 pb-1">Agregar Cupón Interno</h3>
+                        <h3 class="address-title mb-2 pb-1">Agregar Socio</h3>
                     </div>
-                    <form id="addNewCouponForm" class="row g-4" onsubmit="return false">
-                        <div class="col-12 col-md-12">
+                    <form id="partnerForm" class="row g-4" onsubmit="return false">
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="code" name="code" class="form-control"
+                                    placeholder="Código" disabled>
+                                <label for="code">Código</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="pattername" name="pattername" class="form-control"
+                                    placeholder="Apellido Paterno">
+                                <label for="pattername">Apellido Paterno</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="mattername" name="mattername" class="form-control"
+                                    placeholder="Apellido Materno">
+                                <label for="matternamea">Apellido Materno</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="names" name="names" class="form-control"
-                                    placeholder="Ingresa nombres y apellidos">
-                                <label for="names">Apellidos y Nombres</label>
+                                    placeholder="Nombres">
+                                <label for="names">Nombres</label>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
                             <div class="form-floating form-floating-outline">
-                                <input type="text" id="document" name="document" class="form-control"
-                                    placeholder="Ingresa el documento de identidad">
-                                <label for="document">Documento Identidad</label>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" placeholder="YYYY-MM-DD" id="flatpickr-date"
-                                    name="date_use">
-                                <label for="flatpickr-date">Fecha de uso</label>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" id="description" name="description" class="form-control"
-                                    placeholder="Ingresa la descripción del cupón">
-                                <label for="description">Descripción Cupón</label>
+                                <input type="text" id="doc" name="doc" class="form-control"
+                                    placeholder="Número de Documento">
+                                <label for="doc">Número Documento</label>
                             </div>
                         </div>
 
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                                    name=birthdate>
+                                <label for="birthdate">Fecha de Nacimiento</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="affiliation" name="affiliation" class="form-control"
+                                    placeholder="Ficha Afilicación">
+                                <label for="affiliation">Ficha Afilicación</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                                    name="initdate" id="initdate">
+                                <label for="initdate">Inicio Socio</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                                    name="enddate" id="enddate">
+                                <label for="enddate">Vencimiento</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="address" name="address" class="form-control"
+                                    placeholder="Dirección">
+                                <label for="address">Dirección</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="phone" name="phone" class="form-control"
+                                    placeholder="Número Celular">
+                                <label for="phone">Número Celular</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="mail" name="mail" class="form-control"
+                                    placeholder="E-mail">
+                                <label for="mail">E-mail</label>
+                            </div>
+                        </div>
                         <div class="col-12 text-center">
                             <button type="submit" class="btn btn-primary me-sm-3 me-1">Agregar</button>
                             <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
                                 aria-label="Close">Cancelar</button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--/ Add New Address Modal -->
-    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="imagePreviewModalLabel">Previsualización de Imagen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img id="imagePreview" src="" alt="Previsualización" class="img-fluid">
                 </div>
             </div>
         </div>

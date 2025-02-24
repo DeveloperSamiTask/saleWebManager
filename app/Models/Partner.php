@@ -19,9 +19,14 @@ class Partner extends Model
 
     public static function getAllPartners($startDate, $endDate)
     {
-        $partners =  self::whereBetween('dEmisDate', [$startDate, $endDate])->get();
+
+        $query = self::with(['client']);
+
+        $query->whereBetween('dEmisDate', [$startDate, $endDate]);
+        $partners =  $query->orderByDesc('id')->get();
         $data = [];
         foreach ($partners as $partner) {
+
             $data[] = [
                 'id' => $partner->id,
                 'card' => $partner->cClieCode,

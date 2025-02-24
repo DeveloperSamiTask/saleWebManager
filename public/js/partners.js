@@ -19,21 +19,7 @@ $(function () {
     var startDate = formatDate(oneMonthAgo);
     var endDate = formatDate(today);
     var e,
-        s = $(".datatables-entries"),
-        invoice = {
-            1: {
-                title: "PENDIENTE",
-                class: "badge rounded-pill bg-label-warning",
-            },
-            2: {
-                title: "ACEPTADO",
-                class: "badge rounded-pill bg-label-success",
-            },
-            3: {
-                title: "ANULADO",
-                class: "badge rounded-pill bg-label-danger",
-            },
-        };
+        s = $(".datatables-entries");
     $("#flatpickr-range").flatpickr({
         mode: "range",
         dateFormat: "Y-m-d",
@@ -119,6 +105,195 @@ $(function () {
         },
     });
 
+    $(".flatpickr-date").flatpickr({
+        dateFormat: "d-m-Y",
+        allowInput: true,
+        defaultDate: endDate,
+        locale: {
+            firstDayOfWeek: 1,
+            rangeSeparator: " Hasta ",
+            weekdays: {
+                shorthand: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+                longhand: [
+                    "Domingo",
+                    "Lunes",
+                    "Martes",
+                    "Miércoles",
+                    "Jueves",
+                    "Viernes",
+                    "Sábado",
+                ],
+            },
+            months: {
+                shorthand: [
+                    "Ene",
+                    "Feb",
+                    "Mar",
+                    "Abr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Ago",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dic",
+                ],
+                longhand: [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ],
+            },
+        },
+    });
+
+    $("#initdate").flatpickr({
+        dateFormat: "d-m-Y",
+        defaultDate: today,
+        altInput: true, // Muestra un input más amigable
+        locale: {
+            firstDayOfWeek: 1,
+            rangeSeparator: " Hasta ",
+            weekdays: {
+                shorthand: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+                longhand: [
+                    "Domingo",
+                    "Lunes",
+                    "Martes",
+                    "Miércoles",
+                    "Jueves",
+                    "Viernes",
+                    "Sábado",
+                ],
+            },
+            months: {
+                shorthand: [
+                    "Ene",
+                    "Feb",
+                    "Mar",
+                    "Abr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Ago",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dic",
+                ],
+                longhand: [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ],
+            },
+        },
+        onChange: function (selectedDates) {
+            if (selectedDates.length > 0) {
+                let startDate = new Date(selectedDates[0]);
+                let endDate = new Date(startDate);
+
+                // Sumar 1 año y restar 1 día
+                endDate.setFullYear(endDate.getFullYear() + 1);
+                endDate.setDate(endDate.getDate() - 1);
+
+                // Obtener día, mes y año correctamente formateados
+                let day = String(endDate.getDate()).padStart(2, "0"); // 01-31
+                let month = String(endDate.getMonth() + 1).padStart(2, "0"); // 01-12
+                let year = endDate.getFullYear(); // YYYY
+
+                let formattedEndDate = `${day}-${month}-${year}`; // Formato d-m-Y
+
+                // Establecer valor en el input de vencimiento
+                $("#enddate").val(formattedEndDate);
+            }
+        },
+    });
+
+    // Calculate the expiration date (one year minus one day)
+    let expirationDate = new Date();
+    expirationDate.setFullYear(today.getFullYear() + 1); // Add one year
+    expirationDate.setDate(today.getDate() - 1); // Subtract one day
+
+    // Format the date as "YYYY-MM-DD"
+    let day = String(expirationDate.getDate()).padStart(2, "0"); // Ensure two digits
+    let month = String(expirationDate.getMonth() + 1).padStart(2, "0"); // Ensure two digits (months are 0-based)
+    let year = expirationDate.getFullYear();
+    let formattedDate = `${day}-${month}-${year}`;
+    // Set the value of the input field using jQuery
+    $("#enddate").val(formattedDate);
+
+    // Initialize Flatpickr on the input field
+    $("#enddate").flatpickr({
+        dateFormat: "d-m-Y",
+        defaultDate: formattedDate,
+        locale: {
+            firstDayOfWeek: 1,
+            rangeSeparator: " Hasta ",
+            weekdays: {
+                shorthand: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+                longhand: [
+                    "Domingo",
+                    "Lunes",
+                    "Martes",
+                    "Miércoles",
+                    "Jueves",
+                    "Viernes",
+                    "Sábado",
+                ],
+            },
+            months: {
+                shorthand: [
+                    "Ene",
+                    "Feb",
+                    "Mar",
+                    "Abr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Ago",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dic",
+                ],
+                longhand: [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ],
+            },
+        },
+    });
+
     s.length &&
         (e = s.DataTable({
             ajax: {
@@ -138,9 +313,9 @@ $(function () {
                 { data: "card" },
                 { data: "client" },
                 { data: "document" },
-                { data: "document" },
                 { data: "date_start" },
                 { data: "date_end" },
+                { data: "" },
                 { data: "" },
             ],
             columnDefs: [
@@ -175,27 +350,60 @@ $(function () {
                     },
                 },
                 {
-                    targets: 5,
+                    targets: 4,
                     className: "text-center",
                     render: function (a) {
-                        return a;
+                        if (!a) return "";
+                        let date = new Date(a);
+                        let day = date.getDate().toString().padStart(2, "0");
+                        let month = (date.getMonth() + 1)
+                            .toString()
+                            .padStart(2, "0"); // Se suma 1 porque los meses van de 0 a 11
+                        let year = date.getFullYear();
+                        return `${day}/${month}/${year}`;
+                    },
+                },
+                {
+                    targets: 5,
+                    render: function (a, e, t, s) {
+                        if (!a) return "";
+                        let date = new Date(a);
+                        let day = date.getDate().toString().padStart(2, "0");
+                        let month = (date.getMonth() + 1)
+                            .toString()
+                            .padStart(2, "0"); // Se suma 1 porque los meses van de 0 a 11
+                        let year = date.getFullYear();
+                        return `${day}/${month}/${year}`;
                     },
                 },
                 {
                     targets: 6,
+                    title: "Estado",
                     render: function (a, e, t, s) {
-                       return a;
+                        let now = new Date();
+                        let endDate = new Date(t.date_end);
+
+                        return now > endDate
+                            ? '<span class="badge rounded-pill bg-label-danger">Inactivo</span>'
+                            : '<span class="badge rounded-pill bg-label-success">Activo</span>';
                     },
                 },
-
                 {
                     targets: -1,
+                    title: "Acciones",
                     render: function (a, e, t, s) {
-                        return a;
+                        return `<div class="d-flex align-items-center">
+                            <a href="javascript:;" data-bs-toggle="tooltip" class="text-body delete-record" data-bs-placement="top" title="Renovar Socio">
+                                <i class="mdi mdi-credit-card-sync-outline fs-3 mx-1"></i>
+                            </a>
+                            <a href="javascript:;" data-bs-toggle="tooltip" class="text-body edit-record" data-bs-placement="top" title="Editar Socio">
+                                <i class="mdi mdi-account-edit-outline fs-3 mx-1"></i>
+                            </a>
+                            </div>`;
                     },
                 },
             ],
-            order: [[6, "desc"]],
+            order: [[0, "desc"]],
             dom: '<"row mx-2"<"col-md-2"<"me-3"l>><"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0 gap-3"fB>>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
             language: {
                 sLengthMenu: "Mostrar _MENU_",
@@ -379,7 +587,7 @@ $(function () {
                     ],
                 },
                 {
-                    text: '<i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Agregar Cupon</span>',
+                    text: '<i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Agregar Socio</span>',
                     className:
                         "create-new btn btn-primary waves-effect waves-light",
                     attr: {
@@ -433,6 +641,7 @@ $(function () {
     e.on("click", ".btn-acepted", function () {
         let row = $(this).closest("tr");
         let rowData = $(this).closest("table").DataTable().row(row).data();
+
         Swal.fire({
             title: "Estas seguro?",
             text: `Aceptaras el Cambio de Documento de la Entrada: ${rowData.detcart}`,
@@ -486,28 +695,76 @@ $(function () {
         });
     });
 
-    const f = document.getElementById("addNewCouponForm");
+    const f = document.getElementById("partnerForm");
 
     const fv = FormValidation.formValidation(f, {
         fields: {
+            pattername: {
+                validators: {
+                    notEmpty: {
+                        message: "Ingresa el apellido paterno del socio",
+                    },
+                },
+            },
+            mattername: {
+                validators: {
+                    notEmpty: {
+                        message: "Ingresa el apellido materno del socio",
+                    },
+                },
+            },
             names: {
                 validators: {
-                    notEmpty: { message: "Ingresa nombres y apellidos" },
+                    notEmpty: { message: "Ingresa nombres del socio" },
                 },
             },
-            description: {
+            doc: {
                 validators: {
-                    notEmpty: { message: "Ingresa la descripción del cupón" },
+                    notEmpty: {
+                        message: "Ingresa el Nº documento del socio",
+                    },
                 },
             },
-            document: {
+            birthdate: {
                 validators: {
-                    notEmpty: { message: "Ingresa el documento de identidad" },
+                    notEmpty: { message: "Ingresa la fecha de nacimiento" },
                 },
             },
-            date_use: {
+            affiliation: {
                 validators: {
-                    notEmpty: { message: "Ingresa la fecha de uso" },
+                    notEmpty: { message: "Ingresa la ficha de afilicación" },
+                },
+            },
+            initdate: {
+                validators: {
+                    notEmpty: { message: "Ingresa la fecha de inicio" },
+                },
+            },
+            enddate: {
+                validators: {
+                    notEmpty: { message: "Ingresa la fecha de vencimiento" },
+                },
+            },
+            address: {
+                validators: {
+                    notEmpty: { message: "Ingresa la dirección" },
+                },
+            },
+            mail: {
+                validators: {
+                    notEmpty: {
+                        message: "Ingresa el e-mail",
+                    },
+                    emailAddress: {
+                        message: "Ingresa un e-mail válido",
+                    },
+                },
+            },
+            phone: {
+                validators: {
+                    notEmpty: {
+                        message: "Ingresa el número de celular",
+                    },
                 },
             },
         },
@@ -545,18 +802,13 @@ $(function () {
         },
     });
 
-    $(document).on("click", ".view-image-btn", function () {
-        const imageUrl = $(this).data("image");
-        $("#imagePreview").attr("src", imageUrl);
-    });
-
     fv.on("core.form.valid", function () {
         blockUI();
 
         let formData = new FormData(f);
         formData.append("_token", csrfToken);
 
-        fetch("insertCoupon", {
+        fetch("insertPartner", {
             method: "POST",
             body: formData,
         })
@@ -572,10 +824,15 @@ $(function () {
                     icon: data.icon,
                     title: data.message,
                 });
+
                 $("#addNewCoupon").modal("hide");
             })
             .catch((error) => {
                 console.error("Error:", error);
+                Toast.fire({
+                    icon: error.icon,
+                    title: error.message,
+                });
             })
             .finally(() => {
                 $.unblockUI();

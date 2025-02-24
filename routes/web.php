@@ -77,4 +77,5 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/Socios', [PartnerController::class, 'index'])->name('partners');
     Route::get('/partners_table', [PartnerController::class, 'show']);
+    Route::post('/insertPartner', [PartnerController::class, 'insert']);
 });
