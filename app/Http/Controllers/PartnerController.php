@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Partner;
+use App\Models\Proxy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -20,32 +21,33 @@ class PartnerController extends Controller
         return view('partners.index', $data);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+
+    public function search(Request $request)
     {
-        //
+        $search = $request->search;
+        $select = $request->select;
+
+        $query = Client::with(['partners', 'proxy'])->where($select, $search)->first();
+
+        if (!$query) {
+            return response()->json([
+                'icon' => 'warning',
+                'message' => 'No se encontraron resultados',
+            ]);
+        }
+
+        return response()->json($query);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function insert(Request $request)
     {
-        // Verificar si el DNI ya existe
         $existingClient = Client::where('charClienteDni', $request->doc)->first();
 
         if ($existingClient) {
             return response()->json([
                 'icon' => 'warning',
                 'message' => 'El DNI ya está registrado.',
-            ], 404);
+            ]);
         }
 
         // Obtener el último código de cliente
@@ -94,6 +96,17 @@ class PartnerController extends Controller
             $partner->status_magic = 0;
             $partner->save();
 
+            if (!empty($request->proxyPatter) || !empty($request->proxyMatter) || !empty($request->proxyNames) || !empty($request->proxyDoc)) {
+                $proxy = new Proxy();
+                $proxy->proxy_client = $count + 1;
+                $proxy->proxy_pattername = $request->proxyPatter;
+                $proxy->proxy_mattername = $request->proxyMatter;
+                $proxy->proxy_names = $request->proxyNames;
+                $proxy->proxy_doc = $request->proxyDoc;
+                $proxy->save();
+            }
+
+
             return response()->json([
                 'icon' => 'success',
                 'message' => 'Socio agregado correctamente',
@@ -106,13 +119,28 @@ class PartnerController extends Controller
         }
     }
 
+    public function renew(Request $request)
+    {
+        // Verificar si el código llega correctamente
+        if (!$request->has('hiddenCode')) {
+            return response()->json([
+                'icon' => 'error',
+                'message' => 'No se recibió el código del socio.',
+            ], 400);
+        }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+        $partner = Partner::where('cClieCode', $request->hiddenCode)->first();
+        $partner->dEmisDate = Carbon::createFromFormat('d-m-Y', $request->renewInitdate)->format('Y-m-d');
+        $partner->dCaduDate = Carbon::createFromFormat('d-m-Y', $request->renewEnddate)->format('Y-m-d');
+        $partner->affiliation = $request->renewAffiliation;
+        $partner->save();
+
+        return response()->json([
+            'icon' => 'success',
+            'message' => 'Socio renovado correctamente',
+        ]);
+    }
+
     public function show(Request $request)
     {
         $startDate = $request->get('startDate', '2025-01-01');
@@ -129,28 +157,7 @@ class PartnerController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+    public function update(Request $request) {}
 
     /**
      * Remove the specified resource from storage.

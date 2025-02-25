@@ -23,7 +23,7 @@ class Partner extends Model
         $query = self::with(['client']);
 
         $query->whereBetween('dEmisDate', [$startDate, $endDate]);
-        $partners =  $query->orderByDesc('id')->get();
+        $partners =  $query->orderByDesc('dEmisDate')->get();
         $data = [];
         foreach ($partners as $partner) {
 

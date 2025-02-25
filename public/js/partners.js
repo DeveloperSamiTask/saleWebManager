@@ -699,9 +699,225 @@ $(function () {
         let row = $(this).closest("tr");
         let rowData = $(this).closest("table").DataTable().row(row).data();
 
-        $("#")
-
         $("#renew-modal").modal("show");
+    });
+
+    $("#searchPartner").on("click", function () {
+        $("#renew-modal").modal("show");
+    });
+
+    $("#selectSearch").on("change", function () {
+        let text = $("#selectSearch option:selected").text();
+        $("#searchInput").attr("placeholder", `Buscar por ${text}`);
+    });
+
+    $("#renewInitdate").flatpickr({
+        dateFormat: "d-m-Y",
+        defaultDate: today,
+        locale: {
+            firstDayOfWeek: 1,
+            rangeSeparator: " Hasta ",
+            weekdays: {
+                shorthand: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+                longhand: [
+                    "Domingo",
+                    "Lunes",
+                    "Martes",
+                    "Miércoles",
+                    "Jueves",
+                    "Viernes",
+                    "Sábado",
+                ],
+            },
+            months: {
+                shorthand: [
+                    "Ene",
+                    "Feb",
+                    "Mar",
+                    "Abr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Ago",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dic",
+                ],
+                longhand: [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ],
+            },
+        },
+        onChange: function (selectedDates) {
+            if (selectedDates.length > 0) {
+                let renewalDate = selectedDates[0];
+
+                // Calcular fecha de vencimiento (1 año - 1 día)
+                let expirationDate = new Date(renewalDate);
+                expirationDate.setFullYear(expirationDate.getFullYear() + 1); // +1 año
+                expirationDate.setDate(expirationDate.getDate() - 1); // -1 día
+
+                // Extraer día, mes y año
+                let day = expirationDate.getDate().toString().padStart(2, "0");
+                let month = (expirationDate.getMonth() + 1)
+                    .toString()
+                    .padStart(2, "0"); // Meses van de 0 a 11
+                let year = expirationDate.getFullYear();
+
+                let formattedEndDate = `${day}-${month}-${year}`; // Formato d-m-Y
+
+                // Asignar la fecha de vencimiento
+                $("#renewEnddate").val(formattedEndDate);
+            }
+        },
+    });
+
+    // Inicializar el campo de vencimiento (solo lectura)
+    $("#renewEnddate").flatpickr({
+        dateFormat: "d-m-Y",
+        defaultDate: formattedDate,
+        locale: {
+            firstDayOfWeek: 1,
+            rangeSeparator: " Hasta ",
+            weekdays: {
+                shorthand: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+                longhand: [
+                    "Domingo",
+                    "Lunes",
+                    "Martes",
+                    "Miércoles",
+                    "Jueves",
+                    "Viernes",
+                    "Sábado",
+                ],
+            },
+            months: {
+                shorthand: [
+                    "Ene",
+                    "Feb",
+                    "Mar",
+                    "Abr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Ago",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dic",
+                ],
+                longhand: [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ],
+            },
+        },
+    });
+
+    $("#btnSearch").on("click", function () {
+        blockUI();
+        $.ajax({
+            url: "searchPartner",
+            type: "post",
+            data: {
+                search: $("#searchInput").val(),
+                select: $("#selectSearch").val(),
+                _token: csrfToken,
+            },
+        })
+            .done((data) => {
+                $("#hiddenCode").val(data.cClieCode);
+                $("#codeRenew").val(data.cClieCode);
+                $("#namesRenew").val(`${data.sClieApel} ${data.sClieName}`);
+                $("#docRenew").val(data.charClienteDni);
+                $("#birthdateRenew").val(formatDateToDMY(data.dNacmDate));
+                $("#renewInitdate").val(
+                    formatDateToDMY(data.partners[0].dEmisDate)
+                );
+                $("#renewEnddate").val(
+                    formatDateToDMY(data.partners[0].dCaduDate)
+                );
+
+                $(".btnRenew").prop("disabled", false);
+            })
+            .fail((response) => {
+                Toast.fire({
+                    icon: response.icon,
+                    title: response.message,
+                });
+            })
+            .always(() => {
+                $.unblockUI();
+            });
+    });
+
+    $("#renewForm").on("submit", function (h) {
+        h.preventDefault();
+        blockUI();
+
+        if ($("#renewAffiliation").val() == "") {
+            Toast.fire({
+                icon: "error",
+                title: "Debe ingresar la ficha de afiliación",
+            });
+            $.unblockUI();
+
+            return;
+        }
+
+        let formData = new FormData(this);
+        formData.append("_token", csrfToken);
+
+        fetch("renewPartner", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Error en la solicitud");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                e.ajax.reload();
+                Toast.fire({
+                    icon: data.icon,
+                    title: data.message,
+                });
+
+                $("#renew-modal").modal("hide");
+            })
+            .catch((error) => {
+                Toast.fire({
+                    icon: error.icon,
+                    title: error.message,
+                });
+            })
+            .finally(() => {
+                $.unblockUI();
+            });
     });
 
     const f = document.getElementById("partnerForm");
@@ -848,6 +1064,84 @@ $(function () {
             });
     });
 
+    $("#editPartner").on("click", function (h) {
+        $("#edit-modal").modal("show");
+    });
+
+    $("#editSelect").on("change", function () {
+        let text = $("#editSelect option:selected").text();
+        $("#inputSelect").attr("placeholder", `Buscar por ${text}`);
+    });
+
+    $("#editBtn").on("click", function () {
+        blockUI();
+        $.ajax({
+            url: "searchPartner",
+            type: "post",
+            data: {
+                search: $("#inputSelect").val(),
+                select: $("#editSelect").val(),
+                _token: csrfToken,
+            },
+        })
+            .done((data) => {
+                console.log(data);
+
+                $("#editCodeHidden").val(data.cClieCode);
+                $("#editcode").val(data.cClieCode);
+                $("#editpattername").val(`${data.sClieApepat}`);
+                $("#editmattername").val(`${data.sClieApemat}`);
+                $("#editnames").val(`${data.sClieName}`);
+                $("#editdoc").val(data.charClienteDni);
+                $("#editbirthdate").val(formatDateToDMY(data.dNacmDate));
+                $("#editaffiliation").val(data.partners[0].affiliation);
+                $("#editinitdate").val(
+                    formatDateToDMY(data.partners[0].dEmisDate)
+                );
+                $("#editenddate").val(
+                    formatDateToDMY(data.partners[0].dCaduDate)
+                );
+                $("#editaddress").val(data.sClieAddr);
+                $("#editphone").val(data.sClieTelf);
+                $("#editmail").val(data.sClieMail);
+
+                if(data.proxy){
+                    $("#EditaccordionOne").collapse("show");
+                    $("#editproxyPatter").val(data.proxy.proxy_pattername);
+                    $("#editproxyMatter").val(data.proxy.proxy_mattername);
+                    $("#editproxyNames").val(data.proxy.proxy_names);
+                    $("#editproxyDoc").val(data.proxy.proxy_doc);
+                }
+
+            })
+            .fail((response) => {
+                Toast.fire({
+                    icon: response.icon,
+                    title: response.message,
+                });
+            })
+            .always(() => {
+                $.unblockUI();
+            });
+    });
+
+    $("#addNewCoupon").on("hidden.bs.modal", function () {
+        $("#partnerForm")[0].reset();
+        fv.resetForm(true);
+    });
+
+    $("#renew-modal").on("hidden.bs.modal", function () {
+        $("#renewForm")[0].reset();
+        fv.resetForm(true);
+        $("#selectSearch").val("charClienteDni").trigger("change");
+        $(".btnRenew").prop("disabled", true);
+    });
+
+    $("#edit-modal").on("hidden.bs.modal", function () {
+        $("#editForm")[0].reset();
+        fv.resetForm(true);
+    });
+
     function formatDate(date) {
         var year = date.getFullYear();
         var month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -856,6 +1150,19 @@ $(function () {
         var minutes = date.getMinutes().toString().padStart(2, "0");
         var seconds = date.getSeconds().toString().padStart(2, "0");
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
+
+    function formatDateToDMY(dateString) {
+        if (!dateString) return ""; // Si la fecha es null o vacía, retorna vacío
+
+        let dateObj = new Date(dateString);
+        if (isNaN(dateObj)) return ""; // Verifica si la fecha es válida
+
+        let day = ("0" + dateObj.getDate()).slice(-2);
+        let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+        let year = dateObj.getFullYear();
+
+        return `${day}-${month}-${year}`;
     }
 
     function blockUI() {
