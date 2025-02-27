@@ -10,7 +10,13 @@ $(function () {
               (a = config.colors.bodyBg),
               config.colors)
     ).headingColor;
-    var today = new Date(),
+    let today = new Date();
+    let formattedToday =
+            today.getDate().toString().padStart(2, "0") +
+            "-" +
+            (today.getMonth() + 1).toString().padStart(2, "0") +
+            "-" +
+            today.getFullYear(),
         csrfToken = $('meta[name="csrf-token"]').attr("content");
 
     var oneMonthAgo = new Date();
@@ -105,7 +111,7 @@ $(function () {
         },
     });
 
-    $(".flatpickr-date").flatpickr({
+    let datePicker = $(".flatpickr-date").flatpickr({
         dateFormat: "d-m-Y",
         allowInput: true,
         defaultDate: endDate,
@@ -157,10 +163,9 @@ $(function () {
         },
     });
 
-    $("#initdate").flatpickr({
+    let initDatePicker = $("#initdate").flatpickr({
         dateFormat: "d-m-Y",
         defaultDate: today,
-        altInput: true, // Muestra un input más amigable
         locale: {
             firstDayOfWeek: 1,
             rangeSeparator: " Hasta ",
@@ -316,7 +321,7 @@ $(function () {
                 { data: "date_start" },
                 { data: "date_end" },
                 { data: "" },
-                { data: "" },
+                { data: "type" },
             ],
             columnDefs: [
                 {
@@ -390,16 +395,13 @@ $(function () {
                 },
                 {
                     targets: -1,
-                    title: "Acciones",
+                    title: "Tipo",
                     render: function (a, e, t, s) {
-                        return `<div class="d-flex align-items-center">
-                            <a href="javascript:;" data-bs-toggle="tooltip" class="text-body renew" data-bs-placement="top" title="Renovar Socio">
-                                <i class="mdi mdi-credit-card-sync-outline fs-3 mx-1"></i>
-                            </a>
-                            <a href="javascript:;" data-bs-toggle="tooltip" class="text-body edit-record" data-bs-placement="top" title="Editar Socio">
-                                <i class="mdi mdi-account-edit-outline fs-3 mx-1"></i>
-                            </a>
-                            </div>`;
+                      if (a == 0) {
+                        return '<span class="badge rounded-pill bg-label-success">Inscripción</span>';
+                        } else if (a == 1) {
+                          return '<span class="badge rounded-pill bg-label-info">Renovación</span>';
+                        }
                     },
                 },
             ],
@@ -711,7 +713,7 @@ $(function () {
         $("#searchInput").attr("placeholder", `Buscar por ${text}`);
     });
 
-    $("#renewInitdate").flatpickr({
+    let renewInitDatePicker = $("#renewInitdate").flatpickr({
         dateFormat: "d-m-Y",
         defaultDate: today,
         locale: {
@@ -853,12 +855,6 @@ $(function () {
                 $("#namesRenew").val(`${data.sClieApel} ${data.sClieName}`);
                 $("#docRenew").val(data.charClienteDni);
                 $("#birthdateRenew").val(formatDateToDMY(data.dNacmDate));
-                $("#renewInitdate").val(
-                    formatDateToDMY(data.partners[0].dEmisDate)
-                );
-                $("#renewEnddate").val(
-                    formatDateToDMY(data.partners[0].dCaduDate)
-                );
 
                 $(".btnRenew").prop("disabled", false);
             })
@@ -1064,6 +1060,154 @@ $(function () {
             });
     });
 
+    const ef = document.getElementById("editForm");
+    const efv = FormValidation.formValidation(ef, {
+        fields: {
+            editpattername: {
+                validators: {
+                    notEmpty: {
+                        message: "Ingresa el apellido paterno del socio",
+                    },
+                },
+            },
+            editmattername: {
+                validators: {
+                    notEmpty: {
+                        message: "Ingresa el apellido materno del socio",
+                    },
+                    regex: {
+                        message: "Ingresa un apellido válido",
+                        regex: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/,
+                    },
+                },
+            },
+            editnames: {
+                validators: {
+                    notEmpty: { message: "Ingresa nombres del socio" },
+                },
+                validators: {
+                    notEmpty: { message: "Ingresa nombres del socio" },
+                    minLength: {
+                        message: "Ingresa un nombre válido",
+                        length: 2,
+                    },
+                },
+            },
+            editdoc: {
+                validators: {
+                    notEmpty: {
+                        message: "Ingresa el Nº documento del socio",
+                    },
+                },
+            },
+            editbirthdate: {
+                validators: {
+                    notEmpty: { message: "Ingresa la fecha de nacimiento" },
+                },
+            },
+            editaffiliation: {
+                validators: {
+                    notEmpty: { message: "Ingresa la ficha de afilicación" },
+                },
+            },
+            editaddress: {
+                validators: {
+                    notEmpty: { message: "Debe ingresar una dirección" },
+                },
+            },
+            editphone: {
+                validators: {
+                    notEmpty: {
+                        message: "Debe ingresar un número de celular",
+                    },
+                },
+            },
+            editmail: {
+                validators: {
+                    emailAddress: {
+                        message: "Ingresa un e-mail válido",
+                        flags: "i",
+                        breakChainOnFailure: false,
+                        errorElement: "span",
+                        successElement: "span",
+                        errorMessage: "Ingresa un e-mail válido",
+                    },
+                },
+            },
+        },
+        plugins: {
+            trigger: new FormValidation.plugins.Trigger(),
+            bootstrap5: new FormValidation.plugins.Bootstrap5({
+                eleValidClass: "is-valid",
+                rowSelector: function (t, e) {
+                    switch (e) {
+                        case "formValidationName":
+                        case "formValidationEmail":
+                        case "formValidationPass":
+                        case "formValidationConfirmPass":
+                        case "formValidationFile":
+                        case "formValidationDob":
+                        case "formValidationSelect2":
+                        case "formValidationLang":
+                        case "formValidationTech":
+                        case "formValidationHobbies":
+                        case "formValidationBio":
+                        case "formValidationGender":
+                            return ".col-md-6";
+                        case "formValidationPlan":
+                            return ".col-xl-3";
+                        case "formValidationSwitch":
+                        case "formValidationCheckbox":
+                            return ".col-12";
+                        default:
+                            return ".row";
+                    }
+                },
+            }),
+            submitButton: new FormValidation.plugins.SubmitButton(),
+            autoFocus: new FormValidation.plugins.AutoFocus(),
+        },
+    });
+
+    efv.on("core.form.valid", function () {
+        blockUI();
+
+        let formData = new FormData(ef);
+        formData.append("_token", csrfToken);
+
+        fetch("editPartner", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Error en la solicitud");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+
+                e.ajax.reload();
+                Toast.fire({
+                    icon: data.icon,
+                    title: data.message,
+                });
+
+                $("#editPartner").modal("hide");
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                Toast.fire({
+                    icon: error.icon,
+                    title: error.message,
+                });
+            })
+            .finally(() => {
+                $.unblockUI();
+            });
+    });
+
     $("#editPartner").on("click", function (h) {
         $("#edit-modal").modal("show");
     });
@@ -1105,14 +1249,13 @@ $(function () {
                 $("#editphone").val(data.sClieTelf);
                 $("#editmail").val(data.sClieMail);
 
-                if(data.proxy){
+                if (data.proxy) {
                     $("#EditaccordionOne").collapse("show");
                     $("#editproxyPatter").val(data.proxy.proxy_pattername);
                     $("#editproxyMatter").val(data.proxy.proxy_mattername);
                     $("#editproxyNames").val(data.proxy.proxy_names);
                     $("#editproxyDoc").val(data.proxy.proxy_doc);
                 }
-
             })
             .fail((response) => {
                 Toast.fire({
@@ -1127,7 +1270,11 @@ $(function () {
 
     $("#addNewCoupon").on("hidden.bs.modal", function () {
         $("#partnerForm")[0].reset();
+        console.log(today);
+
         fv.resetForm(true);
+
+        initDatePicker.setDate(formattedToday, true);
     });
 
     $("#renew-modal").on("hidden.bs.modal", function () {
@@ -1135,6 +1282,7 @@ $(function () {
         fv.resetForm(true);
         $("#selectSearch").val("charClienteDni").trigger("change");
         $(".btnRenew").prop("disabled", true);
+        renewInitDatePicker.setDate(formattedToday, true);
     });
 
     $("#edit-modal").on("hidden.bs.modal", function () {

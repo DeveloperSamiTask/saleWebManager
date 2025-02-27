@@ -393,14 +393,14 @@
                         <div class="col-3">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
-                                    name="editinitdate" id="editinitdate">
+                                    name="editinitdate" id="editinitdate" disabled>
                                 <label for="editinitdate">Inicio Socio</label>
                             </div>
                         </div>
                         <div class="col-3">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
-                                    name="editenddate" id="editenddate">
+                                    name="editenddate" id="editenddate" disabled>
                                 <label for="editenddate">Vencimiento</label>
                             </div>
                         </div>

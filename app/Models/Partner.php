@@ -34,6 +34,7 @@ class Partner extends Model
                 'document' => optional($partner->client)->charClienteDni,
                 'date_start' => $partner->dEmisDate,
                 'date_end' => $partner->dCaduDate,
+                'type' => $partner->type_partner,
             ];
         }
 

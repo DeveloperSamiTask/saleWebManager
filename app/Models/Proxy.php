@@ -10,7 +10,9 @@ class Proxy extends Model
     use HasFactory;
 
     protected $table = 'apoderado_cliente';
+    protected $primaryKey = 'proxy_id';
     public $timestamps = false;
+    protected $fillable = ['proxy_pattername', 'proxy_mattername', 'proxy_names', 'proxy_doc'];
 
     public function client()
     {

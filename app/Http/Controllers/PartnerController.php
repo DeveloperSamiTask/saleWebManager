@@ -7,6 +7,7 @@ use App\Models\Partner;
 use App\Models\Proxy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use PhpParser\Node\Stmt\Return_;
 
 class PartnerController extends Controller
 {
@@ -94,6 +95,7 @@ class PartnerController extends Controller
             $partner->IdLocal = 1;
             $partner->estado = "";
             $partner->status_magic = 0;
+            $partner->type_partner = 0;
             $partner->save();
 
             if (!empty($request->proxyPatter) || !empty($request->proxyMatter) || !empty($request->proxyNames) || !empty($request->proxyDoc)) {
@@ -133,6 +135,9 @@ class PartnerController extends Controller
         $partner->dEmisDate = Carbon::createFromFormat('d-m-Y', $request->renewInitdate)->format('Y-m-d');
         $partner->dCaduDate = Carbon::createFromFormat('d-m-Y', $request->renewEnddate)->format('Y-m-d');
         $partner->affiliation = $request->renewAffiliation;
+        $partner->status_magic = 0;
+        $partner->estado = "";
+        $partner->type_partner = 1;
         $partner->save();
 
         return response()->json([
@@ -157,7 +162,37 @@ class PartnerController extends Controller
         ]);
     }
 
-    public function update(Request $request) {}
+    public function update(Request $request)
+    {
+
+        $dNacmDate = Carbon::hasFormat($request->editbirthdate, 'd-m-Y')
+            ? Carbon::createFromFormat('d-m-Y', $request->editbirthdate)->format('Y-m-d')
+            : null;
+
+        $client = Client::find($request->editCodeHidden);
+        $client->sClieApel = $request->editpattername . ' ' . $request->editmattername;
+        $client->sClieApepat = $request->editpattername;
+        $client->sClieApemat = $request->editmattername;
+        $client->sClieName = $request->editnames;
+        $client->sClieAddr = $request->editaddress;
+        $client->sClieTelf = $request->editphone;
+        $client->sClieMail = $request->editmail;
+        $client->dNacmDate = $dNacmDate;
+        $client->charClienteDni = $request->editdoc;
+        $client->save();
+
+        $proxy = Proxy::where('proxy_client', $request->editCodeHidden)->first();
+        $proxy->proxy_pattername = $request->editproxyPatter;
+        $proxy->proxy_mattername = $request->editproxyMatter;
+        $proxy->proxy_names = $request->editproxyNames;
+        $proxy->proxy_doc = $request->editproxyDoc;
+        $proxy->save();
+
+        return response()->json([
+            'icon' => 'success',
+            'message' => 'Se editaron los datos'
+        ]);
+    }
 
     /**
      * Remove the specified resource from storage.

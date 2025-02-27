@@ -80,4 +80,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/insertPartner', [PartnerController::class, 'insert']);
     Route::post('/searchPartner', [PartnerController::class, 'search']);
     Route::post('/renewPartner', [PartnerController::class, 'renew']);
+    Route::post('/editPartner', [PartnerController::class, 'update']);
 });
