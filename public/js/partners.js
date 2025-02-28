@@ -397,10 +397,10 @@ $(function () {
                     targets: -1,
                     title: "Tipo",
                     render: function (a, e, t, s) {
-                      if (a == 0) {
-                        return '<span class="badge rounded-pill bg-label-success">Inscripción</span>';
-                        } else if (a == 1) {
-                          return '<span class="badge rounded-pill bg-label-info">Renovación</span>';
+                        if (a == 0) {
+                            return '<span class="badge rounded-pill bg-label-success">Inscripción</span>';
+                        } else {
+                            return '<span class="badge rounded-pill bg-label-info">Renovación</span>';
                         }
                     },
                 },
@@ -850,18 +850,34 @@ $(function () {
             },
         })
             .done((data) => {
-                $("#hiddenCode").val(data.cClieCode);
-                $("#codeRenew").val(data.cClieCode);
-                $("#namesRenew").val(`${data.sClieApel} ${data.sClieName}`);
-                $("#docRenew").val(data.charClienteDni);
-                $("#birthdateRenew").val(formatDateToDMY(data.dNacmDate));
+                if (data.icon) {
+                    // Si hay un mensaje de advertencia, mostrarlo y salir
+                    Toast.fire({
+                        icon: data.icon,
+                        title: data.message,
+                    });
+
+                    $("#renew-modal").modal("hide");
+                    $("#addNewCoupon").modal("show");
+
+                    $.unblockUI();
+                    return;
+                }
+
+                let client = data;
+
+                $("#hiddenCode").val(client.cClieCode);
+                $("#codeRenew").val(client.partner[0].nTarjNumb);
+                $("#namesRenew").val(`${client.sClieApel} ${client.sClieName}`);
+                $("#docRenew").val(client.charClienteDni);
+                $("#birthdateRenew").val(formatDateToDMY(client.dNacmDate));
 
                 $(".btnRenew").prop("disabled", false);
             })
-            .fail((response) => {
+            .fail(() => {
                 Toast.fire({
-                    icon: response.icon,
-                    title: response.message,
+                    icon: "error",
+                    title: "Ocurrió un error en la búsqueda.",
                 });
             })
             .always(() => {
@@ -1040,6 +1056,14 @@ $(function () {
                 return response.json();
             })
             .then((data) => {
+                //si el doc existe, mostramos el modal de renovación
+
+                if (data.doc) {
+                    $("#addNewCoupon").modal("hide");
+                    $("#renew-modal").modal("show");
+                    $("#searchInput").val(data.doc);
+                }
+
                 e.ajax.reload();
                 Toast.fire({
                     icon: data.icon,
@@ -1229,21 +1253,33 @@ $(function () {
             },
         })
             .done((data) => {
-                console.log(data);
+                if (data.icon) {
+                    // Si hay un mensaje de advertencia, mostrarlo y salir
+                    Toast.fire({
+                        icon: data.icon,
+                        title: data.message,
+                    });
 
+                    $("#edit-modal").modal("hide");
+
+                    $("#addNewCoupon").modal("show");
+
+                    $.unblockUI();
+                    return;
+                }
                 $("#editCodeHidden").val(data.cClieCode);
-                $("#editcode").val(data.cClieCode);
+                $("#editcode").val(data.partner[0].nTarjNumb);
                 $("#editpattername").val(`${data.sClieApepat}`);
                 $("#editmattername").val(`${data.sClieApemat}`);
                 $("#editnames").val(`${data.sClieName}`);
                 $("#editdoc").val(data.charClienteDni);
                 $("#editbirthdate").val(formatDateToDMY(data.dNacmDate));
-                $("#editaffiliation").val(data.partners[0].affiliation);
+                $("#editaffiliation").val(data.partner[0].affiliation);
                 $("#editinitdate").val(
-                    formatDateToDMY(data.partners[0].dEmisDate)
+                    formatDateToDMY(data.partner[0].dEmisDate)
                 );
                 $("#editenddate").val(
-                    formatDateToDMY(data.partners[0].dCaduDate)
+                    formatDateToDMY(data.partner[0].dCaduDate)
                 );
                 $("#editaddress").val(data.sClieAddr);
                 $("#editphone").val(data.sClieTelf);

@@ -22,55 +22,77 @@ class PartnerController extends Controller
         return view('partners.index', $data);
     }
 
-
     public function search(Request $request)
     {
         $search = $request->search;
         $select = $request->select;
 
-        $query = Client::with(['partners', 'proxy'])->where($select, $search)->first();
+        // Buscar cliente con su socio asociado
+        $client = Client::with('partner')->where($select, $search)->first();
 
-        if (!$query) {
+        if (!$client) {
             return response()->json([
                 'icon' => 'warning',
-                'message' => 'No se encontraron resultados',
+                'message' => 'No se encontraron resultados.',
             ]);
         }
 
-        return response()->json($query);
+        return response()->json($client);
     }
+
 
     public function insert(Request $request)
     {
+        $dNacmDate = $this->convertDate($request->birthdate);
+        $dEmisDate = $this->convertDate($request->initdate);
+        $dCaduDate = $this->convertDate($request->enddate);
+
         $existingClient = Client::where('charClienteDni', $request->doc)->first();
 
         if ($existingClient) {
-            return response()->json([
-                'icon' => 'warning',
-                'message' => 'El DNI ya está registrado.',
-            ]);
-        }
+            // Verificar si ya es socio en Partner
+            $existingPartner = Partner::where('cClieCode', $existingClient->cClieCode)->first();
 
-        // Obtener el último código de cliente
-        $count = Partner::orderBy('id', 'desc')->value('cClieCode') ?? 0;
+            if ($existingPartner) {
+                return response()->json([
+                    'icon' => 'warning',
+                    'message' => 'El cliente ya es socio.',
+                    'doc' => $request->doc,
+                ]);
+            }
 
-        try {
-            // Convertir fechas con validación previa
+            // Si el cliente existe pero no es socio, actualizamos sus datos
             $dNacmDate = Carbon::hasFormat($request->birthdate, 'd-m-Y')
                 ? Carbon::createFromFormat('d-m-Y', $request->birthdate)->format('Y-m-d')
                 : null;
 
-            $dEmisDate = Carbon::hasFormat($request->initdate, 'd-m-Y')
-                ? Carbon::createFromFormat('d-m-Y', $request->initdate)->format('Y-m-d')
-                : null;
+            $existingClient->update([
+                'sClieApel'   => $request->pattername . ' ' . $request->mattername,
+                'sClieApepat' => $request->pattername,
+                'sClieApemat' => $request->mattername,
+                'sClieName'   => $request->names,
+                'sClieAddr'   => $request->address,
+                'sClieTelf'   => $request->phone,
+                'sClieMail'   => $request->mail,
+                'dNacmDate'   => $dNacmDate,
+                'iTipo'       => 1,
+                'IdLocal'     => 1,
+            ]);
 
-            $dCaduDate = Carbon::hasFormat($request->enddate, 'd-m-Y')
-                ? Carbon::createFromFormat('d-m-Y', $request->enddate)->format('Y-m-d')
-                : null;
+            // Después de actualizar, lo agregamos como socio
+            return $this->createPartner($existingClient->cClieCode, $request, $dEmisDate, $dCaduDate);
+        }
 
+        // Obtener el último código de cliente
+        $count = Partner::whereRaw('LENGTH(cClieCode) = 6')
+            ->orderBy('id', 'desc')
+            ->value('cClieCode') ?? 0;
+        $newClientCode = $count + 1;
+
+        try {
             // Guardar cliente
             $client = new Client();
-            $client->cClieCode = $count + 1;
+            $client->cClieCode = $newClientCode;
             $client->sClieApel = $request->pattername . ' ' . $request->mattername;
             $client->sClieApepat = $request->pattername;
             $client->sClieApemat = $request->mattername;
@@ -85,9 +107,24 @@ class PartnerController extends Controller
             $client->save();
 
             // Guardar socio
+            return $this->createPartner($newClientCode, $request, $dEmisDate, $dCaduDate);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'icon' => 'error',
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Crea un socio en la tabla Partner.
+     */
+    private function createPartner($clientCode, Request $request, $dEmisDate = null, $dCaduDate = null)
+    {
+        try {
             $partner = new Partner();
-            $partner->cClieCode = $count + 1;
-            $partner->nTarjNumb = '00' . ($count + 1);
+            $partner->cClieCode = $clientCode;
+            $partner->nTarjNumb = str_pad($clientCode, 8, '0', STR_PAD_LEFT);
             $partner->cTarjActi = 1;
             $partner->dEmisDate = $dEmisDate;
             $partner->dCaduDate = $dCaduDate;
@@ -98,16 +135,16 @@ class PartnerController extends Controller
             $partner->type_partner = 0;
             $partner->save();
 
+            // Guardar apoderado si se ingresó información
             if (!empty($request->proxyPatter) || !empty($request->proxyMatter) || !empty($request->proxyNames) || !empty($request->proxyDoc)) {
                 $proxy = new Proxy();
-                $proxy->proxy_client = $count + 1;
+                $proxy->proxy_client = $clientCode;
                 $proxy->proxy_pattername = $request->proxyPatter;
                 $proxy->proxy_mattername = $request->proxyMatter;
                 $proxy->proxy_names = $request->proxyNames;
                 $proxy->proxy_doc = $request->proxyDoc;
                 $proxy->save();
             }
-
 
             return response()->json([
                 'icon' => 'success',
@@ -121,6 +158,14 @@ class PartnerController extends Controller
         }
     }
 
+    /**
+     * Convierte una fecha de 'd-m-Y' a 'Y-m-d', retorna null si el formato es inválido.
+     */
+    private function convertDate($date)
+    {
+        return Carbon::hasFormat($date, 'd-m-Y') ? Carbon::createFromFormat('d-m-Y', $date)->format('Y-m-d') : null;
+    }
+
     public function renew(Request $request)
     {
         // Verificar si el código llega correctamente
@@ -131,18 +176,40 @@ class PartnerController extends Controller
             ], 400);
         }
 
+        // Verificar si el socio existe
         $partner = Partner::where('cClieCode', $request->hiddenCode)->first();
-        $partner->dEmisDate = Carbon::createFromFormat('d-m-Y', $request->renewInitdate)->format('Y-m-d');
-        $partner->dCaduDate = Carbon::createFromFormat('d-m-Y', $request->renewEnddate)->format('Y-m-d');
-        $partner->affiliation = $request->renewAffiliation;
-        $partner->status_magic = 0;
-        $partner->estado = "";
-        $partner->type_partner = 1;
-        $partner->save();
+
+        if (!$partner) {
+            return response()->json([
+                'icon' => 'error',
+                'message' => 'El socio no existe.',
+            ], 404);
+        }
+
+        // Convertir fechas con seguridad
+        $dEmisDate = $this->convertDate($request->renewInitdate);
+        $dCaduDate = $this->convertDate($request->renewEnddate);
+
+        if (!$dEmisDate || !$dCaduDate) {
+            return response()->json([
+                'icon' => 'error',
+                'message' => 'Formato de fecha inválido. Use el formato dd-mm-yyyy.',
+            ], 400);
+        }
+
+        // Actualizar datos del socio
+        $partner->update([
+            'dEmisDate'     => $dEmisDate,
+            'dCaduDate'     => $dCaduDate,
+            'affiliation'   => $request->renewAffiliation,
+            'status_magic'  => 0,
+            'estado'        => '',
+            'type_partner'  => 1,
+        ]);
 
         return response()->json([
             'icon' => 'success',
-            'message' => 'Socio renovado correctamente',
+            'message' => 'Socio renovado correctamente.',
         ]);
     }
 

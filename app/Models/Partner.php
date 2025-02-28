@@ -12,6 +12,16 @@ class Partner extends Model
     protected $table = 'TARJETA';
     public $timestamps = false;
 
+    protected $fillable = [
+        'cClieCode',
+        'dEmisDate',
+        'dCaduDate',
+        'affiliation',
+        'status_magic',
+        'estado',
+        'type_partner',
+    ];
+
     public function client()
     {
         return $this->belongsTo(Client::class, 'cClieCode', 'cClieCode');
@@ -29,7 +39,7 @@ class Partner extends Model
 
             $data[] = [
                 'id' => $partner->id,
-                'card' => $partner->cClieCode,
+                'card' => $partner->nTarjNumb,
                 'client' => optional($partner->client)->sClieApel . " " . optional($partner->client)->sClieName,
                 'document' => optional($partner->client)->charClienteDni,
                 'date_start' => $partner->dEmisDate,

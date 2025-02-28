@@ -11,8 +11,21 @@ class Client extends Model
     protected $table = 'CLIENTE';
     protected $primaryKey = 'cClieCode';
     public $timestamps = false;
+    protected $fillable = [
+        'sClieApel',
+        'sClieApepat',
+        'sClieApemat',
+        'sClieName',
+        'sClieAddr',
+        'sClieTelf',
+        'sClieMail',
+        'dNacmDate',
+        'iTipo',
+        'IdLocal',
+        'charClienteDni',
+    ];
 
-    public function partners()
+    public function partner()
     {
         return $this->hasMany(Partner::class, 'cClieCode', 'cClieCode');
     }
