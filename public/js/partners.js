@@ -1129,11 +1129,6 @@ $(function () {
                     notEmpty: { message: "Ingresa la fecha de nacimiento" },
                 },
             },
-            editaffiliation: {
-                validators: {
-                    notEmpty: { message: "Ingresa la ficha de afilicación" },
-                },
-            },
             editaddress: {
                 validators: {
                     notEmpty: { message: "Debe ingresar una dirección" },
@@ -1284,7 +1279,7 @@ $(function () {
                 $("#editaddress").val(data.sClieAddr);
                 $("#editphone").val(data.sClieTelf);
                 $("#editmail").val(data.sClieMail);
-
+console.log(data)
                 if (data.proxy) {
                     $("#EditaccordionOne").collapse("show");
                     $("#editproxyPatter").val(data.proxy.proxy_pattername);

@@ -28,7 +28,7 @@ class PartnerController extends Controller
         $select = $request->select;
 
         // Buscar cliente con su socio asociado
-        $client = Client::with('partner')->where($select, $search)->first();
+        $client = Client::with('partner', 'proxy')->where($select, $search)->first();
 
         if (!$client) {
             return response()->json([
@@ -231,7 +231,6 @@ class PartnerController extends Controller
 
     public function update(Request $request)
     {
-
         $dNacmDate = Carbon::hasFormat($request->editbirthdate, 'd-m-Y')
             ? Carbon::createFromFormat('d-m-Y', $request->editbirthdate)->format('Y-m-d')
             : null;
@@ -248,18 +247,22 @@ class PartnerController extends Controller
         $client->charClienteDni = $request->editdoc;
         $client->save();
 
+        // Buscar proxy solo si existe
         $proxy = Proxy::where('proxy_client', $request->editCodeHidden)->first();
-        $proxy->proxy_pattername = $request->editproxyPatter;
-        $proxy->proxy_mattername = $request->editproxyMatter;
-        $proxy->proxy_names = $request->editproxyNames;
-        $proxy->proxy_doc = $request->editproxyDoc;
-        $proxy->save();
+        if ($proxy) {
+            $proxy->proxy_pattername = $request->editproxyPatter;
+            $proxy->proxy_mattername = $request->editproxyMatter;
+            $proxy->proxy_names = $request->editproxyNames;
+            $proxy->proxy_doc = $request->editproxyDoc;
+            $proxy->save();
+        }
 
         return response()->json([
             'icon' => 'success',
-            'message' => 'Se editaron los datos'
+            'message' => 'Se editaron los datos correctamente'
         ]);
     }
+
 
     /**
      * Remove the specified resource from storage.
