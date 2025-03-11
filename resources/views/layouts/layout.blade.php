@@ -71,23 +71,7 @@
 </head>
 
 <body>
-    @php
-        function obtenerNombreRol($idRol)
-        {
-            $roles = [
-                1 => 'ADMIN',
-                2 => 'CAJA',
-                3 => 'COLEGIOS',
-                4 => 'CONTROLLER',
-            ];
 
-            if (array_key_exists($idRol, $roles)) {
-                return $roles[$idRol];
-            } else {
-                return 'Rol Desconocido';
-            }
-        }
-    @endphp
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar  ">
         <div class="layout-container">
@@ -149,88 +133,39 @@
                 </div>
                 <div class="menu-inner-shadow"></div>
                 <ul class="menu-inner py-1">
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon tf-icons mdi mdi-home-outline"></i>
-                            <div data-i18n="Dashboards">Dashboards</div>
-                            <div class="badge bg-primary rounded-pill ms-auto">1</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="{{ route('Dashboard') }}" class="menu-link">
-                                    <div data-i18n="sale web">Ventas Web</div>
-                                </a>
+                    @foreach ($menus as $menu)
+                        {{-- Si es un header, mostrarlo como un encabezado --}}
+                        @if (isset($menu['header']) && $menu['header'] === true)
+                            <li class="menu-header">
+                                <span class="menu-header-text text-uppercase"
+                                    data-i18n="{{ $menu['dataI18n'] ?? '' }}">{{ $menu['text'] }}</span>
                             </li>
-                        </ul>
-                    </li>
-
-                    <!-- Boxes -->
-                    <li class="menu-header fw-medium mt-4">
-                        <span class="menu-header-text" data-i18n="Boxes">Cajas</span>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="{{ route('Boleteria') }}" class="menu-link">
-                            <i class="menu-icon tf-icons mdi mdi-cart-arrow-down"></i>
-                            <div data-i18n="Generate Coupon">Generar Lista Entradas</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('validateList') }}" class="menu-link">
-                            <i class="menu-icon tf-icons mdi mdi-playlist-check"></i>
-                            <div data-i18n="Validate Coupon">Valir Lista Entradas</div>
-                        </a>
-                    </li>
-
-                    <!-- Controller -->
-                    <li class="menu-header fw-medium mt-4">
-                        <span class="menu-header-text" data-i18n="Controllers">Controllers</span>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="{{ route('partners') }}" class="menu-link">
-                            <i class="menu-icon tf-icons mdi mdi-card-account-details-star-outline"></i>
-                            <div data-i18n="Partners">Socios</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="{{ route('cambioDNI') }}" class="menu-link">
-                            <i class="menu-icon tf-icons mdi mdi-card-account-details-outline"></i>
-                            <div data-i18n="ID rectification">Rectificación de DNI</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="{{ route('coupons') }}" class="menu-link">
-                            <i class="menu-icon tf-icons mdi mdi-ticket-percent-outline"></i>
-                            <div data-i18n="Internal coupons">Cupones Internos</div>
-                        </a>
-                    </li>
-
-                    <!-- Reports -->
-                    <li class="menu-header fw-medium mt-4">
-                        <span class="menu-header-text" data-i18n="Reports">Reportes</span>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="javascript:void(0);" class="menu-link menu-toggle">
-                            <i class="menu-icon tf-icons mdi mdi-file-chart"></i>
-                            <div>Reportes Entradas</div>
-                        </a>
-                        <ul class="menu-sub">
-                            <li class="menu-item">
-                                <a href="{{ route('saleWeb') }}" class="menu-link">
-                                    <div data-i18n="sale web">Ventas Web</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="{{ route('listEntries') }}" class="menu-link">
-                                    <div data-i18n="detail entries">Detalle Entrada</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                        @else
+                            {{-- Si no es un header, procesarlo como un elemento de menú regular --}}
+                            @if (array_intersect($menu['roles'], [Auth::user()->idrol]))
+                                <li
+                                    class="menu-item {{ isset($menu['submenu']) ? setOpen(array_column($menu['submenu'], 'route'), 'open') : setActive($menu['route']) }}">
+                                    <a href="{{ isset($menu['submenu']) ? 'javascript:void(0);' : route($menu['route']) }}"
+                                        class="menu-link {{ isset($menu['submenu']) ? 'menu-toggle' : '' }}">
+                                        <i class="menu-icon tf-icons {{ $menu['icon'] ?? '' }}"></i>
+                                        <div data-i18n="{{ $menu['dataI18n'] ?? '' }}">{{ $menu['text'] }}</div>
+                                    </a>
+                                    @if (isset($menu['submenu']))
+                                        <ul class="menu-sub">
+                                            @foreach ($menu['submenu'] as $submenu)
+                                                <li class="menu-item {{ setActive($submenu['route']) }}">
+                                                    <a href="{{ route($submenu['route']) }}" class="menu-link">
+                                                        <div data-i18n="{{ $submenu['dataI18n'] }}">
+                                                            {{ $submenu['text'] }}</div>
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </li>
+                            @endif
+                        @endif
+                    @endforeach
                 </ul>
             </aside>
             <!-- / Menu -->
@@ -435,8 +370,7 @@
                                                 <div class="flex-grow-1">
                                                     <span
                                                         class="fw-medium d-block">{{ session('user')['usuario'] }}</span>
-                                                    <small
-                                                        class="text-muted label-rol">{{ obtenerNombreRol(session('user')['idrol']) }}</small>
+                                                    <small class="text-muted label-rol"></small>
                                                 </div>
                                             </div>
                                         </a>
