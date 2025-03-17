@@ -236,7 +236,7 @@ $(function () {
                             text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -279,7 +279,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -310,7 +310,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -341,7 +341,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -372,7 +372,7 @@ $(function () {
                             text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
