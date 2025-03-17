@@ -81,4 +81,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/searchPartner', [PartnerController::class, 'search']);
     Route::post('/renewPartner', [PartnerController::class, 'renew']);
     Route::post('/editPartner', [PartnerController::class, 'update']);
+    Route::get('/Socios_Validaciones', [PartnerController::class, 'report_view'])->name('reportPartners');
 });
+
+Route::get('/tableValidate', [PartnerController::class, 'showValidate']);

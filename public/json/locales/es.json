@@ -59,7 +59,7 @@
   "Address & Billing": "Address & Billing",
   "Manage Reviews": "Manage Reviews",
   "Referrals": "Referrals",
-  "Settings": "Settings",
+  "Settings": "Configuraciones",
   "Store Details": "Store Details",
   "Payments": "Payments",
   "Shipping & Delivery": "Shipping & Delivery",
@@ -67,7 +67,7 @@
   "Roles & Permissions": "Roles & Permissions",
   "Roles": "Roles",
   "Permission": "Permission",
-  "Users": "Users",
+  "Users": "Usuarios",
   "List": "List",
   "View": "View",
   "Edit": "Edit",
@@ -202,5 +202,7 @@
   "Description": "Descripción",
   "category-org": "Categoria",
   "Internal coupons": "Cupones Internos",
-  "Partners" : "Socios"
+  "Partners" : "Socios",
+  "Report partners": "Reporte Socios"
+
 }

@@ -134,15 +134,16 @@
                 <div class="menu-inner-shadow"></div>
                 <ul class="menu-inner py-1">
                     @foreach ($menus as $menu)
-                        {{-- Si es un header, mostrarlo como un encabezado --}}
-                        @if (isset($menu['header']) && $menu['header'] === true)
-                            <li class="menu-header">
-                                <span class="menu-header-text text-uppercase"
-                                    data-i18n="{{ $menu['dataI18n'] ?? '' }}">{{ $menu['text'] }}</span>
-                            </li>
-                        @else
-                            {{-- Si no es un header, procesarlo como un elemento de menú regular --}}
-                            @if (array_intersect($menu['roles'], [Auth::user()->idrol]))
+                        {{-- Verificar si el usuario tiene el rol necesario --}}
+                        @if (array_intersect($menu['roles'], [Auth::user()->idrol]))
+                            {{-- Si es un header, mostrarlo como un encabezado --}}
+                            @if (isset($menu['header']) && $menu['header'] === true)
+                                <li class="menu-header">
+                                    <span class="menu-header-text text-uppercase"
+                                        data-i18n="{{ $menu['dataI18n'] ?? '' }}">{{ $menu['text'] }}</span>
+                                </li>
+                            @else
+                                {{-- Si no es un header, procesarlo como un elemento de menú regular --}}
                                 <li
                                     class="menu-item {{ isset($menu['submenu']) ? setOpen(array_column($menu['submenu'], 'route'), 'open') : setActive($menu['route']) }}">
                                     <a href="{{ isset($menu['submenu']) ? 'javascript:void(0);' : route($menu['route']) }}"

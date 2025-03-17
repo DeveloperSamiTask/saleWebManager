@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Partner;
 use App\Models\Proxy;
+use App\Models\V_Birthday;
+use App\Models\V_NMagic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use PhpParser\Node\Stmt\Return_;
@@ -264,14 +266,30 @@ class PartnerController extends Controller
     }
 
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function report_view()
     {
-        //
+        $data['title'] = "Reporte de Validación de Cupones Socios";
+        return view('coupons.report', $data);
+    }
+
+    public function showValidate(Request $request)
+    {
+        $startDate = $request->get('startDate');
+        $endDate = $request->get('endDate');
+
+        $startDate = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+        $v_birthday = V_Birthday::show($startDate, $endDate);
+        $v_magic = V_NMagic::show($startDate, $endDate);
+
+        return response()->json([
+            'data' => array_merge($v_birthday, $v_magic),
+            'count' => [
+                'birthday' => count($v_birthday),
+                'magic' => count($v_magic),
+                'total' => count($v_birthday) + count($v_magic)
+            ]
+        ]);
     }
 }
