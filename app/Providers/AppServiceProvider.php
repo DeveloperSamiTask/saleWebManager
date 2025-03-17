@@ -63,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Partners',
             ],
             [
-                'roles' => [1, 3, 4],
+                'roles' => [1, 4],
                 'route' => 'cambioDNI',
                 'icon' => 'mdi mdi-card-account-details-outline',
                 'text' => 'Rectificación de DNI',
