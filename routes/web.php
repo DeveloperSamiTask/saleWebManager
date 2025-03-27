@@ -7,10 +7,12 @@ use App\Http\Controllers\SaleWebs;
 use App\Http\Controllers\TableEntries;
 use App\Http\Controllers\ValidateWebs;
 use App\Http\Controllers\CashierReport;
+use App\Http\Controllers\CouponManagementController;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\DniController;
 use App\Http\Controllers\Notify;
 use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\TemplateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +84,24 @@ Route::middleware('auth')->group(function () {
     Route::post('/renewPartner', [PartnerController::class, 'renew']);
     Route::post('/editPartner', [PartnerController::class, 'update']);
     Route::get('/Socios_Validaciones', [PartnerController::class, 'report_view'])->name('reportPartners');
+
+    Route::prefix('Cupon')->group(function () {
+        Route::get('/', [CouponManagementController::class, 'index'])->name('coupon.index'); // Mostrar lista de cupones
+        Route::post('/DNI', [CouponManagementController::class, 'searchDNI'])->name('cupon.dni'); // Formulario de creación
+        Route::get('/Show', [CouponManagementController::class, 'show'])->name('cupon.show');
+        Route::post('/Promotions', [CouponManagementController::class, 'getPromotions'])->name('cupon.promotions'); // Formulario de creación
+        Route::post('/Create', [CouponManagementController::class, 'store'])->name('cupon.store'); // Formulario de creación
+        Route::get('/pdf/{code}', [CouponManagementController::class, 'generatePdf'])->name('cupon.pdf'); // Formulario para validar
+        Route::post('/validar', [CouponManagementController::class, 'validateCoupon'])->name('cupon.validate'); // Validar cupón
+    });
+
+    Route::prefix('Plantillas')->group(function () {
+        Route::get('/', [TemplateController::class, 'index'])->name('template.index'); // Mostrar lista de plantillas
+        Route::get('/Show', [TemplateController::class, 'show'])->name('template.show'); // Formulario de creación
+        Route::post('/Store', [TemplateController::class, 'store'])->name('template.store'); // Guardar plantilla
+        Route::post('/Update', [TemplateController::class, 'update'])->name('template.update'); // Actualizar plantilla
+        Route::post('/Delete/{id}', [TemplateController::class, 'destroy'])->name('template.destroy'); // Eliminar plantilla
+    });
 });
 
 Route::get('/tableValidate', [PartnerController::class, 'showValidate']);

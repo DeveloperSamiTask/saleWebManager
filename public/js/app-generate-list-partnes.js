@@ -142,7 +142,7 @@ $(function () {
                         },
                     },
                     {
-                        targets: [3,8],
+                        targets: [3, 8],
                         render: function (e, t, a, n) {
                             return `<span class="text-heading fw-medium">${e}</span>`;
                         },
@@ -154,7 +154,7 @@ $(function () {
                         },
                     },
                     {
-                        targets: [5,6],
+                        targets: [5, 6],
                         className: "text-center",
                         render: function (e, t, a, n) {
                             return e ? e.split(" ")[0] : "";
@@ -180,9 +180,7 @@ $(function () {
                                 text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
                                 className: "dropdown-item",
                                 exportOptions: {
-                                    columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8
-                                    ],
+                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                     format: {
                                         body: function (e, t, a) {
                                             var n;
@@ -226,9 +224,7 @@ $(function () {
                                 text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
                                 className: "dropdown-item",
                                 exportOptions: {
-                                    columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8
-                                    ],
+                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                     format: {
                                         body: function (e, t, a) {
                                             var n;
@@ -260,9 +256,7 @@ $(function () {
                                 text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
                                 className: "dropdown-item",
                                 exportOptions: {
-                                    columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8
-                                    ],
+                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                     format: {
                                         body: function (e, t, a) {
                                             var n;
@@ -294,9 +288,7 @@ $(function () {
                                 text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
                                 className: "dropdown-item",
                                 exportOptions: {
-                                    columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8
-                                    ],
+                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                     format: {
                                         body: function (e, t, a) {
                                             var n;
@@ -328,9 +320,7 @@ $(function () {
                                 text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
                                 className: "dropdown-item",
                                 exportOptions: {
-                                    columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8
-                                    ],
+                                    columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                     format: {
                                         body: function (e, t, a) {
                                             var n;

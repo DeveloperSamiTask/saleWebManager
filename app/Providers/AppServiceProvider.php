@@ -50,6 +50,19 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Valir Lista Entradas',
             ],
             [
+                'roles' => [1, 2, 3, 4],
+                'header' => true,
+                'text' => 'Cupones',
+                'dataI18n' => 'Coupons',
+            ],
+            [
+                'roles' => [1, 3, 4],
+                'route' => 'coupon.index',
+                'icon' => 'mdi mdi-ticket-percent-outline',
+                'text' => 'Cupones Cumpleaños',
+                'dataI18n' => 'Birthday Coupons',
+            ],
+            [
                 'roles' => [1, 3, 4],
                 'header' => true,
                 'text' => 'Controllers',
@@ -113,6 +126,13 @@ class AppServiceProvider extends ServiceProvider
                 'header' => true,
                 'text' => 'Configuraciones',
                 'dataI18n' => 'Settings',
+            ],
+            [
+                'roles' => [1],
+                'route' => 'template.index',
+                'icon' => 'mdi mdi-file-pdf-box',
+                'text' => 'Plantillas',
+                'dataI18n' => 'Templates',
             ],
             [
                 'roles' => [1],

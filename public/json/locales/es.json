@@ -202,7 +202,10 @@
   "Description": "Descripción",
   "category-org": "Categoria",
   "Internal coupons": "Cupones Internos",
+  "Coupons": "Cupones",
+  "Birthday Coupons": "Cupones Cumpleaños",
   "Partners" : "Socios",
-  "Report partners": "Reporte Socios"
+  "Report partners": "Reporte Socios",
+  "Templates": "Plantillas"
 
 }
