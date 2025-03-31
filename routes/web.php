@@ -92,15 +92,17 @@ Route::middleware('auth')->group(function () {
         Route::post('/Promotions', [CouponManagementController::class, 'getPromotions'])->name('cupon.promotions'); // Formulario de creación
         Route::post('/Create', [CouponManagementController::class, 'store'])->name('cupon.store'); // Formulario de creación
         Route::get('/pdf/{code}', [CouponManagementController::class, 'generatePdf'])->name('cupon.pdf'); // Formulario para validar
-        Route::post('/validar', [CouponManagementController::class, 'validateCoupon'])->name('cupon.validate'); // Validar cupón
+        Route::post('/Status', [CouponManagementController::class, 'changeStatus'])->name('cupon.status'); // Validar cupón
+
+        Route::get('/Validar_Cupon', [CouponManagementController::class, 'viewValidate'])->name('cupon.validate'); // Formulario para validar
+        Route::get('/Search/{code}', [CouponManagementController::class, 'search'])->name('cupon.search'); // Formulario para validar
     });
 
     Route::prefix('Plantillas')->group(function () {
-        Route::get('/', [TemplateController::class, 'index'])->name('template.index'); // Mostrar lista de plantillas
-        Route::get('/Show', [TemplateController::class, 'show'])->name('template.show'); // Formulario de creación
+        Route::get('/', [TemplateController::class, 'index'])->name('template.index'); // Vista lista de plantillas
+        Route::get('/Show', [TemplateController::class, 'show'])->name('template.show'); // Api plantillas
         Route::post('/Store', [TemplateController::class, 'store'])->name('template.store'); // Guardar plantilla
         Route::post('/Update', [TemplateController::class, 'update'])->name('template.update'); // Actualizar plantilla
-        Route::post('/Delete/{id}', [TemplateController::class, 'destroy'])->name('template.destroy'); // Eliminar plantilla
     });
 });
 

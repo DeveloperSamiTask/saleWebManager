@@ -19,7 +19,7 @@
                     <div class="col-md-2 d-flex justify-content-end">
 
                     </div>
-                    <div class="col-md-4 d-flex justify-content-end">
+                   <!-- <div class="col-md-4 d-flex justify-content-end">
                         <div class="card-header-elements ms-auto">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary waves-effect waves-light" id="editPartner"><i
@@ -34,7 +34,7 @@
                                     Socio</button>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
             <div class="card-datatable table-responsive">

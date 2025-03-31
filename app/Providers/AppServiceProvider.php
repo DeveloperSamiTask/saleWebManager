@@ -46,8 +46,15 @@ class AppServiceProvider extends ServiceProvider
                 'roles' => [1, 2],
                 'route' => 'validateList',
                 'icon' => 'mdi mdi-playlist-check',
-                'text' => 'Validate Coupon',
-                'dataI18n' => 'Valir Lista Entradas',
+                'text' => 'Validar lista entradas',
+                'dataI18n' => 'Validate list entries',
+            ],
+            [
+                'roles' => [1, 2],
+                'route' => 'cupon.validate',
+                'icon' => 'mdi mdi-newspaper-check',
+                'text' => 'Validar Cupón',
+                'dataI18n' => 'Validate Coupon',
             ],
             [
                 'roles' => [1, 2, 3, 4],

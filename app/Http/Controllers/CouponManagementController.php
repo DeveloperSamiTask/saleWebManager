@@ -6,6 +6,7 @@ use App\Helpers\ReniecHelper;
 use App\Models\Companies;
 use App\Models\Coupons;
 use App\Models\Promotions;
+use App\Models\Templates;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
@@ -94,30 +95,38 @@ class CouponManagementController extends Controller
         }
     }
 
-
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function viewValidate()
     {
-        //
+        $data['title'] = "Validar Cupón";
+        return view('coupon.validate', $data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function search($code)
     {
-        //
+        $coupon = Coupons::with('promotion')->where('code', $code)->first();
+
+        if (!$coupon) {
+            return $this->response('error', 'Cupón no encontrado', 404);
+        }
+
+        return match (true) {
+            $coupon->status == 1 => $this->response(
+                'warning',
+                'Este cupón ya ha sido utilizado el ' . optional($coupon->used_date)->format('d/m/Y H:i:s')
+            ),
+            $coupon->status == 3 => $this->response(
+                'warning',
+                'Este cupón está inhabilitado'
+            ),
+            $coupon->expired_date < now()->toDateString() => $this->response(
+                'warning',
+                'Este cupón expiró el ' . \Carbon\Carbon::parse($coupon->expired_date)->format('d/m/Y')
+            ),
+            default => $this->response('success', 'Cupón encontrado', 200, $coupon),
+        };
     }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -130,11 +139,29 @@ class CouponManagementController extends Controller
         //
     }
 
+    public function changeStatus(Request $request)
+    {
+        $coupon = Coupons::find($request->id);
+        if ($coupon) {
+            $coupon->status = $request->status;
+            $coupon->save();
+            return response()->json(['icon' => 'success', 'message' => 'Estado actualizado correctamente']);
+        } else {
+            return response()->json(['icon' => 'error', 'message' => 'Cupón no encontrado'], 404);
+        }
+    }
+
 
     public function generatePdf($code)
     {
         // Buscar el cupón en la base de datos
         $client = Coupons::where('code', $code)->first();
+
+        $template = Templates::where('company_id', $client->company_id)
+            ->where('promotion_id', $client->promotion_id)
+            ->first();
+
+        $content = $template->content;
 
         // Ruta absoluta del archivo en el servidor
         $imagePath = public_path('storage/' . $client->img);
@@ -152,10 +179,10 @@ class CouponManagementController extends Controller
         $barcodeBase64 = 'data:image/png;base64,' . $barcodeData;
 
         // Generar el PDF con la vista
-        $pdf = Pdf::loadView('pdf.coupon', compact('client', 'imagePath', 'barcodeBase64'));
+        $pdf = Pdf::loadView('pdf.coupon', compact('client', 'imagePath', 'barcodeBase64', 'content'));
 
         // Mostrar el PDF en el navegador sin descargarlo
-        return $pdf->stream('ticket.pdf');
+        return $pdf->stream($client->code . '.pdf');
     }
 
     public function searchDNI(Request $request)
@@ -172,5 +199,16 @@ class CouponManagementController extends Controller
         $formattedNumber = str_pad($number, 3, '0', STR_PAD_LEFT); // Asegura que el número tenga al menos 3 dígitos
 
         return "{$ci}-{$date}-{$formattedNumber}";
+    }
+    /**
+     * Genera una respuesta JSON estructurada.
+     */
+    private function response($icon, $message, $status = 400, $data = null)
+    {
+        return response()->json([
+            'icon' => $icon,
+            'message' => $message,
+            'data' => $data
+        ], $status);
     }
 }

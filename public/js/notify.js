@@ -4,7 +4,7 @@ $(function () {
     function viewNotifyAndPush() {
         // Realizar la solicitud AJAX para obtener las notificaciones
         $.ajax({
-            url: "Result_Notify",
+            url: "/Result_Notify",
             type: "GET",
             data: {
                 _token: csrfToken,
@@ -76,7 +76,7 @@ $(function () {
                     var formattedDate = moment(
                         notification.created_at
                     ).fromNow(); // Formatear la fecha y hora
-                    
+
                     var innerHTML = `
                     <div class="d-flex gap-2">
                         <div class="d-flex flex-column flex-grow-1 overflow-hidden w-px-200">

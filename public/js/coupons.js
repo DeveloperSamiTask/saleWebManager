@@ -232,7 +232,7 @@ $(function () {
                 {
                     targets: 1,
                     render: function (e, t, a, n) {
-                        return e;
+                        return `<a href="Cupon/pdf/${e}" target="_blank">${e}</a>`;
                     },
                 },
 
@@ -265,24 +265,55 @@ $(function () {
                 {
                     targets: 7,
                     title: "Estado",
-                    render: function (a, e, t, s) {
-                        let now = new Date();
-                        let endDate = new Date(t.date_end);
+                    render: function (data, type, row) {
+                        let statusLabels = {
+                            0: { text: "ACTIVO", class: "success" },
+                            1: { text: "USADO", class: "primary" },
+                            2: { text: "INACTIVO", class: "danger" },
+                            3: { text: "VENCIDO", class: "warning" },
+                        };
 
-                        return now > endDate
-                            ? '<span class="badge rounded-pill bg-label-danger">Inactivo</span>'
-                            : '<span class="badge rounded-pill bg-label-success">Activo</span>';
+                        let label = `<span class="badge bg-${statusLabels[data].class}">${statusLabels[data].text}</span>`;
+
+                        // Solo mostrar opciones de activación/inactivación si es 0 o 2
+                        if (data === 0 || data === 2) {
+                            let newStatus = data === 0 ? 2 : 0;
+                            let newText = data === 0 ? "desactivar" : "Activar";
+                            let newClass = data === 0 ? "danger" : "success";
+
+                            return `
+                                <div class="btn-group">
+                                    ${label}
+                                    <button type="button" class="btn btn-${statusLabels[data].class} btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item change-status" href="javascript:void(0);"
+                                               data-id="${row.id}" data-status="${newStatus}">
+                                                <i class="fas fa-sync-alt text-${newClass}"></i> ${newText}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            `;
+                        }
+
+                        return label;
                     },
                 },
                 {
                     targets: -1,
-                    title: "Tipo",
+                    title: "Fecha Uso",
                     render: function (a, e, t, s) {
-                        if (a == 0) {
-                            return '<span class="badge rounded-pill bg-label-success">Inscripción</span>';
-                        } else {
-                            return '<span class="badge rounded-pill bg-label-info">Renovación</span>';
-                        }
+                        if (!a) return "";
+                        let date = new Date(a);
+                        let day = date.getDate().toString().padStart(2, "0");
+                        let month = (date.getMonth() + 1)
+                            .toString()
+                            .padStart(2, "0");
+                        let year = date.getFullYear();
+                        return `${day}/${month}/${year}`;
                     },
                 },
             ],
@@ -567,124 +598,34 @@ $(function () {
         }
     });
 
-    e.on("click", ".btn-acepted", function () {
-        let row = $(this).closest("tr");
-        let rowData = $(this).closest("table").DataTable().row(row).data();
-
-        Swal.fire({
-            title: "Estas seguro?",
-            text: `Aceptaras el Cambio de Documento de la Entrada: ${rowData.detcart}`,
-            icon: "warning",
-            showCancelButton: !0,
-            confirmButtonText: "Si, aceptar",
-            cancelButtonText: "Cancelar",
-            customClass: {
-                confirmButton: "btn btn-primary me-3 waves-effect waves-light",
-                cancelButton: "btn btn-outline-secondary waves-effect",
-            },
-            buttonsStyling: !1,
-        }).then(function (t) {
-            if (t.value) {
-                $.blockUI({
-                    message:
-                        '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
-                    css: { backgroundColor: "transparent", border: "0" },
-                    overlayCSS: { opacity: 0.5 },
-                });
-                $.ajax({
-                    url: "updatedDocument",
-                    type: "post",
-                    data: {
-                        id: rowData.id,
-                        detcart: rowData.detcart,
-                        document: rowData.dniAfter,
-                        _token: csrfToken,
-                    },
-                })
-                    .done((response) => {
-                        console.log(response);
-                        e.ajax.reload();
-
-                        Toast.fire({
-                            icon: "success",
-                            title: "Se ha cambiad el Documento",
-                        });
-                    })
-                    .fail((response) => {
-                        Toast.fire({
-                            icon: "error",
-                            title: "Error al cambiar documento, contactar con SISTEMAS",
-                        });
-                        console.log(response.responseText);
-                    })
-                    .always(() => {
-                        $.unblockUI();
-                    });
-            }
-        });
-    });
-
-    e.on("click", ".renew", function () {
-        let row = $(this).closest("tr");
-        let rowData = $(this).closest("table").DataTable().row(row).data();
-
-        $("#renew-modal").modal("show");
-    });
-
-    $("#searchPartner").on("click", function () {
-        $("#renew-modal").modal("show");
-    });
-
-    $("#selectSearch").on("change", function () {
-        let text = $("#selectSearch option:selected").text();
-        $("#searchInput").attr("placeholder", `Buscar por ${text}`);
-    });
-
-    $("#renewForm").on("submit", function (h) {
-        h.preventDefault();
+    e.on("click", ".change-status", function () {
+        let id = $(this).data("id");
+        let newStatus = $(this).data("status");
         blockUI();
-
-        if ($("#renewAffiliation").val() == "") {
-            Toast.fire({
-                icon: "error",
-                title: "Debe ingresar la ficha de afiliación",
-            });
-            $.unblockUI();
-
-            return;
-        }
-
-        let formData = new FormData(this);
-        formData.append("_token", csrfToken);
-
-        fetch("renewPartner", {
+        $.ajax({
+            url: "/Cupon/Status",
             method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error en la solicitud");
-                }
-                return response.json();
-            })
-            .then((data) => {
+            data: {
+                id: id,
+                status: newStatus,
+            },
+            success: function (response) {
                 e.ajax.reload();
+
                 Toast.fire({
-                    icon: data.icon,
-                    title: data.message,
+                    icon: response.icon,
+                    title: response.message,
                 });
 
-                $("#renew-modal").modal("hide");
-            })
-            .catch((error) => {
-                Toast.fire({
-                    icon: error.icon,
-                    title: error.message,
-                });
-            })
-            .finally(() => {
                 $.unblockUI();
-            });
+            },
+            error: function () {
+                Toast.fire({
+                    icon: response.icon,
+                    title: response.message,
+                });
+            },
+        });
     });
 
     const f = document.getElementById("partnerForm");
@@ -823,221 +764,6 @@ $(function () {
             });
     });
 
-    const ef = document.getElementById("editForm");
-    const efv = FormValidation.formValidation(ef, {
-        fields: {
-            editpattername: {
-                validators: {
-                    notEmpty: {
-                        message: "Ingresa el apellido paterno del socio",
-                    },
-                },
-            },
-            editmattername: {
-                validators: {
-                    notEmpty: {
-                        message: "Ingresa el apellido materno del socio",
-                    },
-                    regex: {
-                        message: "Ingresa un apellido válido",
-                        regex: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/,
-                    },
-                },
-            },
-            editnames: {
-                validators: {
-                    notEmpty: { message: "Ingresa nombres del socio" },
-                },
-                validators: {
-                    notEmpty: { message: "Ingresa nombres del socio" },
-                    minLength: {
-                        message: "Ingresa un nombre válido",
-                        length: 2,
-                    },
-                },
-            },
-            editdoc: {
-                validators: {
-                    notEmpty: {
-                        message: "Ingresa el Nº documento del socio",
-                    },
-                },
-            },
-            editbirthdate: {
-                validators: {
-                    notEmpty: { message: "Ingresa la fecha de nacimiento" },
-                },
-            },
-            editaddress: {
-                validators: {
-                    notEmpty: { message: "Debe ingresar una dirección" },
-                },
-            },
-            editphone: {
-                validators: {
-                    notEmpty: {
-                        message: "Debe ingresar un número de celular",
-                    },
-                },
-            },
-            editmail: {
-                validators: {
-                    emailAddress: {
-                        message: "Ingresa un e-mail válido",
-                        flags: "i",
-                        breakChainOnFailure: false,
-                        errorElement: "span",
-                        successElement: "span",
-                        errorMessage: "Ingresa un e-mail válido",
-                    },
-                },
-            },
-        },
-        plugins: {
-            trigger: new FormValidation.plugins.Trigger(),
-            bootstrap5: new FormValidation.plugins.Bootstrap5({
-                eleValidClass: "is-valid",
-                rowSelector: function (t, e) {
-                    switch (e) {
-                        case "formValidationName":
-                        case "formValidationEmail":
-                        case "formValidationPass":
-                        case "formValidationConfirmPass":
-                        case "formValidationFile":
-                        case "formValidationDob":
-                        case "formValidationSelect2":
-                        case "formValidationLang":
-                        case "formValidationTech":
-                        case "formValidationHobbies":
-                        case "formValidationBio":
-                        case "formValidationGender":
-                            return ".col-md-6";
-                        case "formValidationPlan":
-                            return ".col-xl-3";
-                        case "formValidationSwitch":
-                        case "formValidationCheckbox":
-                            return ".col-12";
-                        default:
-                            return ".row";
-                    }
-                },
-            }),
-            submitButton: new FormValidation.plugins.SubmitButton(),
-            autoFocus: new FormValidation.plugins.AutoFocus(),
-        },
-    });
-
-    efv.on("core.form.valid", function () {
-        blockUI();
-
-        let formData = new FormData(ef);
-        formData.append("_token", csrfToken);
-
-        fetch("editPartner", {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error en la solicitud");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log(data);
-
-                e.ajax.reload();
-                Toast.fire({
-                    icon: data.icon,
-                    title: data.message,
-                });
-
-                $("#editPartner").modal("hide");
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                Toast.fire({
-                    icon: error.icon,
-                    title: error.message,
-                });
-            })
-            .finally(() => {
-                $.unblockUI();
-            });
-    });
-
-    $("#editPartner").on("click", function (h) {
-        $("#edit-modal").modal("show");
-    });
-
-    $("#editSelect").on("change", function () {
-        let text = $("#editSelect option:selected").text();
-        $("#inputSelect").attr("placeholder", `Buscar por ${text}`);
-    });
-
-    $("#editBtn").on("click", function () {
-        blockUI();
-        $.ajax({
-            url: "searchPartner",
-            type: "post",
-            data: {
-                search: $("#inputSelect").val(),
-                select: $("#editSelect").val(),
-                _token: csrfToken,
-            },
-        })
-            .done((data) => {
-                if (data.icon) {
-                    // Si hay un mensaje de advertencia, mostrarlo y salir
-                    Toast.fire({
-                        icon: data.icon,
-                        title: data.message,
-                    });
-
-                    $("#edit-modal").modal("hide");
-
-                    $("#addNewCoupon").modal("show");
-
-                    $.unblockUI();
-                    return;
-                }
-                $("#editCodeHidden").val(data.cClieCode);
-                $("#editcode").val(data.partner[0].nTarjNumb);
-                $("#editpattername").val(`${data.sClieApepat}`);
-                $("#editmattername").val(`${data.sClieApemat}`);
-                $("#editnames").val(`${data.sClieName}`);
-                $("#editdoc").val(data.charClienteDni);
-                $("#editbirthdate").val(formatDateToDMY(data.dNacmDate));
-                $("#editaffiliation").val(data.partner[0].affiliation);
-                $("#editinitdate").val(
-                    formatDateToDMY(data.partner[0].dEmisDate)
-                );
-                $("#editenddate").val(
-                    formatDateToDMY(data.partner[0].dCaduDate)
-                );
-                $("#editaddress").val(data.sClieAddr);
-                $("#editphone").val(data.sClieTelf);
-                $("#editmail").val(data.sClieMail);
-                console.log(data);
-                if (data.proxy) {
-                    $("#EditaccordionOne").collapse("show");
-                    $("#editproxyPatter").val(data.proxy.proxy_pattername);
-                    $("#editproxyMatter").val(data.proxy.proxy_mattername);
-                    $("#editproxyNames").val(data.proxy.proxy_names);
-                    $("#editproxyDoc").val(data.proxy.proxy_doc);
-                }
-            })
-            .fail((response) => {
-                Toast.fire({
-                    icon: response.icon,
-                    title: response.message,
-                });
-            })
-            .always(() => {
-                $.unblockUI();
-            });
-    });
-
     $("#addNewCoupon").on("hidden.bs.modal", function () {
         $("#partnerForm")[0].reset();
         fv.resetForm(true);
@@ -1045,19 +771,6 @@ $(function () {
         datePicker.setDate(formattedToday, true);
         $("#company").val(null).trigger("change");
         $("#promotion").val(null).trigger("change");
-    });
-
-    $("#renew-modal").on("hidden.bs.modal", function () {
-        $("#renewForm")[0].reset();
-        fv.resetForm(true);
-        $("#selectSearch").val("charClienteDni").trigger("change");
-        $(".btnRenew").prop("disabled", true);
-        renewInitDatePicker.setDate(formattedToday, true);
-    });
-
-    $("#edit-modal").on("hidden.bs.modal", function () {
-        $("#editForm")[0].reset();
-        fv.resetForm(true);
     });
 
     function fetchDNI(dni) {
