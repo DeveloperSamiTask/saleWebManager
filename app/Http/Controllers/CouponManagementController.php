@@ -172,7 +172,7 @@ class CouponManagementController extends Controller
         $content = $template->content;
 
         // Ruta absoluta del archivo en el servidor
-        $imagePath = url($client->img);
+        $imagePath = url('public/'.$client->img);
 
         // Verificar si la imagen existe
         if (!file_exists($imagePath)) {
