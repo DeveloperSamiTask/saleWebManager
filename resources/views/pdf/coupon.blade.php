@@ -31,9 +31,9 @@
 <body>
     <table style="background: url('{{ $imagePath }}'); background-repeat:no-repeat; height:365px;">
         <tr>
-            <td style="width:25px;">&nbsp;</td>
+            <td style="width:10px;">&nbsp;</td>
             <td style="text-align:left;">
-                <img src="{{ $barcodeBase64 }}" class="barcode" alt="Código de Barras">
+                <img src="{{ $barcodeBase64 }}" style="margin-top: 3.5rem;" class="barcode" alt="Código de Barras">
             </td>
         </tr>
     </table>
