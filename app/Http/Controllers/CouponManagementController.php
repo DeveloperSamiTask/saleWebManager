@@ -78,8 +78,16 @@ class CouponManagementController extends Controller
             $coupon->status = 0;
 
             if ($request->hasFile('formFile')) {
+                // Define una ruta personalizada para guardar la imagen
+                $imagePath = '/home/ep3s6easy863/web.lagranjavilla.com/coupons';
+
+                // Genera el nombre del archivo de la imagen
                 $filename = time() . '.' . $request->formFile->getClientOriginalExtension();
-                $request->formFile->storeAs('public/coupons', $filename);
+
+                // Guarda la imagen en la ruta personalizada
+                $request->formFile->move($imagePath, $filename);
+
+                // Actualiza el campo de la imagen en el modelo con la ruta relativa a la ubicación del servidor
                 $coupon->img = 'coupons/' . $filename;
             }
 
@@ -164,7 +172,7 @@ class CouponManagementController extends Controller
         $content = $template->content;
 
         // Ruta absoluta del archivo en el servidor
-        $imagePath = public_path('storage/' . $client->img);
+        $imagePath = url($client->img);
 
         // Verificar si la imagen existe
         if (!file_exists($imagePath)) {
