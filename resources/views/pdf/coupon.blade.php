@@ -46,6 +46,10 @@
             <td align="left" style="font-size:15px;"><b>DNI:</b> </td>
             <td>{{ $client->number_doc }}</td>
         </tr>
+        <tr>
+            <td align="left" style="font-size:15px;"><b>DNI:</b> </td>
+            <td>{{ $client->expired_date }}</td>
+        </tr>
     </table>
     <div>{!! $content !!}</div>
 </body>
