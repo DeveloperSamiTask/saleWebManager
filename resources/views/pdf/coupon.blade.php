@@ -47,7 +47,7 @@
             <td>{{ $client->number_doc }}</td>
         </tr>
         <tr>
-            <td align="left" style="font-size:15px;"><b>Fecha Expiración:</b> </td>
+            <td align="left" style="font-size:15px;"><b>FECHA EXPIRACION:</b> </td>
             <td>{{ $client->expired_date }}</td>
         </tr>
     </table>
