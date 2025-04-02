@@ -75,7 +75,7 @@ class CouponManagementController extends Controller
             $coupon->names = $request->names;
             $coupon->phone = $request->phone;
             $coupon->email = $request->mail;
-            $coupon->status = 0;
+            $coupon->status = 4;
 
             if ($request->hasFile('formFile')) {
                 $filename = time() . '.' . $request->formFile->getClientOriginalExtension();

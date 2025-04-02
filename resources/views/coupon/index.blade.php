@@ -454,5 +454,9 @@
 
 @section('scripts')
     <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
+    <script>
+        let userRole = "{{ auth()->user()->idrol }}";
+
+    </script>
     <script src="{{ asset('js/coupons.js') }}"></script>
 @endsection

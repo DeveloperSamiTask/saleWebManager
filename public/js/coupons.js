@@ -267,40 +267,43 @@ $(function () {
                     title: "Estado",
                     render: function (data, type, row) {
                         let statusLabels = {
-                            0: { text: "ACTIVO", class: "success" },
-                            1: { text: "USADO", class: "primary" },
-                            2: { text: "INACTIVO", class: "danger" },
-                            3: { text: "VENCIDO", class: "warning" },
+                            0: { text: "ACTIVO", class: "success", newStatus: 2, newText: "Desactivar", newClass: "danger" },
+                            1: { text: "USADO", class: "primary", newStatus: null },
+                            2: { text: "INACTIVO", class: "danger", newStatus: 0, newText: "Activar", newClass: "success" },
+                            3: { text: "VENCIDO", class: "warning", newStatus: null },
+                            4: { text: "PENDIENTE", class: "secondary", newStatus: 0, newText: "Activar", newClass: "success" }
                         };
 
                         let label = `<span class="badge bg-${statusLabels[data].class}">${statusLabels[data].text}</span>`;
 
-                        // Solo mostrar opciones de activación/inactivación si es 0 o 2
-                        if (data === 0 || data === 2) {
-                            let newStatus = data === 0 ? 2 : 0;
-                            let newText = data === 0 ? "desactivar" : "Activar";
-                            let newClass = data === 0 ? "danger" : "success";
-
-                            return `
-                                <div class="btn-group">
-                                    ${label}
-                                    <button type="button" class="btn btn-${statusLabels[data].class} btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-cog"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item change-status" href="javascript:void(0);"
-                                               data-id="${row.id}" data-status="${newStatus}">
-                                                <i class="fas fa-sync-alt text-${newClass}"></i> ${newText}
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            `;
+                        // Solo los usuarios con rol 4 o más pueden activar un estado "PENDIENTE"
+                        if (data === 4 && userRole < 4) {
+                            return label; // Si el rol es menor a 4, solo muestra la etiqueta sin botón
                         }
 
-                        return label;
-                    },
+                        // Si el estado no tiene una acción disponible, solo muestra la etiqueta
+                        if (statusLabels[data].newStatus === null) {
+                            return label;
+                        }
+
+                        return `
+                            <div class="btn-group">
+                                ${label}
+                                <button type="button" class="btn btn-${statusLabels[data].class} btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item change-status" href="javascript:void(0);"
+                                           data-id="${row.id}" data-status="${statusLabels[data].newStatus}">
+                                            <i class="fas fa-sync-alt text-${statusLabels[data].newClass}"></i> ${statusLabels[data].newText}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+
                 },
                 {
                     targets: -1,
