@@ -10,8 +10,8 @@ use App\Models\Templates;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
-use Psr\Http\Message\RequestInterface;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
 
 class CouponManagementController extends Controller
 {
@@ -76,6 +76,7 @@ class CouponManagementController extends Controller
             $coupon->phone = $request->phone;
             $coupon->email = $request->mail;
             $coupon->status = 4;
+            $coupon->use_create = session('user')['idusuario'];
 
             if ($request->hasFile('formFile')) {
                 $filename = time() . '.' . $request->formFile->getClientOriginalExtension();
@@ -112,11 +113,15 @@ class CouponManagementController extends Controller
         return match (true) {
             $coupon->status == 1 => $this->response(
                 'warning',
-                'Este cupón ya ha sido utilizado el ' . optional($coupon->used_date)->format('d/m/Y H:i:s')
+                'Este cupón ya ha sido utilizado el ' . optional(Carbon::parse($coupon->used_date))->format('d/m/Y H:i:s')
             ),
             $coupon->status == 3 => $this->response(
                 'warning',
                 'Este cupón está inhabilitado'
+            ),
+            $coupon->status == 4 => $this->response(
+                'warning',
+                'Este cupón está pendiente de validación'
             ),
             $coupon->expired_date < now()->toDateString() => $this->response(
                 'warning',
@@ -126,17 +131,19 @@ class CouponManagementController extends Controller
         };
     }
 
-
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function validateCoupon(Request $request)
     {
-        //
+
+        $coupon = Coupons::where('code', $request->code)->first();
+
+        $coupon->status = 1;
+        $coupon->user_validate = session('user')['idusuario'];
+
+        $coupon->used_date = now();
+
+        $coupon->save();
+
+        return response()->json(['icon' => 'success', 'message' => 'Cupón validado correctamente']);
     }
 
     public function changeStatus(Request $request)
@@ -184,6 +191,30 @@ class CouponManagementController extends Controller
         // Mostrar el PDF en el navegador sin descargarlo
         return $pdf->stream($client->code . '.pdf');
     }
+
+    public function validatePdf($code)
+    {
+
+        // Buscar el cupón en la base de datos
+        $coupon = Coupons::with('promotion')->where('code', $code)->first();
+
+        $html = view('pdf.validate', compact('coupon'))->render();
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+
+        $dompdf->setPaper([0, 0, 200, 426]);
+
+        $dompdf->render();
+
+        return response($dompdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $code . '.pdf"');
+    }
+
 
     public function searchDNI(Request $request)
     {

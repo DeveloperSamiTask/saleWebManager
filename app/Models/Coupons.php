@@ -31,10 +31,11 @@ class Coupons extends Model
             $data[] = [
                 'id' => $row->id,
                 'code' => $row->code,
-                'client' => $row->father_surname . " " .$row->mother_surname . " " . $row->names,
+                'client' => $row->father_surname . " " . $row->mother_surname . " " . $row->names,
                 'document' => $row->number_doc,
                 'company' =>  optional($row->company)->name,
                 'status' => $row->status,
+                'expired_date' => $row->expired_date,
                 'issue_date' => $row->created_at,
                 'used_date' => $row->used_date,
             ];

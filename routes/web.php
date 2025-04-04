@@ -95,7 +95,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/Status', [CouponManagementController::class, 'changeStatus'])->name('cupon.status'); // Validar cupón
 
         Route::get('/Validar_Cupon', [CouponManagementController::class, 'viewValidate'])->name('cupon.validate'); // Formulario para validar
+        Route::get('/Validacion/{code}', [CouponManagementController::class, 'validatePdf'])->name('cupon.validateCode'); // Formulario para validar
         Route::get('/Search/{code}', [CouponManagementController::class, 'search'])->name('cupon.search'); // Formulario para validar
+        Route::post('/Validate', [CouponManagementController::class, 'validateCoupon'])->name('cupon.validateCoupon'); // Formulario para validar
     });
 
     Route::prefix('Plantillas')->group(function () {

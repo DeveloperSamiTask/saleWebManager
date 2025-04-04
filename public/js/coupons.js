@@ -213,7 +213,7 @@ $(function () {
                 { data: "client" },
                 { data: "document" },
                 { data: "issue_date" },
-                { data: "issue_date" },
+                { data: "expired_date" },
                 { data: "status" },
                 { data: "" },
             ],
@@ -228,14 +228,12 @@ $(function () {
                         return "";
                     },
                 },
-
                 {
                     targets: 1,
                     render: function (e, t, a, n) {
                         return `<a href="Cupon/pdf/${e}" target="_blank">${e}</a>`;
                     },
                 },
-
                 {
                     targets: 2,
                     render: function (e, t, a, n) {
@@ -249,7 +247,7 @@ $(function () {
                     },
                 },
                 {
-                    targets: [5, 6],
+                    targets: [5],
                     className: "text-center",
                     render: function (a) {
                         if (!a) return "";
@@ -267,11 +265,37 @@ $(function () {
                     title: "Estado",
                     render: function (data, type, row) {
                         let statusLabels = {
-                            0: { text: "ACTIVO", class: "success", newStatus: 2, newText: "Desactivar", newClass: "danger" },
-                            1: { text: "USADO", class: "primary", newStatus: null },
-                            2: { text: "INACTIVO", class: "danger", newStatus: 0, newText: "Activar", newClass: "success" },
-                            3: { text: "VENCIDO", class: "warning", newStatus: null },
-                            4: { text: "PENDIENTE", class: "secondary", newStatus: 0, newText: "Activar", newClass: "success" }
+                            0: {
+                                text: "ACTIVO",
+                                class: "success",
+                                newStatus: 2,
+                                newText: "Desactivar",
+                                newClass: "danger",
+                            },
+                            1: {
+                                text: "USADO",
+                                class: "primary",
+                                newStatus: null,
+                            },
+                            2: {
+                                text: "INACTIVO",
+                                class: "danger",
+                                newStatus: 0,
+                                newText: "Activar",
+                                newClass: "success",
+                            },
+                            3: {
+                                text: "VENCIDO",
+                                class: "warning",
+                                newStatus: null,
+                            },
+                            4: {
+                                text: "PENDIENTE",
+                                class: "secondary",
+                                newStatus: 0,
+                                newText: "Activar",
+                                newClass: "success",
+                            },
                         };
 
                         let label = `<span class="badge bg-${statusLabels[data].class}">${statusLabels[data].text}</span>`;
@@ -302,8 +326,7 @@ $(function () {
                                 </ul>
                             </div>
                         `;
-                    }
-
+                    },
                 },
                 {
                     targets: -1,
@@ -557,7 +580,6 @@ $(function () {
 
     $("#doc").on("input", function () {
         let docValue = $(this).val().trim();
-
         if (
             $("#collapsible-address-type-home").prop("checked") &&
             docValue.length === 8

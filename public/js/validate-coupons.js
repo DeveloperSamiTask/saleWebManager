@@ -37,6 +37,9 @@
                         dropdownParent: e.parent(),
                     });
             });
+            csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content");
 
         $("#code").on("input", function () {
             var e = $("#code").val().trim();
@@ -46,7 +49,13 @@
             }
         });
 
-        $("#validateCode").click(function () {
+        $("#searchCode").click(function () {
+            var e = $("#code").val();
+            searchCode(e);
+        });
+
+        $("#validateCoupon").click(function (event) {
+            event.preventDefault();
             var e = $("#code").val();
             validateR(e);
         });
@@ -103,8 +112,9 @@
 
         function validateR(i) {
             blockUI();
-            fetch("validateR/" + i, {
-                method: "GET",
+            fetch("Validate", {
+                method: "POST",
+                body: JSON.stringify({ code: i, _token: csrfToken }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -121,15 +131,7 @@
                         title: data.message,
                     });
 
-                    var pdfUrl = data.pdfUrl;
-
-                    console.log(pdfUrl);
-
-                    var newWindow = window.open(pdfUrl);
-
-                    newWindow.onload = function () {
-                        newWindow.print();
-                    };
+                    window.open(`Validacion/${i}`, "_blank");
                 })
                 .catch((error) => {
                     console.error(

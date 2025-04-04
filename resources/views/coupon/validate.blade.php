@@ -25,12 +25,12 @@
                     <div class="col-md mb-md-0 mb-2">
                         <div class="form-check custom-option custom-option-icon">
                             <input name="customRadioIcon-01" class="form-check-input d-none tab-radio" type="radio"
-                                id="customRadioIcon2" data-target="#tab-personal">
+                                id="customRadioIcon2" data-target="#tab-personal" disabled>
                             <label class="form-check-label custom-option-content" for="customRadioIcon2">
                                 <span class="custom-option-body">
-                                    <i class="mdi mdi-account-outline"></i>
-                                    <span class="custom-option-title">Personal</span>
-                                    <small>Información de Personal.</small>
+                                    <i class="mdi mdi-domain"></i>
+                                    <span class="custom-option-title">Empresas</span>
+                                    <small>Validar Cupones de Empresa</small>
                                 </span>
                             </label>
                         </div>
@@ -38,12 +38,12 @@
                     <div class="col-md">
                         <div class="form-check custom-option custom-option-icon">
                             <input name="customRadioIcon-01" class="form-check-input d-none tab-radio" type="radio"
-                                id="customRadioIcon3" data-target="#tab-enterprise">
+                                id="customRadioIcon3" data-target="#tab-enterprise" disabled>
                             <label class="form-check-label custom-option-content" for="customRadioIcon3">
                                 <span class="custom-option-body">
-                                    <i class="mdi mdi-crown-outline"></i>
-                                    <span class="custom-option-title">Enterprise</span>
-                                    <small>Información de Enterprise.</small>
+                                    <i class="mdi mdi-town-hall"></i>
+                                    <span class="custom-option-title">Colegios</span>
+                                    <small>Validar Cupones de Colegios.</small>
                                 </span>
                             </label>
                         </div>
@@ -148,7 +148,7 @@
                                                         <textarea id="autosize-demo" rows="3" class="form-control" id="observations"></textarea>
                                                     </div>
                                                     <div class="col-sm-2 col-4 d-grid">
-                                                        <button class="btn btn-primary" id="validateCode">Validar</button>
+                                                        <button class="btn btn-primary" id="validateCoupon">Validar</button>
                                                     </div>
                                                 </div>
                                                 <hr />
