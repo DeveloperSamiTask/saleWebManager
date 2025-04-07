@@ -76,7 +76,7 @@ class CouponManagementController extends Controller
             $coupon->phone = $request->phone;
             $coupon->email = $request->mail;
             $coupon->status = 4;
-            $coupon->use_create = session('user')['idusuario'];
+            $coupon->user_create = session('user')['idusuario'];
 
             if ($request->hasFile('formFile')) {
                 $filename = time() . '.' . $request->formFile->getClientOriginalExtension();
