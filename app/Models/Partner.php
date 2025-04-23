@@ -47,6 +47,8 @@ class Partner extends Model
                 'date_start' => $partner->dEmisDate,
                 'date_end' => $partner->dCaduDate,
                 'type' => $partner->type_partner,
+                'email' => optional($partner->client)->sClieMail,
+                'phone' => optional($partner->client)->sClieTelf,
                 'new' => $partner->user_new,
                 'renew' => $partner->user_renew,
             ];

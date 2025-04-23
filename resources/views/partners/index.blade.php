@@ -52,6 +52,8 @@
                             <th>CODIGO</th>
                             <th>Nombres y Apellidos</th>
                             <th>Numero Doc.</th>
+                            <th>correo</th>
+                            <th>Numero CELULAR</th>
                             <th>Fecha Inicio</th>
                             <th>Fecha Vencimiento</th>
                             <th></th>
