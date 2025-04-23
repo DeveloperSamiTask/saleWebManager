@@ -20,6 +20,8 @@ class Partner extends Model
         'status_magic',
         'estado',
         'type_partner',
+        'user_new',
+        'user_renew'
     ];
 
     public function client()
@@ -45,6 +47,8 @@ class Partner extends Model
                 'date_start' => $partner->dEmisDate,
                 'date_end' => $partner->dCaduDate,
                 'type' => $partner->type_partner,
+                'new' => $partner->user_new,
+                'renew' => $partner->user_renew,
             ];
         }
 

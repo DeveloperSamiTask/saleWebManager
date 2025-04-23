@@ -322,6 +322,8 @@ $(function () {
                 { data: "date_end" },
                 { data: "" },
                 { data: "type" },
+                { data: "new" },
+                { data: "renew" },
             ],
             columnDefs: [
                 {
@@ -394,7 +396,7 @@ $(function () {
                     },
                 },
                 {
-                    targets: -1,
+                    targets: 7,
                     title: "Tipo",
                     render: function (a, e, t, s) {
                         if (a == 0) {
@@ -403,6 +405,10 @@ $(function () {
                             return '<span class="badge rounded-pill bg-label-info">Renovación</span>';
                         }
                     },
+                },
+                {
+                    targets: [8, 9],
+                    visible: !1,
                 },
             ],
             order: [[0, "desc"]],
@@ -424,7 +430,7 @@ $(function () {
                             text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -467,7 +473,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -498,7 +504,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -529,7 +535,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -560,7 +566,7 @@ $(function () {
                             text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -1279,7 +1285,7 @@ $(function () {
                 $("#editaddress").val(data.sClieAddr);
                 $("#editphone").val(data.sClieTelf);
                 $("#editmail").val(data.sClieMail);
-console.log(data)
+                console.log(data);
                 if (data.proxy) {
                     $("#EditaccordionOne").collapse("show");
                     $("#editproxyPatter").val(data.proxy.proxy_pattername);

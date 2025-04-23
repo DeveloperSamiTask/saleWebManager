@@ -56,6 +56,8 @@
                             <th>Fecha Vencimiento</th>
                             <th></th>
                             <th></th>
+                            <th>Usuario Ingreso</th>
+                            <th>Usuario Renovacion</th>
                         </tr>
                     </thead>
                 </table>

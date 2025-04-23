@@ -7,6 +7,7 @@ use App\Models\Partner;
 use App\Models\Proxy;
 use App\Models\V_Birthday;
 use App\Models\V_NMagic;
+use App\Models\LogPartnet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use PhpParser\Node\Stmt\Return_;
@@ -135,6 +136,7 @@ class PartnerController extends Controller
             $partner->estado = "";
             $partner->status_magic = 0;
             $partner->type_partner = 0;
+            $partner->user_new = auth()->user()->usuario ?? 'Sistema';
             $partner->save();
 
             // Guardar apoderado si se ingresó información
@@ -147,6 +149,8 @@ class PartnerController extends Controller
                 $proxy->proxy_doc = $request->proxyDoc;
                 $proxy->save();
             }
+
+            LogPartnet::registerLog($clientCode, 0, $request->affiliation);
 
             return response()->json([
                 'icon' => 'success',
@@ -207,7 +211,11 @@ class PartnerController extends Controller
             'status_magic'  => 0,
             'estado'        => '',
             'type_partner'  => 1,
+            'user_renew'    => auth()->user()->usuario ?? 'Sistema',
         ]);
+
+        // Agregar el log en la tabla log_partnets
+        LogPartnet::registerLog($request->hiddenCode, 1, $request->renewAffiliation);
 
         return response()->json([
             'icon' => 'success',

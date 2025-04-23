@@ -91,11 +91,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/Show', [CouponManagementController::class, 'show'])->name('cupon.show');
         Route::post('/Promotions', [CouponManagementController::class, 'getPromotions'])->name('cupon.promotions'); // Formulario de creación
         Route::post('/Create', [CouponManagementController::class, 'store'])->name('cupon.store'); // Formulario de creación
-        Route::get('/pdf/{code}', [CouponManagementController::class, 'generatePdf'])->name('cupon.pdf'); // Formulario para validar
-        Route::post('/Status', [CouponManagementController::class, 'changeStatus'])->name('cupon.status'); // Validar cupón
-
+        Route::get('/pdf/{code}', [CouponManagementController::class, 'generatePdf'])->name('cupon.pdf'); // Generar PDF
+        Route::post('/Status', [CouponManagementController::class, 'changeStatus'])->name('cupon.status'); // Cambiar Estado
         Route::get('/Validar_Cupon', [CouponManagementController::class, 'viewValidate'])->name('cupon.validate'); // Formulario para validar
-        Route::get('/Validacion/{code}', [CouponManagementController::class, 'validatePdf'])->name('cupon.validateCode'); // Formulario para validar
+        Route::get('/Validacion/{code}', [CouponManagementController::class, 'validatePdf'])->name('cupon.validateCode'); // Imprimir PDF
         Route::get('/Search/{code}', [CouponManagementController::class, 'search'])->name('cupon.search'); // Formulario para validar
         Route::post('/Validate', [CouponManagementController::class, 'validateCoupon'])->name('cupon.validateCoupon'); // Formulario para validar
     });
