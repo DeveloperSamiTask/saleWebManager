@@ -94,8 +94,7 @@
                         }
 
                         let maxEntries = Math.max(...entriesPerDay);
-                        console.log(entriesPerDay, maxEntries);
-                        renderChart(entriesPerDay, labels, maxEntries);
+                        renderChart(entriesPerDay, labels, maxEntries, response.total);
                     })
                     .fail(function (error) {
                         console.error("error:", error.responseText);
