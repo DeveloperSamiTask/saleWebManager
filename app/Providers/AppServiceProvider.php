@@ -17,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
         $menus = [
             [
                 'roles' => [1, 2, 3, 4],
+                'companies' => [1],
                 'icon' => 'mdi mdi-home-outline',
                 'text' => 'Dashboard',
                 'dataI18n' => 'Dashboard',
@@ -31,12 +32,14 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 2],
+                'companies' => [1],
                 'header' => true,
                 'text' => 'Cajas',
                 'dataI18n' => 'Boxes',
             ],
             [
                 'roles' => [1, 2],
+                'companies' => [1],
                 'route' => 'Boleteria',
                 'icon' => 'mdi mdi-cart-arrow-down',
                 'text' => 'Generar Lista Entradas',
@@ -44,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 2],
+                'companies' => [1],
                 'route' => 'validateList',
                 'icon' => 'mdi mdi-playlist-check',
                 'text' => 'Validar lista entradas',
@@ -51,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 2],
+                'companies' => [1,2,3],
                 'route' => 'cupon.validate',
                 'icon' => 'mdi mdi-newspaper-check',
                 'text' => 'Validar Cupón',
@@ -58,12 +63,14 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 2, 3, 4],
+                'companies' => [1],
                 'header' => true,
                 'text' => 'Cupones',
                 'dataI18n' => 'Coupons',
             ],
             [
                 'roles' => [1, 3, 4],
+                'companies' => [1],
                 'route' => 'coupon.index',
                 'icon' => 'mdi mdi-ticket-percent-outline',
                 'text' => 'Cupones Cumpleaños',
@@ -71,12 +78,14 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 3, 4],
+                'companies' => [1],
                 'header' => true,
                 'text' => 'Controllers',
                 'dataI18n' => 'Controllers',
             ],
             [
                 'roles' => [1, 3, 4],
+                'companies' => [1],
                 'route' => 'partners',
                 'icon' => 'mdi mdi-card-account-details-star-outline',
                 'text' => 'Socios',
@@ -84,6 +93,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 4],
+                'companies' => [1],
                 'route' => 'cambioDNI',
                 'icon' => 'mdi mdi-card-account-details-outline',
                 'text' => 'Rectificación de DNI',
@@ -91,6 +101,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 3, 4],
+                'companies' => [1],
                 'route' => 'coupons',
                 'icon' => 'mdi mdi-ticket-percent-outline',
                 'text' => 'Cupones Internos',
@@ -98,6 +109,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 2, 3, 4],
+                'companies' => [1],
                 'header' => true,
                 'text' => 'Reportes',
                 'dataI18n' => 'Reports',
@@ -105,6 +117,7 @@ class AppServiceProvider extends ServiceProvider
 
             [
                 'roles' => [1, 2, 3, 4],
+                'companies' => [1],
                 'icon' => 'mdi mdi-file-chart',
                 'text' => 'Reporte Entradas',
                 'dataI18n' => 'Input Reports',
@@ -123,6 +136,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 3, 4],
+                'companies' => [1],
                 'route' => 'reportPartners',
                 'icon' => 'mdi mdi-format-list-bulleted-type',
                 'text' => 'Reporte Socios',
@@ -130,12 +144,14 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1],
+                'companies' => [1],
                 'header' => true,
                 'text' => 'Configuraciones',
                 'dataI18n' => 'Settings',
             ],
             [
                 'roles' => [1],
+                'companies' => [1],
                 'route' => 'template.index',
                 'icon' => 'mdi mdi-file-pdf-box',
                 'text' => 'Plantillas',
@@ -143,6 +159,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1],
+                'companies' => [1],
                 'route' => 'users.index',
                 'icon' => 'mdi mdi-account-multiple',
                 'text' => 'Usuarios',

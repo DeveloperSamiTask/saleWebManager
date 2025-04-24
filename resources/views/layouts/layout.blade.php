@@ -133,9 +133,18 @@
                 </div>
                 <div class="menu-inner-shadow"></div>
                 <ul class="menu-inner py-1">
+                    @php
+                        $userCompanies = explode(',', Auth::user()->companies);
+                    @endphp
                     @foreach ($menus as $menu)
-                        {{-- Verificar si el usuario tiene el rol necesario --}}
-                        @if (array_intersect($menu['roles'], [Auth::user()->idrol]))
+                        {{-- Verificar si el usuario tiene el rol y necesario --}}
+                        @php
+                            $hasRole = array_intersect($menu['roles'], [Auth::user()->idrol]);
+                            $hasCompany =
+                                !isset($menu['companies']) || array_intersect($menu['companies'], $userCompanies);
+                        @endphp
+
+                        @if ($hasRole && $hasCompany)
                             {{-- Si es un header, mostrarlo como un encabezado --}}
                             @if (isset($menu['header']) && $menu['header'] === true)
                                 <li class="menu-header">

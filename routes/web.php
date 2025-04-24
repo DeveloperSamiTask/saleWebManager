@@ -100,21 +100,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/Validate', [CouponManagementController::class, 'validateCoupon'])->name('cupon.validateCoupon'); // Formulario para validar
     });
 
+    Route::prefix('Usuarios')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('users.index'); // Vista lista de usuarios
+        Route::get('/Show', [UserController::class, 'show'])->name('users.show'); // Api usuarios
+        Route::post('/Create', [UserController::class, 'store'])->name('users.store'); // Guardar usuario
+        Route::post('/Update', [UserController::class, 'update'])->name('users.update'); // Actualizar usuario
+    });
+
+
     Route::prefix('Plantillas')->group(function () {
         Route::get('/', [TemplateController::class, 'index'])->name('template.index'); // Vista lista de plantillas
         Route::get('/Show', [TemplateController::class, 'show'])->name('template.show'); // Api plantillas
         Route::post('/Store', [TemplateController::class, 'store'])->name('template.store'); // Guardar plantilla
         Route::post('/Update', [TemplateController::class, 'update'])->name('template.update'); // Actualizar plantilla
     });
-
-
 });
 
-Route::prefix('Usuarios')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('users.index'); // Vista lista de usuarios
-    Route::get('/Show', [UserController::class, 'show'])->name('users.show'); // Api usuarios
-    Route::post('/Create', [UserController::class, 'store'])->name('users.store'); // Guardar usuario
-    Route::post('/Update', [UserController::class, 'update'])->name('users.update'); // Actualizar usuario
-});
 
 Route::get('/tableValidate', [PartnerController::class, 'showValidate']);
