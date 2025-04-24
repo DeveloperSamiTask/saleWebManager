@@ -13,6 +13,7 @@ use App\Http\Controllers\DniController;
 use App\Http\Controllers\Notify;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +106,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/Store', [TemplateController::class, 'store'])->name('template.store'); // Guardar plantilla
         Route::post('/Update', [TemplateController::class, 'update'])->name('template.update'); // Actualizar plantilla
     });
+
+
+});
+
+Route::prefix('Usuarios')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('users.index'); // Vista lista de usuarios
+    Route::get('/Show', [UserController::class, 'show'])->name('users.show'); // Api usuarios
+    Route::post('/Create', [UserController::class, 'store'])->name('users.store'); // Guardar usuario
+    Route::post('/Update', [UserController::class, 'update'])->name('users.update'); // Actualizar usuario
 });
 
 Route::get('/tableValidate', [PartnerController::class, 'showValidate']);

@@ -143,7 +143,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1],
-                'route' => 'saleWeb',
+                'route' => 'users.index',
                 'icon' => 'mdi mdi-account-multiple',
                 'text' => 'Usuarios',
                 'dataI18n' => 'Users',
