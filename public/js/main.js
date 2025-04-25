@@ -565,7 +565,7 @@ document.getElementById("layout-menu") &&
                     overlayCSS: { opacity: 0.5 },
                 });
                 $.ajax({
-                    url: "Logout",
+                    url: "/Logout",
                     method: "POST",
                     data: { box: cashierValue, _token: csrfToken },
                 })
