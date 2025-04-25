@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1, 2],
-                'companies' => [1,2,3],
+                'companies' => [2, 3],
                 'route' => 'cupon.validate',
                 'icon' => 'mdi mdi-newspaper-check',
                 'text' => 'Validar Cupón',

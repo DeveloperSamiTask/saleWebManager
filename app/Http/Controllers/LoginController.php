@@ -33,23 +33,15 @@ class LoginController extends Controller
         Auth::loginUsingId($user->idusuario);
         session(['user' => $user]);
 
-        // Obtener roles y empresas
-        $userCompanies = explode(',', $user->companies); // ejemplo: "1,3" → [1, 3]
-        $idRol = $user->idrol;
-
-        // Redirección personalizada
-        if ($idRol == 2 && in_array(3, $userCompanies)) { // si es cajero y empresa 3
-            $redirectUrl = route('cupon.validate');
-        } else {
-            $redirectUrl = route('Dashboard');
-        }
+        $redirectRoute = $this->getRedirectRoute($user);
 
         return response()->json([
             'icon' => 'success',
             'message' => 'Inicio de sesión exitoso',
-            'redirect_url' => $redirectUrl
+            'redirect_url' => route($redirectRoute)
         ]);
     }
+
 
     public function logout(Request $request)
     {
@@ -58,5 +50,42 @@ class LoginController extends Controller
         Auth::logout();
         session::forget(['user', 'box']);
         return response()->json(['status' => '200', 'box' => $boxValue]);
+    }
+
+    private function getRedirectRoute($user)
+    {
+        $userCompanies = array_map('intval', explode(',', $user->companies));
+        $idRol = $user->idrol;
+
+        // Mapa de redirección: [idEmpresa => [idRol => 'nombre_de_ruta']]
+        // Ejemplo:
+        // Empresa 2:
+        //    - Rol 1 → Boleteria
+        //    - Rol 2 → cupon.validate
+
+        $redirectMap = [
+            1 => [
+                1 => 'Dashboard',
+                2 => 'Boleteria',
+                3 => 'Dashboard',
+            ],
+            2 => [
+                1 => 'Boleteria',
+                2 => 'cupon.validate',
+            ],
+            3 => [
+                2 => 'cupon.validate',
+            ],
+        ];
+
+        $default = 'Dashboard';
+
+        foreach ($userCompanies as $companyId) {
+            if (isset($redirectMap[$companyId][$idRol])) {
+                return $redirectMap[$companyId][$idRol];
+            }
+        }
+
+        return $default;
     }
 }
