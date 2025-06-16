@@ -270,8 +270,8 @@ $(() => {
                                 }
                             }
 
-                            if (data.status === 1) {
-                                $("#dni").attr("disabled", true);
+                            if (data.status == 1) {
+                            $("#dni").attr("disabled", true);
                                 $("#validate_message").show();
                                 $("#date_use").text(data.used);
                             } else if (

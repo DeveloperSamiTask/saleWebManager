@@ -110,14 +110,14 @@
                                                 <td class="pe-3 fw-medium">Comprador:</td>
                                                 <td>{{ $ticket['client'] }}</td>
                                             </tr>
-                                            @if ($ticket['type_doc'] === 1)
+                                            @if ($ticket['type_doc'] == 1)
                                                 <tr>
                                                     <td class="pe-3 fw-medium">Dni :</td>
                                                     <td>{{ $ticket['dni'] }}</td>
                                                 </tr>
                                             @endif
 
-                                            @if ($ticket['type_doc'] === 2)
+                                            @if ($ticket['type_doc'] == 2)
                                                 <tr>
                                                     <td class="pe-3 fw-medium">Razon Social :</td>
                                                     <td>{{ $ticket['rs'] }}</td>
@@ -135,7 +135,7 @@
                                                     <td>{{ $ticket['address'] }}</td>
                                                 </tr>
                                             @endif
-                                            
+
                                         </tbody>
                                     </table>
 

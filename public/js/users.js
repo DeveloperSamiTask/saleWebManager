@@ -475,7 +475,6 @@ $(function () {
     function sendDataServe(url) {
         const submitBtn = document.querySelector(".data-submit");
 
-        // Cambiar el estilo del botón y obtener la función de restablecimiento
         const resetBtn = setLoadingState(submitBtn);
 
         const formData = new FormData(f);
