@@ -99,7 +99,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between flex-wrap">
                                 <div class="my-3">
-                                    @if ($ticket['type_doc'] === 1)
+                                    @if ($ticket['type_doc'] == 1)
                                         <h6 class="pb-2">Boletear a:</h6>
                                     @else
                                         <h6 class="pb-2">Facturar a:</h6>
