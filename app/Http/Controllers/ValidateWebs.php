@@ -32,6 +32,20 @@ class ValidateWebs extends Controller
         // Consultar la tabla Ticket para obtener el valor del atributo 'tickets'
         $ticket = Ticket::where('code', $code)->first();
 
+        if (!$ticket) {
+            return response()->json([
+                'message' => 'QR no encontrado',
+                'icon' => 'error'
+            ], 404);
+        }
+
+        if ($ticket->status_coupon == 1) {
+            return response()->json([
+                'message' => 'Este QR ya ha sido validado',
+                'icon' => 'warning' 
+            ], 400);
+        }
+
         // Verificar si se encontró un ticket con el código proporcionado
         if ($ticket) {
             // Obtener el valor del atributo 'tickets'
@@ -74,7 +88,7 @@ class ValidateWebs extends Controller
             return response()->json($cartDetRecords);
         } else {
             // Retornar una respuesta indicando que el ticket no fue encontrado
-            return response()->json(['error' => 'Ticket no encontrado'], 404);
+            return response()->json(['message' => 'Ticket no encontrado', 'icon' => 'error'], 404);
         }
     }
 
@@ -227,6 +241,4 @@ class ValidateWebs extends Controller
         // Devolver la URL del PDF como respuesta a la solicitud AJAX
         return response()->json(['pdfUrl' => asset('validate/' . $ticket . '.pdf')]);
     }
-
-
 }

@@ -285,10 +285,13 @@ $(() => {
                     });
                 })
                 .fail(function (error) {
-                    console.error(error.responseText);
+                    let response = error.responseJSON;
+
+                    console.error(response);
+
                     Toast.fire({
-                        icon: "error",
-                        title: "No existe Ticket",
+                        icon: response.icon,
+                        title: response.message,
                     });
                 })
                 .always(() => {
@@ -381,7 +384,6 @@ $(() => {
             $("#validateTicky").text(response[0].active);
             $("#noValidateTicky").text(response[0].inactive);
             $(".card-numbers-tickets").unblock();
-
         });
     }
 
