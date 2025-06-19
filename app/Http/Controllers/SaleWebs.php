@@ -29,6 +29,7 @@ class SaleWebs extends Controller
             return response()->json(['success' => false, 'message' => 'No existe entrada']);
         }
     }
+
     public function whatsapp(Request $request)
     {
         $tickets = $request->input('ids');
@@ -82,59 +83,87 @@ class SaleWebs extends Controller
     }
 
 
-    public function print(Request $request)
+    public function printQR(Request $request)
     {
-        $tickets = $request->input('ids');
-        $unique = false;
-        $code = null;
+        $ids = $request->input('ids'); // String con IDs separados por coma
+        $method = $request->input('method');
+        $boxValue = session('box');
+        $idUsuario = session('user')['idusuario'];
+
+        // 1. Generar código único
         do {
             $code = Str::upper(Str::random(10));
+        } while (Ticket::where('code', $code)->exists());
 
-            // Verificar si el hash ya existe en la base de datos
-            $existingTicket = Ticket::where('code', $code)->first();
+        // 2. Guardar Ticket
+        $ticket = new Ticket();
+        $ticket->code_coupon = $code;
+        $ticket->tickets = $ids;
+        $ticket->code = $code;
+        $ticket->method = $method;
+        $ticket->status_coupon = 1;
+        $ticket->date_used = now();
+        $ticket->save();
 
-            if (!$existingTicket) {
-                $unique = true;
-            }
-        } while (!$unique);
-
-        $row = new Ticket();
-        $row->code_coupon = $code;
-        $row->tickets = $tickets;
-        $row->code = $code;
-        $row->method = $request->input('method');
-        $row->save();
-
-        $qrcode = "data:image/png;base64," . $this->generateQrCode($code);
-
-
-        // Crear una instancia de Dompdf
-        $dompdf = new Dompdf();
-        $dompdf->setPaper('b7', 'portrait');
-
-        // Renderizar la vista del PDF con los datos del ticket
-        $viewData = [
-            'code' => $code,
-            'image' => $qrcode,
+        // 3. Convertir IDs y actualizar DetCart
+        $ticketCodesArray = explode(',', $ids);
+        $data = [];
+        $shiftOptions = [
+            1 => "TURNO COMPLETO",
+            2 => "AFTER SCHOOL",
         ];
-        $html = view('sale_web/print', $viewData)->render();
+        $deviceOptions = [
+            "Seleccione" => "SIN DISPOSITIVO",
+            "Tarjeta" => "TARJETA",
+            "Portatarjeta" => "TARJETA + LANGER",
+            "Pulserasilicona" => "PULSERA SILICONA",
+            "Pulserafashion" => "PULSERA SILICONA AJUSTABLE",
+        ];
 
-        // Cargar el HTML en Dompdf
+        foreach ($ticketCodesArray as $id) {
+            $cart = DetCart::find($id);
+            if ($cart) {
+                $cart->ticketstatus = 1;
+                $cart->ticketdateuse = now();
+                $cart->cashier = $idUsuario;
+                $cart->box = $boxValue;
+                $cart->save();
+
+                $shift = $shiftOptions[$cart->shiftCart] ?? 'SIN TURNO';
+                $device = $deviceOptions[$cart->deviceCart] ?? 'SIN DISPOSITIVO';
+
+                $data[] = [
+                    'id' => $cart->intCartdetId,
+                    'producto' => strtoupper($shift . ' - ' . $device),
+                    'precio' => $cart->decCartdetStotal,
+                ];
+            }
+        }
+
+        // 5. Generar HTML PDF
+        $total = array_sum(array_column($data, 'precio'));
+        $html = view('sale_web/print', [
+            'code' => $code,
+            'data' => $data,
+            'total' => $total,
+        ])->render();
+
+        // 6. PDF con Dompdf
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
         $dompdf->setPaper([0, 0, 200, 426]);
-        // Renderizar el PDF
         $dompdf->render();
 
-        // Obtener el contenido del PDF como una cadena
-        $pdfContent = $dompdf->output();
+        // 7. Guardar PDF temporal
+        $pdfPath = public_path('validate/' . $code . '.pdf');
+        file_put_contents($pdfPath, $dompdf->output());
 
-        // Guardar el PDF temporalmente en el servidor
-        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/temp/' . $code . '.pdf';
-        file_put_contents($pdfPath, $pdfContent);
-
-        // Devolver la URL del PDF como respuesta a la solicitud AJAX
-        return response()->json(['pdfUrl' => asset('temp/' . $code . '.pdf')]);
+        // 8. Responder con URL
+        return response()->json(['pdfUrl' => asset('validate/' . $code . '.pdf')]);
     }
+
 
     public function generateQRCode($data)
     {

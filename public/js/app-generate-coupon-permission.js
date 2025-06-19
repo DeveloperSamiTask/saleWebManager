@@ -149,7 +149,7 @@ $(() => {
                     },
                 },
                 {
-                    text: "ENVIAR",
+                    text: "VALIDAR",
                     className:
                         "send-data btn rounded-pill btn-primary waves-effect waves-light mt-3",
                 },
@@ -243,7 +243,7 @@ $(() => {
                     .done(function (response) {
                         if (response.success) {
                             var data = response.ticket;
-                            if (data.shift == 2) {
+                            /*if (data.shift == 2) {
                                 console.log("after school");
                                 var now = new Date();
                                 var currentHour = now.getHours();
@@ -268,10 +268,10 @@ $(() => {
                                     });
                                     return false;
                                 }
-                            }
+                        }]*/
 
                             if (data.status == 1) {
-                            $("#dni").attr("disabled", true);
+                                $("#dni").attr("disabled", true);
                                 $("#validate_message").show();
                                 $("#date_use").text(data.used);
                             } else if (
@@ -471,10 +471,38 @@ $(() => {
                 title: "No hay entradas en la lista",
             });
         } else {
+            $.blockUI({
+                message:
+                    '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+                css: { backgroundColor: "transparent", border: "0" },
+                overlayCSS: { opacity: 0.5 },
+            });
             var ids = e.column(1).data().toArray().join(",");
-            $("#twoFactorAuth").modal("show");
+            $.ajax({
+                url: "printQR",
+                method: "POST",
+                data: { ids: ids, _token: csrfToken, method: 2 },
+            })
+                .done((response) => {
+                    var pdfUrl = response.pdfUrl;
+
+                    var newWindow = window.open(pdfUrl);
+
+                    newWindow.onload = function () {
+                        newWindow.print();
+                    };
+
+                    e.clear().draw();
+                })
+                .fail((error) => {
+                    console.log(error.responseText);
+                })
+                .always(() => {
+                    $.unblockUI();
+                });
         }
     });
+
     $(".send-whatsapp").on("click", function () {
         $.blockUI({
             message:
@@ -547,6 +575,7 @@ $(() => {
         $("#twoFactorAuth").modal("hide");
         $("#twoFactorAuthOne").modal("hide");
     });
+
     $("#formChangeDNI").on("submit", function (event) {
         event.preventDefault();
         $.blockUI({
@@ -588,7 +617,6 @@ $(() => {
         localStorage.removeItem("document");
         $("#ticket").focus();
     }
-
     function percentMatch(str1, str2) {
         const longitud = Math.max(str1.length, str2.length);
         let coincidencias = 0;

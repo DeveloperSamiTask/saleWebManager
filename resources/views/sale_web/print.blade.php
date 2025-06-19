@@ -1,31 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Print Ticket</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        * {
+            font-family: "century gothic";
+            font-size: 10px;
         }
 
-        .ticket-container {
-            text-align: center;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            border-bottom: 1px solid #000;
+            border-style: dotted;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+        }
+
+        td {
+            font-size: 10px;
+        }
+
+        h3 {
+            font-size: 15px;
         }
     </style>
 </head>
 
 <body>
-
-    <div class="ticket-container">
-        <img src="{{$image}}" alt="QR Code">
-        <h2>{{ $code }}</h2>
-    </div>
+    <h3>Validación de Ventas Web</h3>
+    <p style="font-size: 14px">Fecha: {{ now() }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody border="1">
+            @foreach ($data as $index => $row)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $row['id'] }}</td>
+                    <td>{{ $row['producto'] }}</td>
+                    <td>{{ $row['precio'] }}</td>
+                </tr>
+            @endforeach
+            <tr>
+                <th colspan="3" style="text-align: right;">TOTAL</th>
+                <th>S/. {{ number_format($total, 2) }}</th>
+            </tr>
+        </tbody>
+    </table>
 </body>
 
 </html>

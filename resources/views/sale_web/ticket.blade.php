@@ -210,7 +210,7 @@
             </div>
             <!--/ Add Permission Modal -->
 
-            <!-- Two Factor Auth Modal -->
+            <!-- prev modal btn whatsao/QR
 
             <div class="modal fade" id="twoFactorAuth" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-simple">

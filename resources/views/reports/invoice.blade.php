@@ -115,6 +115,10 @@
                                                     <td class="pe-3 fw-medium">Dni :</td>
                                                     <td>{{ $ticket['dni'] }}</td>
                                                 </tr>
+                                                <tr>
+                                                    <td class="pe-3 fw-medium">Correo Electrónico :</td>
+                                                    <td>{{ $ticket['mail'] }}</td>
+                                                </tr>
                                             @endif
 
                                             @if ($ticket['type_doc'] == 2)

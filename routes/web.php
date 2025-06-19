@@ -42,7 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::post('viewTicket', [SaleWebs::class, 'getTicket']);
     Route::post('sendWhatsapp', [SaleWebs::class, 'whatsapp']);
     Route::get('token/{token}', [SaleWebs::class, 'generateQr']);
-    Route::post('printQR', [SaleWebs::class, 'print']);
+    Route::post('printQR', [SaleWebs::class, 'printQr']);
     Route::get('ticketsValidate', [SaleWebs::class, 'tickets']);
 
     // Rutas para ValidateWebs
