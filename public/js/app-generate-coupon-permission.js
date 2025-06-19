@@ -227,6 +227,7 @@ $(() => {
                     icon: "error",
                     title: "La Entrada ya se encuentra en la lista",
                 });
+                playErrorSound();
             } else {
                 $.blockUI({
                     message:
@@ -243,7 +244,7 @@ $(() => {
                     .done(function (response) {
                         if (response.success) {
                             var data = response.ticket;
-                            /*if (data.shift == 2) {
+                            if (data.shift == 2) {
                                 console.log("after school");
                                 var now = new Date();
                                 var currentHour = now.getHours();
@@ -266,9 +267,10 @@ $(() => {
                                         icon: "error",
                                         title: "La entrada es After School no está dentro del rango de hora",
                                     });
+                                        playErrorSound(); // sonido de error
                                     return false;
                                 }
-                        }]*/
+                            }
 
                             if (data.status == 1) {
                                 $("#dni").attr("disabled", true);
@@ -315,6 +317,7 @@ $(() => {
                                 icon: "error",
                                 title: "Número de ticket no encontrado",
                             });
+                            playErrorSound();
                         }
                     })
                     .fail(function (error) {
@@ -350,6 +353,8 @@ $(() => {
                 $(".btnChangeDNI").prop("style", "display:none");
             } else {
                 $(".btnChangeDNI").prop("style", "display:block");
+                    playErrorSound(); // sonido de error
+
             }
 
             $(".btn_validate").prop("disabled", !isValidDNI);
@@ -674,4 +679,9 @@ $(() => {
             toast.onmouseleave = Swal.resumeTimer;
         },
     });
+
+    function playErrorSound() {
+        var audio = new Audio("/audio/error.mp3");
+        audio.play();
+    }
 });

@@ -157,7 +157,7 @@ class SaleWebs extends Controller
         $dompdf->render();
 
         // 7. Guardar PDF temporal
-        $pdfPath = public_path('validate/' . $code . '.pdf');
+        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/validate/' . $code . '.pdf';
         file_put_contents($pdfPath, $dompdf->output());
 
         // 8. Responder con URL
