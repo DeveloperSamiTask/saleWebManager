@@ -212,11 +212,14 @@ $(() => {
     });
 
     $("#ticket").on("input", function (e) {
-        var ticket = $(this).val();
+        var ticket = $(this).val().replace(/\s+/g, "");
         var ticketExists = false;
         if (ticket.length > 5) {
             $(".datatables-permissions tbody tr").each(function () {
-                var ticketEnTabla = $(this).find("td:eq(1)").text(); // Suponiendo que el ticket está en la segunda columna
+                var ticketEnTabla = $(this)
+                    .find("td:eq(1)")
+                    .text()
+                    .replace(/\s+/g, "");
                 if (ticketEnTabla === ticket) {
                     ticketExists = true;
                     return false;
@@ -267,7 +270,7 @@ $(() => {
                                         icon: "error",
                                         title: "La entrada es After School no está dentro del rango de hora",
                                     });
-                                        playErrorSound(); // sonido de error
+                                    playErrorSound(); // sonido de error
                                     return false;
                                 }
                             }
@@ -353,8 +356,7 @@ $(() => {
                 $(".btnChangeDNI").prop("style", "display:none");
             } else {
                 $(".btnChangeDNI").prop("style", "display:block");
-                    playErrorSound(); // sonido de error
-
+                playErrorSound(); // sonido de error
             }
 
             $(".btn_validate").prop("disabled", !isValidDNI);
