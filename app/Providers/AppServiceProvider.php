@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Generate Coupon',
             ],
             [
-                'roles' => [1, 2],
+                'roles' => [1],
                 'companies' => [1],
                 'route' => 'validateList',
                 'icon' => 'mdi mdi-playlist-check',
@@ -62,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Validate Coupon',
             ],
             [
-                'roles' => [1, 2, 3, 4],
+                'roles' => [1, 3, 4],
                 'companies' => [1],
                 'header' => true,
                 'text' => 'Cupones',
