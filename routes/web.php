@@ -12,6 +12,7 @@ use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\DniController;
 use App\Http\Controllers\Notify;
 use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\PaymentLinkController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserController;
 
@@ -113,6 +114,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/Show', [TemplateController::class, 'show'])->name('template.show'); // Api plantillas
         Route::post('/Store', [TemplateController::class, 'store'])->name('template.store'); // Guardar plantilla
         Route::post('/Update', [TemplateController::class, 'update'])->name('template.update'); // Actualizar plantilla
+    });
+
+    Route::prefix('PagoLink')->group(function () {
+        Route::get('/Lista', [PaymentLinkController::class, 'list'])->name('paymentLink.index');
+        Route::get('/Agregar-pago', [PaymentLinkController::class, 'create'])->name('paymentLink.add');
+        Route::get('/Promociones', [PaymentLinkController::class, 'promotions'])->name('paymentLink.promotions');
+        Route::get('/ShowPromotions', [PaymentLinkController::class, 'showPromotions']);
+        Route::post('/StorePromotion', [PaymentLinkController::class, 'storePromotion']);
+        Route::post('/StatusPromotion', [PaymentLinkController::class, 'status']);
+        Route::get('/Show', [PaymentLinkController::class, 'show'])->name('paymentLink.show'); // Api pagos
+        Route::post('/Store', [PaymentLinkController::class, 'store'])->name('paymentLink.store'); // Guardar pago
+        Route::post('/Update', [PaymentLinkController::class, 'update'])->name('paymentLink.update'); // Actualizar pago
     });
 });
 

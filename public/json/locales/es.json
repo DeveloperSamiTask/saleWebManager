@@ -69,7 +69,7 @@
     "Roles": "Roles",
     "Permission": "Permission",
     "Users": "Usuarios",
-    "List": "List",
+    "List": "Lista",
     "View": "View",
     "Edit": "Edit",
     "Logistics": "Logistics",
@@ -207,5 +207,10 @@
     "Birthday Coupons": "Cupones Cumpleaños",
     "Partners": "Socios",
     "Report partners": "Reporte Socios",
-    "Templates": "Plantillas"
+    "Templates": "Plantillas",
+    "Payment Link": "Pago Link",
+    "Payment List": "Lista de Pagos",
+    "New Payment": "Nuevo Pago",
+    "Promotions": "Promociones"
+
 }
