@@ -119,6 +119,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('PagoLink')->group(function () {
         Route::get('/Lista', [PaymentLinkController::class, 'list'])->name('paymentLink.index');
         Route::get('/Agregar-pago', [PaymentLinkController::class, 'create'])->name('paymentLink.add');
+        Route::post('/store', [PaymentLinkController::class, 'storePayment']);
+        Route::get('/qr/download/{code}', [PaymentLinkController::class, 'downloadQrCode'])->name('qr.download');
         Route::get('/Promociones', [PaymentLinkController::class, 'promotions'])->name('paymentLink.promotions');
         Route::get('/ShowPromotions', [PaymentLinkController::class, 'showPromotions']);
         Route::post('/StorePromotion', [PaymentLinkController::class, 'storePromotion']);

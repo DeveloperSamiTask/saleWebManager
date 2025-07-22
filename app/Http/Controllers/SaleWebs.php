@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 use Dompdf\Dompdf;
 use App\Models\DetCart;
@@ -165,16 +164,5 @@ class SaleWebs extends Controller
     }
 
 
-    public function generateQRCode($data)
-    {
 
-        // Generar el QR en el servidor
-        $qrCode = QrCode::size(220)->generate($data);
-
-        // Convertir el QR a datos de imagen base64
-        $qrCodeBase64 = base64_encode($qrCode);
-
-        // Enviar los datos de imagen base64 al cliente como parte de la respuesta
-        return $qrCodeBase64;
-    }
 }
