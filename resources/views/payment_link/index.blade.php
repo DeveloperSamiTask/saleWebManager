@@ -25,13 +25,14 @@
                     <thead class="table-light">
                         <tr>
                             <th></th>
-                            <th>Descripcion</th>
+                            <th>Codigo</th>
                             <th>Nombres y Apellidos</th>
-                            <th>Enviado Por</th>
+                            <th>Combos</th>
+                            <th>Integrantes</th>
+                            <th>Fecha de Compra</th>
                             <th>Fecha de Uso</th>
-                            <th>Autorización</th>
                             <th>Estado</th>
-                            <th>Fecha de Solicitud</th>
+                            <th></th>
                         </tr>
                     </thead>
                 </table>

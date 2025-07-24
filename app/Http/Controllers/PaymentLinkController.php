@@ -6,9 +6,6 @@ use App\Models\Combos\PurchaseCombo;
 use App\Models\Combos\PurchaseComboMember;
 use App\Models\Combos\PurchaseLink;
 use App\Models\PromotionsLink;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd as ImageSvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer as RendererImageRenderer;
-use BaconQrCode\Renderer\Module\RoundnessModule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -19,9 +16,6 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Renderer\ImageRenderer;
-use Endroid\QrCode\Renderer\Image\SvgImageBackEnd;
-use Endroid\QrCode\Renderer\Module\RoundModule;
 
 class PaymentLinkController extends Controller
 {
@@ -29,6 +23,23 @@ class PaymentLinkController extends Controller
     {
         $data['title'] = "Lista Pago Link";
         return view('payment_link.index', $data);
+    }
+
+    public function listPayments(Request $request)
+    {
+        $startDate = $request->get('startDate', '2025-07-01');
+        $endDate = $request->get('endDate', '2025-07-31');
+
+        $startDate = Carbon::parse($startDate)->startOfDay();
+        $endDate = Carbon::parse($endDate)->endOfDay();
+
+        $coupons = PurchaseLink::getList($startDate->toDateTimeString(), $endDate->toDateTimeString());
+
+        return response()->json([
+            'data' => $coupons,
+            'startDate' => $startDate->toDateString(),
+            'endDate' => $endDate->toDateString(),
+        ]);
     }
 
     public function create()
@@ -59,6 +70,7 @@ class PaymentLinkController extends Controller
                 'phone' => $request->phone,
                 'date_purchase' => $request->date_purchase,
                 'date_issue' => $request->date_issue,
+                'status' => 'unused',
                 'user_id' => session('user')['idusuario'],
             ]);
 
@@ -77,6 +89,7 @@ class PaymentLinkController extends Controller
                             'purchase_combo_id' => $comboRecord->id,
                             'name'              => $member['name'],
                             'dni'               => $member['dni'],
+                            'status_entrie'            => 'unused',
                         ]);
                     }
                 }

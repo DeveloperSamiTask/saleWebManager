@@ -116,8 +116,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/Update', [TemplateController::class, 'update'])->name('template.update'); // Actualizar plantilla
     });
 
+
+});
+
+
+Route::get('/tableValidate', [PartnerController::class, 'showValidate']);
+
     Route::prefix('PagoLink')->group(function () {
         Route::get('/Lista', [PaymentLinkController::class, 'list'])->name('paymentLink.index');
+        Route::get('/Lista_Pagos', [PaymentLinkController::class, 'listPayments']);
         Route::get('/Agregar-pago', [PaymentLinkController::class, 'create'])->name('paymentLink.add');
         Route::post('/store', [PaymentLinkController::class, 'storePayment']);
         Route::get('/qr/download/{code}', [PaymentLinkController::class, 'downloadQrCode'])->name('qr.download');
@@ -129,7 +136,3 @@ Route::middleware('auth')->group(function () {
         Route::post('/Store', [PaymentLinkController::class, 'store'])->name('paymentLink.store'); // Guardar pago
         Route::post('/Update', [PaymentLinkController::class, 'update'])->name('paymentLink.update'); // Actualizar pago
     });
-});
-
-
-Route::get('/tableValidate', [PartnerController::class, 'showValidate']);

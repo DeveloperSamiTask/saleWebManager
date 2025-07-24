@@ -20,18 +20,14 @@ $(function () {
     var endDate = formatDate(today);
     var e,
         s = $(".datatables-entries"),
-        invoice = {
-            1: {
-                title: "PENDIENTE",
+        status = {
+            unused: {
+                title: "NO USADO",
                 class: "badge rounded-pill bg-label-warning",
             },
-            2: {
-                title: "ACEPTADO",
+            used: {
+                title: "USADO",
                 class: "badge rounded-pill bg-label-success",
-            },
-            3: {
-                title: "ANULADO",
-                class: "badge rounded-pill bg-label-danger",
             },
         };
     $("#flatpickr-range").flatpickr({
@@ -49,21 +45,15 @@ $(function () {
                     css: { backgroundColor: "transparent", border: "0" },
                     overlayCSS: { opacity: 0.5 },
                 });
-                var Checked = $(".switch-input").prop("checked");
-
-                var isChecked = Checked ? "1" : "0";
-
-                console.log(isChecked);
 
                 var startDate = selectedDates[0].toISOString();
                 var endDate = selectedDates[1].toISOString();
                 $.ajax({
-                    url: "coupons_table",
+                    url: "Lista_Pagos",
                     type: "GET",
                     data: {
-                        start_date: startDate,
-                        end_date: endDate,
-                        isChecked: isChecked,
+                        startDate: startDate,
+                        endDate: endDate,
                     },
                 })
                     .done((response) => {
@@ -86,16 +76,28 @@ $(function () {
 
     s.length &&
         (e = s.DataTable({
-            ajax: "coupons_table",
+            ajax: {
+                url: "Lista_Pagos",
+                data: function (d) {
+                    var selectedDates = $("#flatpickr-range").val(); // Obtén las fechas seleccionadas
+
+                    if (selectedDates) {
+                        var dates = selectedDates.split(" Hasta "); // Separa las fechas
+                        d.startDate = dates[0]; // Asigna la fecha de inicio
+                        d.endDate = dates[1] ?? dates[0]; // Asigna la fecha de fin (puede ser la misma si no se seleccionó un rango)
+                    }
+                },
+            },
             columns: [
                 { data: "id" },
-                { data: "description" },
+                { data: "code" },
                 { data: "names" },
-                { data: "user_send" },
-                { data: "date_use" },
-                { data: "file" },
+                { data: "combos" },
+                { data: "members" },
+                { data: "date_purchase" },
+                { data: "date_issue" },
                 { data: "status" },
-                { data: "date_insert" },
+                { data: "" },
             ],
             columnDefs: [
                 {
@@ -112,7 +114,11 @@ $(function () {
                 {
                     targets: 1,
                     render: function (e, t, a, n) {
-                        return e;
+                        return (
+                            '<a href="app-invoice-preview.html"><span>#' +
+                            e +
+                            "</span></a>"
+                        );
                     },
                 },
 
@@ -128,11 +134,30 @@ $(function () {
                         return e;
                     },
                 },
-
+                {
+                    targets: 7,
+                    render: function (e, t, a, n) {
+                        const info = status[e] || {
+                            title: "DESCONOCIDO",
+                            class: "badge rounded-pill bg-label-secondary",
+                        };
+                        return `<span class="${info.class}">${info.title}</span>`;
+                    },
+                },
                 {
                     targets: -1,
+                    title: "Acciones",
                     render: function (a, e, t, s) {
-                        return a;
+                        return `
+                            <div class="d-flex align-items-center">
+                                    <a href="qr/download/${t.code}"
+                                    class="text-body"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Descargar QR">
+                                        <i class="mdi mdi-qrcode-plus mdi-24px mx-1"></i>
+                                    </a>
+                                </div>`;
                     },
                 },
             ],
@@ -324,7 +349,7 @@ $(function () {
                     className:
                         "add-new btn btn-primary ms-n1 waves-effect waves-light",
                     action: function () {
-                        window.location.href = "Agregar_pago";
+                        window.location.href = "Agregar-pago";
                     },
                 },
             ],
