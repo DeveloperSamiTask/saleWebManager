@@ -115,24 +115,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/Store', [TemplateController::class, 'store'])->name('template.store'); // Guardar plantilla
         Route::post('/Update', [TemplateController::class, 'update'])->name('template.update'); // Actualizar plantilla
     });
-
-
 });
 
 
 Route::get('/tableValidate', [PartnerController::class, 'showValidate']);
 
-    Route::prefix('PagoLink')->group(function () {
-        Route::get('/Lista', [PaymentLinkController::class, 'list'])->name('paymentLink.index');
-        Route::get('/Lista_Pagos', [PaymentLinkController::class, 'listPayments']);
-        Route::get('/Agregar-pago', [PaymentLinkController::class, 'create'])->name('paymentLink.add');
-        Route::post('/store', [PaymentLinkController::class, 'storePayment']);
-        Route::get('/qr/download/{code}', [PaymentLinkController::class, 'downloadQrCode'])->name('qr.download');
-        Route::get('/Promociones', [PaymentLinkController::class, 'promotions'])->name('paymentLink.promotions');
-        Route::get('/ShowPromotions', [PaymentLinkController::class, 'showPromotions']);
-        Route::post('/StorePromotion', [PaymentLinkController::class, 'storePromotion']);
-        Route::post('/StatusPromotion', [PaymentLinkController::class, 'status']);
-        Route::get('/Show', [PaymentLinkController::class, 'show'])->name('paymentLink.show'); // Api pagos
-        Route::post('/Store', [PaymentLinkController::class, 'store'])->name('paymentLink.store'); // Guardar pago
-        Route::post('/Update', [PaymentLinkController::class, 'update'])->name('paymentLink.update'); // Actualizar pago
-    });
+Route::prefix('PagoLink')->group(function () {
+    Route::get('/Lista', [PaymentLinkController::class, 'list'])->name('paymentLink.index');
+    Route::get('/Lista_Pagos', [PaymentLinkController::class, 'listPayments']);
+    Route::get('/Agregar-pago', [PaymentLinkController::class, 'create'])->name('paymentLink.add');
+    Route::post('/store', [PaymentLinkController::class, 'storePayment']);
+    Route::get('/qr/download/{code}', [PaymentLinkController::class, 'downloadQrCode'])->name('qr.download');
+    Route::get('/Promociones', [PaymentLinkController::class, 'promotions'])->name('paymentLink.promotions');
+    Route::get('/ShowPromotions', [PaymentLinkController::class, 'showPromotions']);
+    Route::post('/StorePromotion', [PaymentLinkController::class, 'storePromotion']);
+    Route::post('/StatusPromotion', [PaymentLinkController::class, 'status']);
+    Route::get('/Validar_Pago_link', [PaymentLinkController::class, 'validateForm'])->name('paymentLink.validate'); // Api pagos
+    Route::get('/qr/details/{code}', [PaymentLinkController::class, 'getQrDetails'])->name('qr.details');
+});

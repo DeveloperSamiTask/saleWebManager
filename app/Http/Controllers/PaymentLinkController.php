@@ -144,8 +144,6 @@ class PaymentLinkController extends Controller
             ->header('Content-Disposition', "attachment; filename={$filename}");
     }
 
-
-
     //Info: Promociones
 
     public function promotions()
@@ -213,5 +211,42 @@ class PaymentLinkController extends Controller
                 'line' => $e->getLine(),
             ], 500);
         }
+    }
+
+    public function validateForm()
+    {
+        $data['title'] = "Validar Pago Link";
+        return view('payment_link.validate');
+    }
+
+    public function getQrDetails($code)
+    {
+        $link = PurchaseLink::with(['combos.combo', 'combos.members'])
+            ->where('code', $code)
+            ->firstOrFail();
+
+        $data = [];
+
+        foreach ($link->combos as $combo) {
+            foreach ($combo->members as $member) {
+                $data[] = [
+                    'id'    => $member->id,
+                    'names'  => $member->name,
+                    'combo'  => $combo->combo->name ?? 'Sin Combo',
+                    'status' => $member->status_entrie ?? null, // Asegúrate de tener ese campo en la tabla
+                ];
+            }
+        }
+
+        return response()->json([
+            'data' => $data,
+            'link' => [
+                'code'   => $link->code,
+                'names'   => trim($link->names . ' ' . $link->lastname),
+                'document' => $link->document_type . ': ' . $link->document_number,
+                'date'   => $link->date_purchase,
+                'status' => $link->status,
+            ]
+        ]);
     }
 }

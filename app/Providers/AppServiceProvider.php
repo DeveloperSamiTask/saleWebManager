@@ -45,6 +45,14 @@ class AppServiceProvider extends ServiceProvider
                 'text' => 'Generar Lista Entradas',
                 'dataI18n' => 'Generate Coupon',
             ],
+                        [
+                'roles' => [1, 2],
+                'companies' => [1],
+                'route' => 'paymentLink.validate',
+                'icon' => 'mdi mdi-cart-percent',
+                'text' => 'Validar Pago Link',
+                'dataI18n' => 'Validate Payment Link',
+            ],
             [
                 'roles' => [1],
                 'companies' => [1],
