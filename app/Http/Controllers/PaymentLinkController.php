@@ -72,6 +72,7 @@ class PaymentLinkController extends Controller
                 'date_issue' => $request->date_issue,
                 'status' => 'unused',
                 'user_id' => session('user')['idusuario'],
+                'observation' => $request->observation,
             ]);
 
             $combos = json_decode($request->input('combos'), true);

@@ -66,25 +66,28 @@
     </div>
 
     <div class="modal fade" id="validateModal" tabindex="-1" aria-labelledby="validateModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="validateModalLabel">Validar Código</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Nombre:</strong> <span id="modalName"></span></p>
-                    <p><strong>ID:</strong> <span id="modalId"></span></p>
-                    <div class="mb-3">
-                        <label for="inputDni" class="form-label">Ingrese su DNI:</label>
-                        <input type="text" class="form-control" id="inputDni">
-                    </div>
-                    <input type="hidden" id="hiddenRecordId">
-                    <input type="hidden" id="hiddenDniOriginal">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" id="btnConfirmValidate" class="btn btn-primary">Validar</button>
+                    <form id="formValidateDni">
+                        <div class="modal-body">
+                            <input type="hidden" id="hiddenRecordId" name="record_id">
+                            <input type="hidden" id="hiddenDniOriginal" name="dni_original">
+                            <p><strong>Nombre:</strong> <span id="modalName"></span></p>
+                            <div class="mb-3">
+                                <label for="inputDni" class="form-label">Ingrese el DNI:</label>
+                                <input type="text" class="form-control" id="inputDni" name="input_dni" required>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Validar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

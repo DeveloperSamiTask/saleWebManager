@@ -87,20 +87,30 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-12">
+                                        <div class="col-md-3 col-12">
                                             <div class="form-floating form-floating-outline">
                                                 <input type="text" class="form-control" placeholder="YYYY-MM-DD HH:MM"
                                                     id="date_purchase" name="date_purchase" />
                                                 <label for="date_purchase">Fecha y Hora de Compra</label>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-12">
+                                        <div class="col-md-3 col-12">
                                             <div class="form-floating form-floating-outline">
                                                 <input type="text" class="form-control" placeholder="YYYY-MM-DD"
                                                     id="date_issue" name="date_issue" />
                                                 <label for="date_issue">Fecha de Ingreso</label>
                                             </div>
                                         </div>
+
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-floating form-floating-outline">
+                                                <input class="form-control" type="text" id="observation"
+                                                    name="observation" placeholder="Observación" aria-label="Observación"
+                                                    aria-describedby="Apellidos" />
+                                                <label for="observation">Observación</label>
+                                            </div>
+                                        </div>
+
 
                                         <div class="col-md-12 mt-4 mb-3">
                                             <div class="d-flex justify-content-end mb-2">

@@ -50,18 +50,20 @@ $(function () {
                             }
 
                             return `
-            <button
-                class="btn btn-sm ${
-                    a.status === "unused" ? "btn-danger" : "btn-success"
-                } btnValidate"
-                data-id="${a.id}"
-                data-names="${a.names}"
-                data-status="${a.status}"
-                type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#validateModal">
-                ${statusText}
-            </button>`;
+                            <button
+                                class="btn btn-sm ${
+                                    a.status === "unused"
+                                        ? "btn-danger"
+                                        : "btn-success"
+                                } btnValidate"
+                                data-id="${a.id}"
+                                data-names="${a.names}"
+                                data-status="${a.status}"
+                                type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#validateModal">
+                                ${statusText}
+                            </button>`;
                         },
                     },
                 ],
@@ -166,13 +168,71 @@ $(function () {
     });
 
     t.on("click", ".btnValidate", function () {
-    const id = $(this).data("id");
-    const name = $(this).data("names");
+        const id = $(this).data("id");
+        const name = $(this).data("names");
 
-    $("#modalId").text(id);
-    $("#modalName").text(name);
-    $("#hiddenRecordId").val(id); // para usarlo en validación posterior
-});
+        $("#modalName").text(name);
+
+        $("#hiddenRecordId").val(id);
+
+        $("#validateModal").modal("show");
+    });
+
+    $("#validateModal").on("shown.bs.modal", function () {
+        $("#inputDni").trigger("focus");
+    });
+
+    $("#formValidateDni").on("submit", function (e) {
+        e.preventDefault(); // Evita que el formulario se envíe de forma tradicional
+
+        const dniIngresado = $("#inputDni").val().trim();
+        const dniOriginal = $("#hiddenDniOriginal").val().trim();
+        const recordId = $("#hiddenRecordId").val();
+
+        if (dniIngresado === "") {
+            Toast.fire({
+                icon: "error",
+                title: "El DNI no puede estar vacío.",
+            });
+
+            $("#inputDni").focus();
+            return;
+        }
+
+        if (dniIngresado !== dniOriginal) {
+
+            Toast.fire({
+                icon: "error",
+                title: "El DNI ingresado no coincide con el original.",
+            });
+
+            $("#inputDni").focus();
+            return;
+        }
+
+        // ✅ Si llega aquí, el DNI es correcto
+        // Puedes enviar una petición AJAX o cerrar el modal, etc.
+        alert("✅ Validación correcta. Procesando...");
+
+        // Ejemplo: enviar por AJAX
+        $.ajax({
+            url: "/ruta/para/validar", // Cambia esto por tu ruta
+            method: "POST",
+            data: {
+                record_id: recordId,
+                dni: dniIngresado,
+            },
+            success: function (response) {
+                // cerrar modal, actualizar tabla, etc.
+                $("#validateModal").modal("hide");
+                alert("Registro validado correctamente.");
+                // recargar tabla si tienes DataTables
+            },
+            error: function () {
+                alert("Hubo un error al validar.");
+            },
+        });
+    });
 
     function blockUI() {
         $.blockUI({
@@ -182,4 +242,16 @@ $(function () {
             overlayCSS: { opacity: 0.5 },
         });
     }
+
+        const Toast = Swal.mixin({
+        toast: true,
+        position: "top",
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        },
+    });
 });
