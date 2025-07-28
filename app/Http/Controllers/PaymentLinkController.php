@@ -16,6 +16,8 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\Label\Font\OpenSans;
 
 class PaymentLinkController extends Controller
 {
@@ -116,7 +118,7 @@ class PaymentLinkController extends Controller
         $purchase = PurchaseLink::where('code', $code)->first();
 
         if (!$purchase) {
-            return response()->json(['message' => 'Compra no encontrada.'], 404);
+            return response()->json(['icon' => 'error', 'message' => 'Compra no encontrada.'], 404);
         }
 
         $qrContent = $purchase->code;
@@ -134,6 +136,9 @@ class PaymentLinkController extends Controller
             foregroundColor: new Color(30, 30, 30),
             backgroundColor: new Color(255, 255, 255),
             logoPath: public_path('img/logo.png'), // sin logo
+            labelText: $qrContent,
+            labelFont: new OpenSans(20),
+            labelAlignment: LabelAlignment::Center
         );
 
         $result = $builder->build();

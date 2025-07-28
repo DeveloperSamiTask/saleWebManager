@@ -313,12 +313,23 @@
 
                         // ✅ Descargar QR
                         window.location.href = data.download_url;
+
+                        // ✅ Recargar después de 3 segundos
+                        setTimeout(() => {
+                            location.reload();
+                        }, 3000);
                     } else {
                         $.unblockUI();
                     }
                 })
                 .catch((error) => {
                     $.unblockUI();
+                    Toast.fire({
+                        icon: "error",
+                        title:
+                            error.message || "Error al procesar la solicitud.",
+                    });
+
                     console.error("Error:", error);
                 });
         });

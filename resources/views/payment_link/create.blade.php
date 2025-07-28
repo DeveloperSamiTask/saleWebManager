@@ -158,7 +158,7 @@
     <script src="{{ asset('vendor/libs/jquery-sticky/jquery-sticky.js') }}"></script>
     <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    <script src="{{ asset('js/add-payment-link.js') }}"></script>
+    <script src="{{ asset('js/add-payment-link.js') }}?v={{ time() }}"></script>
     <script>
         const combos = @json($promotions); // {id, name, members}
     </script>
