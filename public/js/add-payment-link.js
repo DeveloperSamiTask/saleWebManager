@@ -309,16 +309,16 @@
                             <td colspan="3" class="text-center text-muted">📦 Elige tus combos para comenzar</td>
                         </tr>`;
 
-                        unblockUI();
+                        $.unblockUI();
 
                         // ✅ Descargar QR
                         window.location.href = data.download_url;
                     } else {
-                        unblockUI();
+                        $.unblockUI();
                     }
                 })
                 .catch((error) => {
-                    unblockUI();
+                    $.unblockUI();
                     console.error("Error:", error);
                 });
         });
