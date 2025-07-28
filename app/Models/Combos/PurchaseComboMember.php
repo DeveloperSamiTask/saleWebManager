@@ -15,6 +15,7 @@ class PurchaseComboMember extends Model
         'purchase_combo_id',
         'name',
         'dni',
+        'status_entrie'
     ];
 
     public function purchaseCombo()

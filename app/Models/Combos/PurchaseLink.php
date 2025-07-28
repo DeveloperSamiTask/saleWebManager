@@ -21,7 +21,8 @@ class PurchaseLink extends Model
         'date_purchase',
         'date_issue',
         'status',
-        'user_id'
+        'user_id',
+        'observation'
     ];
 
     public function combos()
