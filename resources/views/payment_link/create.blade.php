@@ -5,8 +5,8 @@
 
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4">
-            <span class="text-muted fw-light">Forms/</span>
-            Sticky Actions
+            <span class="text-muted fw-light">Formulario/</span>
+            Pago Link
         </h4>
         <!-- Sticky Actions -->
         <div class="row">

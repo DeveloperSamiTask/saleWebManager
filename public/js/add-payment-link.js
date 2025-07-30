@@ -311,10 +311,15 @@
 
                         $.unblockUI();
 
-                        // ✅ Descargar QR
-                        window.location.href = data.download_url;
+                        // ✅ Crear enlace invisible para forzar la descarga
+                        const a = document.createElement("a");
+                        a.href = data.download_url;
+                        a.download = ""; // puedes especificar el nombre si quieres
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
 
-                        // ✅ Recargar después de 3 segundos
+                        // ✅ Esperar 3 segundos y luego recargar
                         setTimeout(() => {
                             location.reload();
                         }, 3000);

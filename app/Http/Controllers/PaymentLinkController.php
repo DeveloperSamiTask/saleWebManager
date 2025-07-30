@@ -18,6 +18,7 @@ use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\Label\Font\OpenSans;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PaymentLinkController extends Controller
 {
@@ -227,32 +228,116 @@ class PaymentLinkController extends Controller
 
     public function getQrDetails($code)
     {
-        $link = PurchaseLink::with(['combos.combo', 'combos.members'])
+        try {
+            $link = $this->findPurchaseLinkByCode($code);
+
+            if (!$this->isValidIssueDate($link->date_issue)) {
+                return response()->json([
+                    'message' => 'Este código solo es válido para el día: ' . Carbon::parse($link->date_issue)->format('d/m/Y'),
+                    'status' => 'invalid_date'
+                ], 403);
+            }
+
+            $data = $this->formatMembersData($link);
+
+            return response()->json([
+                'data' => $data,
+                'link' => $this->formatLinkData($link),
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'No se encontró el código QR ingresado.',
+                'status' => 'not_found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ocurrió un error inesperado.',
+                'status' => 'error'
+            ], 500);
+        }
+    }
+
+    private function findPurchaseLinkByCode($code)
+    {
+        return PurchaseLink::with(['combos.combo', 'combos.members'])
             ->where('code', $code)
             ->firstOrFail();
+    }
 
+    private function isValidIssueDate($dateIssue)
+    {
+        return Carbon::parse($dateIssue)->isSameDay(Carbon::today());
+    }
+
+    private function formatMembersData($link)
+    {
         $data = [];
 
         foreach ($link->combos as $combo) {
             foreach ($combo->members as $member) {
                 $data[] = [
-                    'id'    => $member->id,
+                    'id'     => $member->id,
                     'names'  => $member->name,
-                    'combo'  => $combo->combo->name ?? 'Sin Combo',
-                    'status' => $member->status_entrie ?? null, // Asegúrate de tener ese campo en la tabla
+                    'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'),
+                    'document'    => $member->dni,
+                    'status' => $member->status_entrie ?? null,
                 ];
             }
         }
 
+        return $data;
+    }
+
+    private function formatLinkData($link)
+    {
+        return [
+            'code'     => $link->code,
+            'names'    => trim($link->names . ' ' . $link->lastname),
+            'document' => $link->document_type . ': ' . $link->document_number,
+            'date'     => $link->date_purchase,
+            'status'   => $link->status,
+        ];
+    }
+
+    public function dniValidate(Request $request)
+    {
+        $dni = trim($request->input('dni'));
+        $member = PurchaseComboMember::with('purchaseCombo.combo')
+            ->where('dni', $dni)
+            ->first();
+
+        if (!$member) {
+            return response()->json([
+                'success' => false,
+                'message' => 'DNI incorrecto.',
+            ], 404);
+        }
+
+        if ($member->status_entrie === 'used') {
+            return response()->json([
+                'success' => false,
+                'message' => 'El ingreso ya fue registrado.',
+            ], 409);
+        }
+
+        // Marcar como usado
+        $member->status_entrie = 'used';
+        $member->user = session('user')['usuario'];
+        $member->issue_entrie = now();
+        $member->save();
+
+        $combo = $member->purchaseCombo->combo;
+
         return response()->json([
-            'data' => $data,
-            'link' => [
-                'code'   => $link->code,
-                'names'   => trim($link->names . ' ' . $link->lastname),
-                'document' => $link->document_type . ': ' . $link->document_number,
-                'date'   => $link->date_purchase,
-                'status' => $link->status,
-            ]
+            'success' => true,
+            'message' => 'Ingreso validado correctamente.',
+            'data' => [
+                'id'       => $member->id,
+                'names'    => $member->name,
+                'combo'    => $combo->name . ' - ' . ($combo->description ?? 'Sin descripción'),
+                'document' => $member->dni,
+                'status'   => $member->status_entrie,
+            ],
         ]);
     }
 }

@@ -46,6 +46,7 @@
                 </div>
             </div>
         </div>
+        <div  id="alertCard"></div>
 
         <!-- Row grouping -->
         <div class="card">
@@ -76,8 +77,7 @@
                     <form id="formValidateDni">
                         <div class="modal-body">
                             <input type="hidden" id="hiddenRecordId" name="record_id">
-                            <input type="hidden" id="hiddenDniOriginal" name="dni_original">
-                            <p><strong>Nombre:</strong> <span id="modalName"></span></p>
+                            <p class="fs-5"><strong>Nombre:</strong> <span id="modalName"></span></p>
                             <div class="mb-3">
                                 <label for="inputDni" class="form-label">Ingrese el DNI:</label>
                                 <input type="text" class="form-control" id="inputDni" name="input_dni" required>

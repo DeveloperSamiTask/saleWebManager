@@ -46,22 +46,23 @@ $(function () {
                                     statusText = "ACTIVO";
                                     break;
                                 default:
-                                    statusText = a.status.toUpperCase(); // fallback
+                                    statusText =
+                                        a.status?.toUpperCase() ??
+                                        "DESCONOCIDO";
                             }
+
+                            const isUsed = a.status === "used";
+                            const btnClass = isUsed
+                                ? "btn-success"
+                                : "btn-danger";
 
                             return `
                             <button
-                                class="btn btn-sm ${
-                                    a.status === "unused"
-                                        ? "btn-danger"
-                                        : "btn-success"
-                                } btnValidate"
+                                class="btn btn-sm ${btnClass} btnValidate"
                                 data-id="${a.id}"
                                 data-names="${a.names}"
                                 data-status="${a.status}"
-                                type="button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#validateModal">
+                                type="button">
                                 ${statusText}
                             </button>`;
                         },
@@ -119,57 +120,113 @@ $(function () {
                     : t.order([2, "asc"])
                 ).draw();
             }));
-    $("#qrCode").change(function () {
-        const code = this.value;
+
+    $("#qrCode").change(handleQRCodeChange);
+
+    // Controlador principal del cambio de QR
+    function handleQRCodeChange() {
+        const code = this.value?.trim();
+
+        if (!code) return;
 
         blockUI();
+        clearAlerts();
 
-        if (code) {
-            $.ajax({
-                url: `qr/details/${code}`,
-                type: "GET",
-            })
-                .done((response) => {
-                    const table = $(".dt-row-grouping").DataTable();
-                    table.clear().rows.add(response.data).draw();
+        fetchQRDetails(code)
+            .done(renderQRInfo)
+            .fail(showQRFetchError)
+            .always($.unblockUI);
+    }
 
-                    $("#names").text(response.link.names);
-                    $("#documento").text(response.link.document);
+    // === LÓGICA DE FETCH ===
+    function fetchQRDetails(code) {
+        return $.ajax({
+            url: `qr/details/${code}`,
+            type: "GET",
+        });
+    }
 
-                    let translatedStatus = "";
-                    switch (response.link.status) {
-                        case "unused":
-                            translatedStatus = "SIN USAR";
-                            break;
-                        case "used":
-                            translatedStatus = "USADO";
-                            break;
-                        default:
-                            translatedStatus =
-                                response.link.status.toUpperCase();
-                    }
+    // === RENDERIZADO DE INFORMACIÓN ===
+    function renderQRInfo(response) {
+        const { data, link } = response;
 
-                    $("#status").html(
-                        `<span class="badge bg-${
-                            response.link.status === "unused"
-                                ? "danger"
-                                : "success"
-                        } fs-6">${translatedStatus}</span>`
-                    );
-                })
-                .fail((err) => {
-                    console.error("Error:", err);
-                    alert("Error al obtener los detalles del QR.");
-                })
-                .always(() => {
-                    $.unblockUI();
-                });
+        updateDataTable(data);
+        updateUserInfo(link);
+        updateStatusBadge(link.status);
+    }
+
+    function updateDataTable(data) {
+        $(".dt-row-grouping").DataTable().clear().rows.add(data).draw();
+    }
+
+    function updateUserInfo(link) {
+        $("#names").text(link.names);
+        $("#documento").text(link.document);
+    }
+
+    function updateStatusBadge(status) {
+        const statusLabels = {
+            unused: { text: "SIN USAR", color: "danger" },
+            used: { text: "USADO", color: "success" },
+        };
+
+        const { text, color } = statusLabels[status] || {
+            text: status.toUpperCase(),
+            color: "secondary",
+        };
+
+        $("#status").html(`
+        <button class="btn btn-sm btn-${color}">
+            <i class="mdi mdi-file-pdf-box me-1"></i> ${text}
+        </button>
+    `);
+    }
+
+    // === GESTIÓN DE ALERTAS ===
+    function showQRFetchError(xhr) {
+        clearQRData();
+
+        console.error("QR Error:", xhr);
+
+        let message =
+            "No se encontró información del QR o hubo un error en el servidor.";
+
+        if (xhr.responseJSON && xhr.responseJSON.message) {
+            message = xhr.responseJSON.message;
         }
-    });
+
+        showAlert(message);
+    }
+    function showAlert(message) {
+        const alertHtml = `
+            <div class="alert alert-solid-danger d-flex align-items-center mt-3" role="alert">
+                <i class="mdi mdi-alert-circle-outline me-2"></i>
+                ${message}
+            </div>
+        `;
+
+        $("#alertCard").find(".alert").remove(); // Elimina alertas anteriores dentro de la card
+        $("#alertCard").append(alertHtml); // Agrega la nueva alerta al final del card
+    }
+
+    function clearAlerts() {
+        $("#alertCard").find(".alert").remove();
+    }
+
+    function clearQRData() {
+        updateDataTable([]);
+        updateUserInfo({ names: "", document: "" });
+        updateStatusBadge("");
+    }
 
     t.on("click", ".btnValidate", function () {
         const id = $(this).data("id");
         const name = $(this).data("names");
+        const status = $(this).data("status");
+
+        if (status == "used") {
+            return false;
+        }
 
         $("#modalName").text(name);
 
@@ -183,11 +240,9 @@ $(function () {
     });
 
     $("#formValidateDni").on("submit", function (e) {
-        e.preventDefault(); // Evita que el formulario se envíe de forma tradicional
+        e.preventDefault();
 
         const dniIngresado = $("#inputDni").val().trim();
-        const dniOriginal = $("#hiddenDniOriginal").val().trim();
-        const recordId = $("#hiddenRecordId").val();
 
         if (dniIngresado === "") {
             Toast.fire({
@@ -199,37 +254,55 @@ $(function () {
             return;
         }
 
-        if (dniIngresado !== dniOriginal) {
-
-            Toast.fire({
-                icon: "error",
-                title: "El DNI ingresado no coincide con el original.",
-            });
-
-            $("#inputDni").focus();
-            return;
-        }
-
-        // ✅ Si llega aquí, el DNI es correcto
-        // Puedes enviar una petición AJAX o cerrar el modal, etc.
-        alert("✅ Validación correcta. Procesando...");
-
-        // Ejemplo: enviar por AJAX
         $.ajax({
-            url: "/ruta/para/validar", // Cambia esto por tu ruta
+            url: "validate/dni",
             method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
             data: {
-                record_id: recordId,
                 dni: dniIngresado,
             },
-            success: function (response) {
-                // cerrar modal, actualizar tabla, etc.
-                $("#validateModal").modal("hide");
-                alert("Registro validado correctamente.");
-                // recargar tabla si tienes DataTables
+            beforeSend: function () {
+                blockUI();
             },
-            error: function () {
-                alert("Hubo un error al validar.");
+            success: function (response) {
+                Toast.fire({
+                    icon: "success",
+                    title: response.message,
+                });
+                $("#validateModal").modal("hide");
+                $("#inputDni").val("");
+
+                const updatedMember = response.data;
+
+                const table = $(".dt-row-grouping").DataTable();
+
+                // Buscar la fila por ID
+                const rowIndex = table
+                    .rows()
+                    .indexes()
+                    .filter(function (idx) {
+                        return table.row(idx).data().id === updatedMember.id;
+                    })[0];
+
+                // Actualizar los datos de la fila
+                if (rowIndex !== undefined) {
+                    table.row(rowIndex).data(updatedMember).draw(false);
+                }
+            },
+            error: function (xhr) {
+                let msg = "Error al validar el DNI.";
+                if (xhr.responseJSON?.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                Toast.fire({
+                    icon: "error",
+                    title: msg,
+                });
+            },
+            complete: function () {
+                $.unblockUI();
             },
         });
     });
@@ -243,7 +316,7 @@ $(function () {
         });
     }
 
-        const Toast = Swal.mixin({
+    const Toast = Swal.mixin({
         toast: true,
         position: "top",
         showConfirmButton: false,
