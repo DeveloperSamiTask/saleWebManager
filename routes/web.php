@@ -133,4 +133,5 @@ Route::prefix('PagoLink')->group(function () {
     Route::get('/Validar_Pago_link', [PaymentLinkController::class, 'validateForm'])->name('paymentLink.validate'); // Api pagos
     Route::get('/qr/details/{code}', [PaymentLinkController::class, 'getQrDetails'])->name('qr.details');
     Route::post('/validate/dni', [PaymentLinkController::class, 'dniValidate']);
+    Route::post('/print', [PaymentLinkController::class, 'print']);
 });

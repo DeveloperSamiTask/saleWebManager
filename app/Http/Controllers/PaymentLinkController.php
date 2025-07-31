@@ -9,6 +9,8 @@ use App\Models\PromotionsLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
@@ -291,6 +293,7 @@ class PaymentLinkController extends Controller
     private function formatLinkData($link)
     {
         return [
+            'id'     => $link->id,
             'code'     => $link->code,
             'names'    => trim($link->names . ' ' . $link->lastname),
             'document' => $link->document_type . ': ' . $link->document_number,
@@ -339,5 +342,65 @@ class PaymentLinkController extends Controller
                 'status'   => $member->status_entrie,
             ],
         ]);
+    }
+
+    public function print(Request $request)
+    {
+        try {
+            $id = $request->input('id');
+
+            $purchase = PurchaseLink::with('combos.combo')->findOrFail($id);
+
+            $data = [];
+
+            foreach ($purchase->combos as $combo) {
+                $cantidad = $combo->quantity;
+                $precioUnitario = $combo->combo->price ?? 0;
+                $descripcion = $combo->combo->description ?? '';
+                $nombre = $combo->combo->name ?? '';
+
+                $data[] = [
+                    'combo' => strtoupper($nombre),
+                    'descripcion' => strtoupper($descripcion),
+                    'cantidad' => $cantidad,
+                    'subtotal' => $cantidad * $precioUnitario,
+                ];
+            }
+
+            $total = array_sum(array_column($data, 'subtotal'));
+
+            $html = view('payment_link.print', [
+                'data' => $data,
+                'total' => $total,
+                'user' => session('user')['usuario'] ?? 'Desconocido'
+            ])->render();
+
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+
+            $dompdf = new \Dompdf\Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A5', 'portrait');
+            $dompdf->render();
+
+            $pdfContent = $dompdf->output();
+            $filename = 'pdfs/comprobante_' . $purchase->code . '.pdf';
+
+            if (!file_exists(public_path('pdfs'))) {
+                mkdir(public_path('pdfs'), 0777, true);
+            }
+
+            file_put_contents(public_path($filename), $pdfContent);
+
+            return response()->json([
+                'success' => true,
+                'url' => asset($filename) // URL accesible públicamente
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Excepción: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
