@@ -309,32 +309,7 @@ $(function () {
 
     $(document).on("click", "#btnPrint", function () {
         const id = $(this).data("id");
-
-        $.ajax({
-            url: "print",
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            data: { id },
-            beforeSend: blockUI,
-        })
-            .done(function (response) {
-                if (response.success) {
-                    window.open(response.url, "_blank");
-                } else {
-                    Toast.fire({
-                        icon: "error",
-                        title: response.message || "Error al generar el PDF.",
-                    });
-                }
-            })
-            .fail(function (xhr) {
-                const msg =
-                    xhr.responseJSON?.message || "Error al generar el PDF.";
-                Toast.fire({ icon: "error", title: msg });
-            })
-            .always($.unblockUI);
+        window.open("print?id=" + id, "_blank"); // abre directamente el PDF
     });
 
     function blockUI() {

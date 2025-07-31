@@ -12,6 +12,8 @@ use Illuminate\Support\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
+use Illuminate\Support\Facades\Response;
+
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -383,18 +385,9 @@ class PaymentLinkController extends Controller
             $dompdf->setPaper('A5', 'portrait');
             $dompdf->render();
 
-            $pdfContent = $dompdf->output();
-            $filename = 'pdfs/comprobante_' . $purchase->code . '.pdf';
-
-            if (!file_exists(public_path('pdfs'))) {
-                mkdir(public_path('pdfs'), 0777, true);
-            }
-
-            file_put_contents(public_path($filename), $pdfContent);
-
-            return response()->json([
-                'success' => true,
-                'url' => asset($filename) // URL accesible públicamente
+            return Response::make($dompdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="comprobante.pdf"',
             ]);
         } catch (\Exception $e) {
             return response()->json([
