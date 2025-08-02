@@ -1,66 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
+    <meta charset="UTF-8">
+    <title>Comprobante</title>
     <style>
         * {
-            font-family: "century gothic";
+            font-family: "Century Gothic", sans-serif;
             font-size: 10px;
+            box-sizing: border-box;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            border-bottom: 1px solid #000;
-            border-style: dotted;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            text-align: left;
+        body {
+            margin: 0;
+            padding: 0;
+            width: 50mm;
         }
 
         h3 {
-            font-size: 15px;
+            text-align: center;
+            font-size: 13px;
+            margin: 5px 0;
+        }
+
+        p {
+            margin: 2px 10px;
+        }
+
+        .item {
+            padding: 6px 10px;
+            border-bottom: 1px dashed #000;
+        }
+
+        .label {
+            font-weight: bold;
+            display: block;
+        }
+
+        .total {
+            padding: 10px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        @media print {
+            @page {
+                size: 80mm auto;
+                margin: 0;
+            }
+
+            html,
+            body {
+                width: 80mm;
+                margin: 0;
+                padding: 0;
+            }
         }
     </style>
 </head>
 
 <body>
-    <h3>Validación de Compra por Pago Link</h3>
-    <p style="font-size: 14px">Fecha: {{ now() }}</p>
-    <p style="font-size: 12px">Usuario: {{ $user }}</p>
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Combo</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($data as $index => $row)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $row['combo'] }}</td>
-                    <td>{{ $row['descripcion'] }}</td>
-                    <td>{{ $row['cantidad'] }}</td>
-                    <td>{{ number_format($row['subtotal'], 2) }}</td>
-                </tr>
-            @endforeach
-            <tr>
-                <th colspan="4" style="text-align: right;">TOTAL</th>
-                <th>S/. {{ number_format($total, 2) }}</th>
-            </tr>
-        </tbody>
-    </table>
+    <h3>Validación Pago Link</h3>
+    <p>Fecha: {{ now() }}</p>
+    <p>Usuario: {{ $user }}</p>
+
+    @php
+        $lastCombo = null;
+    @endphp
+
+    @foreach ($data as $index => $row)
+
+
+        <div class="item">
+            <span class="label">{{ $row['combo'] }}</span><br>
+            <span class="label">Descripción:</span><br>
+            {!! nl2br(e(str_replace('+', "\n", $row['descripcion']))) !!}<br>
+            <span class="label">Cantidad:</span> {{ $row['cantidad'] }}<br>
+            <span class="label">Subtotal:</span> S/. {{ number_format($row['subtotal'], 2) }}
+        </div>
+
+        @php
+            $lastCombo = $row['combo'];
+        @endphp
+    @endforeach
+
+    <div class="total">TOTAL: S/. {{ number_format($total, 2) }}</div>
 </body>
 
 </html>

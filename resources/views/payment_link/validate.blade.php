@@ -7,6 +7,16 @@
             <div class="col-lg-5">
                 <div class="card h-100">
                     <div class="card-body">
+                        <h5 class="mb-3 text-nowrap">Total de entradas: {{ $data['paymentLink_total'] }}</h5>
+                        <h5 class="mb-3 text-nowrap">Entradas validadas de hoy: {{ $data['paymentLink_validados'] }} </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4 g-4">
+            <div class="col-lg-5">
+                <div class="card h-100">
+                    <div class="card-body">
                         <form class="referral-form" onsubmit="return false">
                             <div class="mb-4 mt-1">
                                 <div class="row g-2">
@@ -46,7 +56,8 @@
                 </div>
             </div>
         </div>
-        <div  id="alertCard"></div>
+
+        <div id="alertCard"></div>
 
         <!-- Row grouping -->
         <div class="card">

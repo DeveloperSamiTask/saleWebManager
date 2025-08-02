@@ -226,8 +226,16 @@ class PaymentLinkController extends Controller
 
     public function validateForm()
     {
+        $purchaseComboMembers = PurchaseComboMember::whereHas('purchaseCombo', function ($query) {
+            $query->whereHas('purchaseLink', function ($query) {
+                $query->whereDate('date_issue', now());
+            });
+        });
+        
         $data['title'] = "Validar Pago Link";
-        return view('payment_link.validate');
+        $data['paymentLink_total'] = $purchaseComboMembers->count();
+        $data['paymentLink_validados'] = $purchaseComboMembers->where('status_entrie', 'used')->count();
+        return view('payment_link.validate', ['data' => $data]);
     }
 
     public function getQrDetails($code)
@@ -353,6 +361,11 @@ class PaymentLinkController extends Controller
 
             $purchase = PurchaseLink::with('combos.combo')->findOrFail($id);
 
+            $purchase->status = 'used';
+            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->activate_date = now();
+            $purchase->save();
+
             $data = [];
 
             foreach ($purchase->combos as $combo) {
@@ -384,6 +397,8 @@ class PaymentLinkController extends Controller
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A5', 'portrait');
             $dompdf->render();
+
+
 
             return Response::make($dompdf->output(), 200, [
                 'Content-Type' => 'application/pdf',

@@ -309,7 +309,11 @@ $(function () {
 
     $(document).on("click", "#btnPrint", function () {
         const id = $(this).data("id");
-        window.open("print?id=" + id, "_blank"); // abre directamente el PDF
+        window.open("print?id=" + id, "_blank");
+
+        setTimeout(function () {
+            location.reload();
+        }, 2000);
     });
 
     function blockUI() {
