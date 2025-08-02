@@ -231,7 +231,7 @@ class PaymentLinkController extends Controller
                 $query->whereDate('date_issue', now());
             });
         });
-        
+
         $data['title'] = "Validar Pago Link";
         $data['paymentLink_total'] = $purchaseComboMembers->count();
         $data['paymentLink_validados'] = $purchaseComboMembers->where('status_entrie', 'used')->count();
@@ -341,6 +341,8 @@ class PaymentLinkController extends Controller
 
         $combo = $member->purchaseCombo->combo;
 
+
+
         return response()->json([
             'success' => true,
             'message' => 'Ingreso validado correctamente.',
@@ -361,9 +363,16 @@ class PaymentLinkController extends Controller
 
             $purchase = PurchaseLink::with('combos.combo')->findOrFail($id);
 
-            $purchase->status = 'used';
+            $purchaseComboMembersUnused = PurchaseComboMember::whereHas('purchaseCombo', function ($query) use ($id) {
+                $query->whereHas('purchaseLink', function ($query) use ($id) {
+                    $query->where('id', $id);
+                });
+            })->where('status_entrie', 'unused')->count();
+
+            // validar si todos los members estan en uso para actualizar el estado del pago
+            $purchase->status = $purchaseComboMembersUnused > 0 ? 'unused' : 'used';
             $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
-            $purchase->activate_date = now();
+            $purchase->activate_date = now(); // nose ha guardado porque en la base de datos estaba mal escrito y no estaba ddefinido en el modelo fillebale (user_active y activate_date)
             $purchase->save();
 
             $data = [];

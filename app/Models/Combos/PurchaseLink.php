@@ -22,6 +22,8 @@ class PurchaseLink extends Model
         'date_issue',
         'status',
         'user_id',
+        'user_active',
+        'activate_date',
         'observation'
     ];
 
