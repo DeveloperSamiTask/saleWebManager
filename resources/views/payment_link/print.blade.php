@@ -64,20 +64,19 @@
     <h3>Validación Pago Link</h3>
     <p>Fecha: {{ now() }}</p>
     <p>Usuario: {{ $user }}</p>
-    <p>Cliente: {{ $user }}</p>
+    <p>Cliente: {{ $purchase->lastname . ' ' . $purchase->names }}</p>
 
     @php
         $lastCombo = null;
     @endphp
 
     @foreach ($data as $index => $row)
-
-
         <div class="item">
             <span class="label">{{ $row['combo'] }}</span><br>
             <span class="label">Descripción:</span><br>
             {!! nl2br(e(str_replace('+', "\n", $row['descripcion']))) !!}<br>
             <span class="label">Cantidad:</span> {{ $row['cantidad'] }}<br>
+            <span class="label">Validados:</span> {{ $row['validados'] }}<br>
             <span class="label">Subtotal:</span> S/. {{ number_format($row['subtotal'], 2) }}
         </div>
 

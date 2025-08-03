@@ -232,6 +232,7 @@ class PaymentLinkController extends Controller
 
     public function validateForm()
     {
+        session()->forget('validated_members');
         $purchaseComboMembers = PurchaseComboMember::whereHas('purchaseCombo', function ($query) {
             $query->whereHas('purchaseLink', function ($query) {
                 $query->whereDate('date_issue', now());
@@ -246,6 +247,7 @@ class PaymentLinkController extends Controller
 
     public function getQrDetails($code)
     {
+        session()->forget('validated_members');
         try {
             $link = $this->findPurchaseLinkByCode($code);
 
@@ -321,6 +323,7 @@ class PaymentLinkController extends Controller
     public function dniValidate(Request $request)
     {
         $dni = trim($request->input('dni'));
+
         $member = PurchaseComboMember::with('purchaseCombo.combo')
             ->where('dni', $dni)
             ->first();
@@ -347,6 +350,22 @@ class PaymentLinkController extends Controller
 
         $combo = $member->purchaseCombo->combo;
 
+        // Guardar en la sesión
+        $validatedGroup = session('validated_members', []);
+
+        // Evitar duplicados por ID
+        if (!collect($validatedGroup)->contains('id', $member->id)) {
+            $validatedGroup[] = [
+                'id'          => $member->id,
+                'name'        => $member->name,
+                'combo_id'    => $combo->id, // 🔸 agregar combo_id
+                'combo'       => $combo->name,
+                'descripcion' => $combo->description ?? 'Sin descripción',
+                'dni'         => $member->dni,
+                'hora'        => now()->format('H:i:s'),
+            ];
+            session(['validated_members' => $validatedGroup]);
+        }
 
 
         return response()->json([
@@ -361,6 +380,7 @@ class PaymentLinkController extends Controller
             ],
         ]);
     }
+
 
     public function print(Request $request)
     {
@@ -382,16 +402,24 @@ class PaymentLinkController extends Controller
 
             $data = [];
 
+            $validated = session('validated_members', []);
+            $agrupadosPorCombo = collect($validated)->groupBy('combo');
+
             foreach ($purchase->combos as $combo) {
                 $cantidad = $combo->quantity;
                 $precioUnitario = $combo->combo->price ?? 0;
                 $descripcion = $combo->combo->description ?? '';
                 $nombre = $combo->combo->name ?? '';
+                $validados = $agrupadosPorCombo->has($nombre)
+                    ? $agrupadosPorCombo[$nombre]->count()
+                    : 0;
+
 
                 $data[] = [
                     'combo' => strtoupper($nombre),
                     'descripcion' => strtoupper($descripcion),
                     'cantidad' => $cantidad,
+                    'validados' => $validados, // 👈 Agregado aquí
                     'subtotal' => $cantidad * $precioUnitario,
                 ];
             }
@@ -400,8 +428,11 @@ class PaymentLinkController extends Controller
 
             $html = view('payment_link.print', [
                 'data' => $data,
+                'purchase' => $purchase,
                 'total' => $total,
-                'user' => session('user')['usuario'] ?? 'Desconocido'
+                'user' => session('user')['usuario'] ?? 'Desconocido',
+                'agrupadosPorCombo' => $agrupadosPorCombo,
+
             ])->render();
 
             $options = new \Dompdf\Options();
