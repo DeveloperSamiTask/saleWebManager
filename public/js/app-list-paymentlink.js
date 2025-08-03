@@ -121,6 +121,7 @@ $(function () {
                 { data: "combos" },
                 { data: "members" },
                 { data: "validated_members" },
+                { data: "amount" },
                 { data: "date_purchase" },
                 { data: "date_issue" },
                 { data: "status" },

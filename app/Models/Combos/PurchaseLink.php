@@ -35,7 +35,7 @@ class PurchaseLink extends Model
     public static function getList($startDate, $endDate, $isChecked)
     {
         $filterField = $isChecked === '1' ? 'date_issue' : 'date_purchase';
-        
+
         $coupons = self::with(['combos.combo', 'combos.members'])
             ->whereBetween($filterField, [$startDate, $endDate])
             ->orderByDesc($filterField)
@@ -50,11 +50,16 @@ class PurchaseLink extends Model
 
             $totalMembers = 0;
             $validatedMembers = 0;
+            $totalAmount = 0;
 
             foreach ($row->combos as $combo) {
                 $members = $combo->members;
                 $totalMembers += $members->count();
                 $validatedMembers += $members->where('status_entrie', 'used')->count();
+
+                $price = $combo->combo->price ?? 0;
+                $quantity = $combo->quantity ?? 0;
+                $totalAmount += $price * $quantity;
             }
 
             $data[] = [
@@ -65,6 +70,7 @@ class PurchaseLink extends Model
                 'combos'            => $comboNames,
                 'members'           => (string) $totalMembers,
                 'validated_members' => (string) $validatedMembers,
+                'amount'            => number_format($totalAmount, 2, '.', ''), // Ej. 120.00
                 'date_purchase'     => $row->date_purchase,
                 'date_issue'        => $row->date_issue,
                 'status'            => $row->status ?? null,

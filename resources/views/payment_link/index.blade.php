@@ -107,6 +107,7 @@
                             <th>Combos</th>
                             <th>Integrantes</th>
                             <th>Validados</th>
+                            <th>Monto</th>
                             <th>Fecha de Compra</th>
                             <th>Fecha de Uso</th>
                             <th>Estado</th>
