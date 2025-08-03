@@ -64,6 +64,7 @@
     <h3>Validación Pago Link</h3>
     <p>Fecha: {{ now() }}</p>
     <p>Usuario: {{ $user }}</p>
+    <p>Cliente: {{ $user }}</p>
 
     @php
         $lastCombo = null;

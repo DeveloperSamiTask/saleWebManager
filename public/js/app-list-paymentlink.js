@@ -46,6 +46,9 @@ $(function () {
                     overlayCSS: { opacity: 0.5 },
                 });
 
+                var Checked = $(".switch-input").prop("checked");
+                var isChecked = Checked ? "1" : "0";
+
                 var startDate = selectedDates[0].toISOString();
                 var endDate = selectedDates[1].toISOString();
                 $.ajax({
@@ -54,10 +57,32 @@ $(function () {
                     data: {
                         startDate: startDate,
                         endDate: endDate,
+                        isChecked: isChecked,
                     },
                 })
                     .done((response) => {
                         e.clear().rows.add(response.data).draw();
+
+                        // Procesar los datos recibidos para los totales
+                        let totalCombos = response.data.length;
+                        let usedPayments = 0;
+                        let unusedPayments = 0;
+
+                        response.data.forEach(function (row) {
+                            if (
+                                row.status &&
+                                row.status.toLowerCase() === "used"
+                            ) {
+                                usedPayments++;
+                            } else {
+                                unusedPayments++;
+                            }
+                        });
+
+                        // Actualizar los contadores
+                        $("#total").text(totalCombos);
+                        $("#shift1").text(usedPayments);
+                        $("#shift2").text(unusedPayments);
                     })
                     .fail(function (error) {
                         console.error("error:", error.responseText);
@@ -85,6 +110,7 @@ $(function () {
                         var dates = selectedDates.split(" Hasta "); // Separa las fechas
                         d.startDate = dates[0]; // Asigna la fecha de inicio
                         d.endDate = dates[1] ?? dates[0]; // Asigna la fecha de fin (puede ser la misma si no se seleccionó un rango)
+                        d.isChecked = "0";
                     }
                 },
             },
@@ -94,6 +120,7 @@ $(function () {
                 { data: "names" },
                 { data: "combos" },
                 { data: "members" },
+                { data: "validated_members" },
                 { data: "date_purchase" },
                 { data: "date_issue" },
                 { data: "status" },
@@ -135,7 +162,13 @@ $(function () {
                     },
                 },
                 {
-                    targets: 7,
+                    targets: 4,
+                    render: function (e, t, a, n) {
+                        return e;
+                    },
+                },
+                {
+                    targets: -2,
                     render: function (e, t, a, n) {
                         const info = status[e] || {
                             title: "DESCONOCIDO",
@@ -180,7 +213,7 @@ $(function () {
                             text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -223,7 +256,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -254,7 +287,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -285,7 +318,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -316,7 +349,7 @@ $(function () {
                             text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 6, 7],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -381,6 +414,27 @@ $(function () {
                         );
                     },
                 },
+            },
+            initComplete: function () {
+                var array = s.DataTable().rows().data();
+
+                let totalCombos = array.length;
+                let usedPayments = 0;
+                let unusedPayments = 0;
+
+                array.each(function (row) {
+                    // Ajusta el nombre del campo según el backend
+                    if (row.status == "used") {
+                        usedPayments++;
+                    } else {
+                        unusedPayments++;
+                    }
+                });
+
+                // Actualizar los contadores
+                $("#total").text(totalCombos); // Total de pagos
+                $("#shift1").text(usedPayments); // Pagos usados
+                $("#shift2").text(unusedPayments); // Pagos no usados
             },
         })),
         setTimeout(() => {

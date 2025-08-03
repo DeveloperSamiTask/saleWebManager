@@ -32,28 +32,42 @@ class PurchaseLink extends Model
         return $this->hasMany(PurchaseCombo::class, 'purchase_link_id');
     }
 
-    public static function getList($startDate, $endDate)
+    public static function getList($startDate, $endDate, $isChecked)
     {
-        $coupons = self::with(['combos.combo', 'combos.members']) // Asegúrate que exista la relación 'combo' en combos
-            ->whereBetween('date_purchase', [$startDate, $endDate])
-            ->orderByDesc('date_purchase')
+        $filterField = $isChecked === '1' ? 'date_issue' : 'date_purchase';
+        
+        $coupons = self::with(['combos.combo', 'combos.members'])
+            ->whereBetween($filterField, [$startDate, $endDate])
+            ->orderByDesc($filterField)
             ->get();
 
         $data = [];
 
         foreach ($coupons as $row) {
-            $comboNames = $row->combos->pluck('combo.name')->implode(', ');
+            $comboNames = $row->combos->map(function ($combo) {
+                return '(' . $combo->quantity . ') ' . $combo->combo->name;
+            })->implode(', ');
+
+            $totalMembers = 0;
+            $validatedMembers = 0;
+
+            foreach ($row->combos as $combo) {
+                $members = $combo->members;
+                $totalMembers += $members->count();
+                $validatedMembers += $members->where('status_entrie', 'used')->count();
+            }
 
             $data[] = [
-                'id'            => $row->id,
-                'code'          => $row->code,
-                'names'         => trim($row->names . ' ' . $row->lastname),
-                'document' => $row->document_number,
-                'combos'        => $comboNames, // Aquí se listan los nombres de combos
-                'members'       => $row->combos->sum(fn($combo) => $combo->members->count()),
-                'date_purchase' => $row->date_purchase,
-                'date_issue'    => $row->date_issue,
-                'status'        => $row->status ?? null,
+                'id'                => $row->id,
+                'code'              => $row->code,
+                'names'             => trim($row->names . ' ' . $row->lastname),
+                'document'          => $row->document_number,
+                'combos'            => $comboNames,
+                'members'           => (string) $totalMembers,
+                'validated_members' => (string) $validatedMembers,
+                'date_purchase'     => $row->date_purchase,
+                'date_issue'        => $row->date_issue,
+                'status'            => $row->status ?? null,
             ];
         }
 

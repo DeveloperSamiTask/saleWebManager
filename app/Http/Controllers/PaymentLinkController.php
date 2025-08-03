@@ -34,18 +34,24 @@ class PaymentLinkController extends Controller
 
     public function listPayments(Request $request)
     {
-        $startDate = $request->get('startDate', '2025-07-01');
-        $endDate = $request->get('endDate', '2025-07-31');
+        $isChecked = $request->input('isChecked', '0');
 
-        $startDate = Carbon::parse($startDate)->startOfDay();
-        $endDate = Carbon::parse($endDate)->endOfDay();
+        if ($isChecked === '1') {
+            // Filtrar por date_issue (DATE sin hora)
+            $startDate = Carbon::parse($request->get('startDate', '2025-07-01'))->toDateString(); // Y-m-d
+            $endDate = Carbon::parse($request->get('endDate', '2025-07-31'))->toDateString();     // Y-m-d
+        } else {
+            // Filtrar por date_purchase (DATETIME con hora)
+            $startDate = Carbon::parse($request->get('startDate', '2025-07-01'))->startOfDay()->toDateTimeString();
+            $endDate = Carbon::parse($request->get('endDate', '2025-07-31'))->endOfDay()->toDateTimeString();
+        }
 
-        $coupons = PurchaseLink::getList($startDate->toDateTimeString(), $endDate->toDateTimeString());
+        $coupons = PurchaseLink::getList($startDate, $endDate, $isChecked);
 
         return response()->json([
             'data' => $coupons,
-            'startDate' => $startDate->toDateString(),
-            'endDate' => $endDate->toDateString(),
+            'startDate' => $startDate,
+            'endDate' => $endDate,
         ]);
     }
 
