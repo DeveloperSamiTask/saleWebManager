@@ -3,16 +3,64 @@
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
 
-        <div class="row mb-4 g-4">
-            <div class="col-lg-5">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="mb-3 text-nowrap">Total de entradas: {{ $data['paymentLink_total'] }}</h5>
-                        <h5 class="mb-3 text-nowrap">Entradas validadas de hoy: {{ $data['paymentLink_validados'] }} </h5>
+
+        <div class="col-12 card-numbers-tickets mb-4">
+            <div class="card">
+                <div class="card-widget-separator-wrapper">
+                    <div class="card-body card-widget-separator">
+                        <div class="row gy-4 gy-sm-1">
+                            <div class="col-sm-6 col-lg-3">
+                                <div
+                                    class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0">
+                                    <div>
+                                        <h3 class="mb-1" id="totalTicky">{{ $data['paymentLink_total'] }}</h3>
+                                        <p class="mb-0">Total</p>
+                                    </div>
+                                    <div class="avatar me-sm-4">
+                                        <span class="avatar-initial rounded bg-label-secondary">
+                                            <i class="mdi mdi-ticket-outline text-heading mdi-20px"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <hr class="d-none d-sm-block d-lg-none me-4">
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div
+                                    class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0">
+                                    <div>
+                                        <h3 class="mb-1" id="validateTicky">{{ $data['paymentLink_validados'] }}</h3>
+                                        <p class="mb-0">Validados</p>
+                                    </div>
+                                    <div class="avatar  me-lg-4">
+                                        <span class="avatar-initial rounded bg-label-secondary">
+                                            <i class="mdi mdi-ticket-confirmation-outline text-heading mdi-20px"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <hr class="d-none d-sm-block d-lg-none">
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div
+                                    class="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3">
+                                    <div>
+                                        <h3 class="mb-1" id="noValidateTicky">
+                                            {{ $data['paymentLink_total'] - $data['paymentLink_validados'] }}</h3>
+                                        <p class="mb-0">No Validados</p>
+                                    </div>
+                                    <div class="avatar me-sm-4">
+                                        <span class="avatar-initial rounded bg-label-secondary">
+                                            <i class="mdi mdi-ticket-account text-heading mdi-20px"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="row mb-4 g-4">
             <div class="col-lg-5">
                 <div class="card h-100">
@@ -107,6 +155,11 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.css') }}">
+    <style>
+        .table-success {
+            background-color: #d4edda !important;
+        }
+    </style>
 @endsection()
 
 @section('scripts')

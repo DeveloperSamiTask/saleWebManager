@@ -369,10 +369,9 @@ class PaymentLinkController extends Controller
                 });
             })->where('status_entrie', 'unused')->count();
 
-            // validar si todos los members estan en uso para actualizar el estado del pago
             $purchase->status = $purchaseComboMembersUnused > 0 ? 'unused' : 'used';
             $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
-            $purchase->activate_date = now(); // nose ha guardado porque en la base de datos estaba mal escrito y no estaba ddefinido en el modelo fillebale (user_active y activate_date)
+            $purchase->activate_date = now();
             $purchase->save();
 
             $data = [];

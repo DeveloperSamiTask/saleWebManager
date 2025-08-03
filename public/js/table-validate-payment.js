@@ -265,17 +265,18 @@ $(function () {
             },
             beforeSend: function () {
                 blockUI();
+                $("#btnValidateDni").prop("disabled", true);
             },
             success: function (response) {
                 Toast.fire({
                     icon: "success",
                     title: response.message,
                 });
+
                 $("#validateModal").modal("hide");
                 $("#inputDni").val("");
 
                 const updatedMember = response.data;
-
                 const table = $(".dt-row-grouping").DataTable();
 
                 // Buscar la fila por ID
@@ -289,6 +290,14 @@ $(function () {
                 // Actualizar los datos de la fila
                 if (rowIndex !== undefined) {
                     table.row(rowIndex).data(updatedMember).draw(false);
+
+                    // Obtener el nodo de la fila ya actualizada
+                    const rowNode = table.row(rowIndex).node();
+
+                    // Aplicar clase de resaltado
+                    $(rowNode).addClass("table-success");
+
+
                 }
             },
             error: function (xhr) {
@@ -303,6 +312,7 @@ $(function () {
             },
             complete: function () {
                 $.unblockUI();
+                $("#btnValidateDni").prop("disabled", false);
             },
         });
     });

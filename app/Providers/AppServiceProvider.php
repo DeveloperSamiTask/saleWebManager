@@ -45,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
                 'text' => 'Generar Lista Entradas',
                 'dataI18n' => 'Generate Coupon',
             ],
-                        [
+            [
                 'roles' => [1, 2],
                 'companies' => [1],
                 'route' => 'paymentLink.validate',
