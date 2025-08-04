@@ -159,6 +159,19 @@
             getCombosData();
         });
 
+        $(document).on("keydown", ".combo-qty", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault(); // Evita que el formulario se envíe
+                $(this).blur(); // Opcional: quita el foco del input
+            }
+        });
+
+        $("#paymentLinkForm").on("keydown", "input", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+            }
+        });
+
         function updateEmptyMessage() {
             const hasCombos = $("#comboTableBody tr[data-index]").length > 0;
             if (hasCombos) {
@@ -303,7 +316,6 @@
                             title: data.message,
                         });
 
-                        // ✅ Limpiar el formulario
                         f.reset();
 
                         // ✅ Reiniciar Select2 manualmente (si usas Select2)
