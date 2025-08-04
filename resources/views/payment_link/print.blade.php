@@ -65,6 +65,7 @@
     <p>Fecha: {{ now() }}</p>
     <p>Usuario: {{ $user }}</p>
     <p>Cliente: {{ $purchase->lastname . ' ' . $purchase->names }}</p>
+    <p>codigo: {{ $purchase->code }}</p>
 
     @php
         $lastCombo = null;

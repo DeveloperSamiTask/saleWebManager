@@ -135,4 +135,7 @@ Route::prefix('PagoLink')->group(function () {
     Route::post('/validate/dni', [PaymentLinkController::class, 'dniValidate']);
     Route::get('/print', [PaymentLinkController::class, 'print'])->name('print');
     Route::get('/Ver/{id}', [PaymentLinkController::class, 'invoice'])->name('paymentLink.show');
+    Route::get('member/{id}', [PaymentLinkController::class, 'member'])->name('paymentLink.show');
+    Route::put('member/{id}', [PaymentLinkController::class, 'updateMember']);
+
 });

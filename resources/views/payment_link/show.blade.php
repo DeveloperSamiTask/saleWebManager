@@ -125,6 +125,46 @@
         </div>
         <div class="content-backdrop fade"></div>
     </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Cliente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="editId" name="id">
+
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Nombres</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editDni" class="form-label">DNI</label>
+                            <input type="text" class="form-control" id="editDni" name="dni" required>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <label class="switch">
+                                <input type="checkbox" class="switch-input" id="editActive" name="is_active"> <span
+                                    class="switch-toggle-slider">
+                                    <span class="switch-on"></span>
+                                    <span class="switch-off"></span>
+                                </span>
+                                <span class="switch-label">ESTADO</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection()
 
 @section('styles')

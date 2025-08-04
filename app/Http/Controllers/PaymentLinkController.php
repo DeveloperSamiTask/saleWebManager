@@ -307,7 +307,9 @@ class PaymentLinkController extends Controller
                     'activate'    => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : 'No activado',
                     'status' => $member->status_entrie ?? null,
                     'button' => (session('user')['idusuario'] ?? null) == 1
-                        ? '<button class="btn btn-icon btn-warning waves-effect waves-light" data-code="' . $link->code . '"><i class="mdi mdi-pencil-outline"></i></button>'
+                        ? '<button class="btn btn-warning btn-sm edit-btn" data-id="' . $member->id . '">
+                            <i class="mdi mdi-pencil-outline"></i>
+                        </button>'
                         : '',
                 ];
             }
@@ -491,4 +493,34 @@ class PaymentLinkController extends Controller
             'code' => $code
         ]);
     }
+
+    public function member($id)
+    {
+        $member = PurchaseComboMember::with('purchaseCombo.combo')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return response()->json([
+            'id' => $member->id,
+            'name' => $member->name,
+            'dni' => $member->dni,
+            'combo' => $member->purchaseCombo->combo->name,
+            'description' => $member->purchaseCombo->combo->description ?? 'Sin descripción',
+            'is_active' => $member->status_entrie,
+            'issue_entrie' => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : null,
+        ]);
+    }
+
+    public function updateMember(Request $request, $id)
+{
+    $member = PurchaseComboMember::findOrFail($id);
+
+    $member->name = $request->input('name');
+    $member->dni = $request->input('document');
+    $member->status_entrie = $request->input('is_active'); // 'used' o 'unused'
+
+    $member->save();
+
+    return response()->json(['message' => 'Actualizado correctamente']);
+}
 }

@@ -1,6 +1,12 @@
 "use strict";
 
 $(function () {
+    $.ajaxSetup({
+        headers: {
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
+    });
+
     var t,
         s = $(".dt-row-grouping"),
         d =
@@ -248,6 +254,66 @@ $(function () {
         $("#hiddenRecordId").val(id);
 
         $("#validateModal").modal("show");
+    });
+
+    $(document).on("click", ".edit-btn", function () {
+        blockUI();
+        const id = $(this).data("id");
+
+        console.log("Edit button clicked for ID:", id);
+
+        $.get("/PagoLink/member/" + id, function (data) {
+            $("#editId").val(data.id);
+            $("#editName").val(data.name);
+            $("#editDni").val(data.dni);
+            $("#editActive").prop("checked", data.is_active === "used");
+
+            $("#editModal").modal("show");
+        })
+            .fail(function () {
+                alert("Error al obtener datos del miembro.");
+            })
+            .always(function () {
+                $.unblockUI();
+            });
+    });
+
+    $("#editForm").on("submit", function (e) {
+        e.preventDefault(); // Evita el envío normal
+
+        blockUI();
+
+        const id = $("#editId").val();
+        const name = $("#editName").val();
+        const dni = $("#editDni").val();
+        const is_active = $("#editActive").is(":checked") ? "used" : "unused";
+
+        $.ajax({
+            url: "/PagoLink/member/" + id,
+            type: "POST",
+            data: {
+                _method: "PUT",
+                name: name,
+                document: dni,
+                is_active: is_active,
+            },
+            success: function (response) {
+                $("#editModal").modal("hide");
+
+                Toast.fire({
+                    icon: "success",
+                    title: "Cliente actualizado correctamente.",
+                });
+                // Opcional: recarga la tabla o la fila
+                location.reload();
+            },
+            error: function (xhr) {
+                alert("Error al actualizar.");
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+        });
     });
 
     $("#validateModal").on("shown.bs.modal", function () {
