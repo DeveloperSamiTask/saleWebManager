@@ -301,7 +301,7 @@ class PaymentLinkController extends Controller
                 $data[] = [
                     'id'     => $member->id,
                     'names'  => $member->name,
-                    'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'),
+                    'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'). ' ('. $combo->quantity . ')',
                     'document'    => $member->dni,
                     'user'    => $member->user,
                     'activate'    => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : 'No activado',
