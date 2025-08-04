@@ -269,12 +269,20 @@
         });
 
         fv.on("core.form.valid", function () {
+            const combos = getCombosData().filter((c) => c.quantity > 0);
+
+            if (combos.length === 0) {
+                Toast.fire({
+                    icon: "warning",
+                    title: "Agrega al menos un combo con cantidad mayor a 0.",
+                });
+                return;
+            }
+
             blockUI();
 
             const formData = new FormData(f);
             formData.append("_token", csrfToken);
-
-            const combos = getCombosData();
 
             formData.append("combos", JSON.stringify(combos));
 
