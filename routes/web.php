@@ -134,4 +134,5 @@ Route::prefix('PagoLink')->group(function () {
     Route::get('/qr/details/{code}', [PaymentLinkController::class, 'getQrDetails'])->name('qr.details');
     Route::post('/validate/dni', [PaymentLinkController::class, 'dniValidate']);
     Route::get('/print', [PaymentLinkController::class, 'print'])->name('print');
+    Route::get('/Ver/{id}', [PaymentLinkController::class, 'invoice'])->name('paymentLink.show');
 });

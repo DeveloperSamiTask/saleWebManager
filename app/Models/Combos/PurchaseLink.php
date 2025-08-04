@@ -34,7 +34,7 @@ class PurchaseLink extends Model
 
     public static function getList($startDate, $endDate, $isChecked)
     {
-        $filterField = $isChecked === '1' ? 'date_issue' : 'date_purchase';
+        $filterField = $isChecked == '1' ? 'date_issue' : 'date_purchase';
 
         $coupons = self::with(['combos.combo', 'combos.members'])
             ->whereBetween($filterField, [$startDate, $endDate])

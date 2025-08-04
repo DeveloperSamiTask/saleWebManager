@@ -143,9 +143,8 @@ $(function () {
                     targets: 1,
                     render: function (e, t, a, n) {
                         return (
-                            '<a href="app-invoice-preview.html"><span>#' +
-                            e +
-                            "</span></a>"
+                            `<a href="Ver/${e}" target="_blank"><span>#${e}
+                            </span></a>`
                         );
                     },
                 },

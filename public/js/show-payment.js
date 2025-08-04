@@ -10,7 +10,11 @@ $(function () {
                     { data: "" },
                     { data: "names" },
                     { data: "combo" },
+                    { data: "document" },
+                    { data: "user" },
+                    { data: "activate" },
                     { data: "status" },
+                    { data: "button" },
                 ],
                 columnDefs: [
                     {
@@ -31,7 +35,7 @@ $(function () {
                     },
                     { visible: !1, targets: 2 },
                     {
-                        targets: 3,
+                        targets: -2,
                         render: function (e, t, a, s) {
                             let statusText = "";
 
@@ -65,6 +69,15 @@ $(function () {
                                 type="button">
                                 ${statusText}
                             </button>`;
+                        },
+                    },
+                    {
+                        targets: -1,
+                        orderable: !1,
+                        searchable: !1,
+                        render: function (e, t, a, s) {
+                            return `
+                            ${e}`;
                         },
                     },
                 ],
@@ -121,12 +134,10 @@ $(function () {
                 ).draw();
             }));
 
-    $("#qrCode").change(handleQRCodeChange);
+    handleQRCodeChange(code);
 
     // Controlador principal del cambio de QR
-    function handleQRCodeChange() {
-        const code = this.value?.trim();
-
+    function handleQRCodeChange(code) {
         if (!code) return;
 
         blockUI();
@@ -141,7 +152,7 @@ $(function () {
     // === LÓGICA DE FETCH ===
     function fetchQRDetails(code) {
         return $.ajax({
-            url: `qr/details/${code}?validate=1`,
+            url: `/PagoLink/qr/details/${code}?validate=0`,
             type: "GET",
         });
     }
@@ -160,8 +171,12 @@ $(function () {
     }
 
     function updateUserInfo(link) {
-        $("#names").text(link.names);
-        $("#documento").text(link.document);
+        $("#code").text(link.code);
+        $("#d_purchase").text(link.date);
+        $("#client").text("Comprador: " + link.names);
+        $("#document").text(link.document);
+        $("#date_issue").text("Fecha Ingreso: " + link.date_issue);
+        $("#total").text("S/ " + link.total);
     }
 
     function updateStatusBadge(status, id) {
@@ -296,8 +311,6 @@ $(function () {
 
                     // Aplicar clase de resaltado
                     $(rowNode).addClass("table-success");
-
-
                 }
             },
             error: function (xhr) {
@@ -315,15 +328,6 @@ $(function () {
                 $("#btnValidateDni").prop("disabled", false);
             },
         });
-    });
-
-    $(document).on("click", "#btnPrint", function () {
-        const id = $(this).data("id");
-        window.open("print?id=" + id, "_blank");
-
-        setTimeout(function () {
-            location.reload();
-        }, 2000);
     });
 
     function blockUI() {

@@ -195,7 +195,7 @@ class PaymentLinkController extends Controller
             $promotion->price = $request->price;
             $promotion->description = $request->description;
             $promotion->members = $request->members;
-            $promotion->status = 1;
+            $promotion->status = session('user')['idusuario'];
             $promotion->save();
 
             return response()->json(['icon' => 'success', 'message' => 'Promoción guardada correctamente']);
@@ -245,18 +245,21 @@ class PaymentLinkController extends Controller
         return view('payment_link.validate', ['data' => $data]);
     }
 
-    public function getQrDetails($code)
+    public function getQrDetails($code, Request $request)
     {
         session()->forget('validated_members');
         try {
             $link = $this->findPurchaseLinkByCode($code);
 
-            if (!$this->isValidIssueDate($link->date_issue)) {
+            $isValidation = $request->query('validate') === '1';
+
+            if ($isValidation && !$this->isValidIssueDate($link->date_issue)) {
                 return response()->json([
                     'message' => 'Este código solo es válido para el día: ' . Carbon::parse($link->date_issue)->format('d/m/Y'),
                     'status' => 'invalid_date'
                 ], 403);
             }
+
 
             $data = $this->formatMembersData($link);
 
@@ -300,7 +303,12 @@ class PaymentLinkController extends Controller
                     'names'  => $member->name,
                     'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'),
                     'document'    => $member->dni,
+                    'user'    => $member->user,
+                    'activate'    => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : 'No activado',
                     'status' => $member->status_entrie ?? null,
+                    'button' => (session('user')['idusuario'] ?? null) == 1
+                        ? '<button class="btn btn-icon btn-warning waves-effect waves-light" data-code="' . $link->code . '"><i class="mdi mdi-pencil-outline"></i></button>'
+                        : '',
                 ];
             }
         }
@@ -310,14 +318,34 @@ class PaymentLinkController extends Controller
 
     private function formatLinkData($link)
     {
+        $total = $this->calcularTotal($link);
+
         return [
             'id'     => $link->id,
             'code'     => $link->code,
             'names'    => trim($link->names . ' ' . $link->lastname),
             'document' => $link->document_type . ': ' . $link->document_number,
-            'date'     => $link->date_purchase,
+            'date' => Carbon::parse($link->date_purchase)->format('d/m/Y h:i A'),
+            'date_issue' => $link->activate_date
+                ? Carbon::parse($link->activate_date)->format('d/m/Y h:i A') // si ya está activado
+                : Carbon::parse($link->date_issue)->format('d/m/Y'),
             'status'   => $link->status,
+            'total'  => number_format($total, 2, '.', ''),
         ];
+    }
+
+    private function calcularTotal($purchase)
+    {
+        $total = 0;
+
+        foreach ($purchase->combos as $combo) {
+            $cantidad = $combo->quantity;
+            $precioUnitario = $combo->combo->price ?? 0;
+
+            $total += $cantidad * $precioUnitario;
+        }
+
+        return $total;
     }
 
     public function dniValidate(Request $request)
@@ -455,5 +483,12 @@ class PaymentLinkController extends Controller
                 'message' => 'Excepción: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function invoice($code)
+    {
+        return view('payment_link.show', [
+            'code' => $code
+        ]);
     }
 }
