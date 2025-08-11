@@ -246,6 +246,17 @@
                         },
                     },
                 },
+                date_issue: {
+                    validators: {
+                        notEmpty: {
+                            message: "Selecciona la fecha de ingreso",
+                        },
+                        date: {
+                            format: "YYYY-MM-DD HH:mm",
+                            message: "La fecha de ingreso no es válida",
+                        },
+                    },
+                },
             },
             plugins: {
                 trigger: new FormValidation.plugins.Trigger(),
