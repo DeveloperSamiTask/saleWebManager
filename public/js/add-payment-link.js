@@ -252,7 +252,7 @@
                             message: "Selecciona la fecha de ingreso",
                         },
                         date: {
-                            format: "YYYY-MM-DD HH:mm",
+                            format: "YYYY-MM-DD",
                             message: "La fecha de ingreso no es válida",
                         },
                     },
