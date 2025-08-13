@@ -96,9 +96,9 @@
                                         </div>
                                         <div class="col-md-3 col-12">
                                             <div class="form-floating form-floating-outline">
-                                                <input type="text" class="form-control" placeholder="YYYY-MM-DD HH:MM"
-                                                    id="date_issue" name="date_issue" />
-                                                <label for="date_issue">Fecha de Ingreso</label>
+                                                <input type="date" class="form-control" placeholder="YYYY-MM-DD HH:MM"
+                                                    id="date_issuee" name="date_issuee" />
+                                                <label for="date_issuee">Fecha de Ingreso</label>
                                             </div>
                                         </div>
 
