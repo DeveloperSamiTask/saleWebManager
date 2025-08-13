@@ -7,7 +7,11 @@
 
     d_purchase &&
         d_purchase.flatpickr({ enableTime: !0, dateFormat: "Y-m-d H:i" }),
-        d_issue && d_issue.flatpickr({ monthSelectorType: "static" });
+        d_issue &&
+            d_issue.flatpickr({
+                monthSelectorType: "static",
+                dateFormat: "Y-m-d H:i",
+            });
 })(),
     $(function () {
         var e,
@@ -252,7 +256,7 @@
                             message: "Selecciona la fecha de ingreso",
                         },
                         date: {
-                            format: "YYYY-MM-DD",
+                            format: "YYYY-MM-DD HH:mm",
                             message: "La fecha de ingreso no es válida",
                         },
                     },
