@@ -50,8 +50,16 @@ class AppServiceProvider extends ServiceProvider
                 'companies' => [1],
                 'route' => 'paymentLink.validate',
                 'icon' => 'mdi mdi-cart-percent',
-                'text' => 'Validar Pago Link',
-                'dataI18n' => 'Validate Payment Link',
+                'text' => 'V. Entradas Pago Link',
+                'dataI18n' => 'Validate Payment Entries Link',
+            ],
+            [
+                'roles' => [1, 2],
+                'companies' => [1],
+                'route' => 'paymentLink.validate_food',
+                'icon' => 'mdi mdi-food',
+                'text' => 'V. Comidas Pago Link',
+                'dataI18n' => 'Validate paid meals link',
             ],
             [
                 'roles' => [1],

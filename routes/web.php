@@ -93,6 +93,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('PagoLink')->group(function () {
         Route::get('/Lista', [PaymentLinkController::class, 'list'])->name('paymentLink.index');
         Route::get('/Lista_Pagos', [PaymentLinkController::class, 'listPayments']);
+        Route::post('/Autorize', [PaymentLinkController::class, 'AuthorizePayment']);
         Route::get('/Agregar-pago', [PaymentLinkController::class, 'create'])->name('paymentLink.add');
         Route::post('/store', [PaymentLinkController::class, 'storePayment']);
         Route::get('/qr/download/{code}', [PaymentLinkController::class, 'downloadQrCode'])->name('qr.download');
@@ -101,6 +102,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/StorePromotion', [PaymentLinkController::class, 'storePromotion']);
         Route::post('/StatusPromotion', [PaymentLinkController::class, 'status']);
         Route::get('/Validar_Pago_link', [PaymentLinkController::class, 'validateForm'])->name('paymentLink.validate'); // Api pagos
+        Route::get('/Validar_Comidas_Pago_link', [PaymentLinkController::class, 'validateForm'])->name('paymentLink.validate_food'); // Api pagos
         Route::get('/qr/details/{code}', [PaymentLinkController::class, 'getQrDetails'])->name('qr.details');
         Route::post('/validate/dni', [PaymentLinkController::class, 'dniValidate']);
         Route::get('/print', [PaymentLinkController::class, 'print'])->name('print');

@@ -2,6 +2,7 @@
 
 namespace App\Models\Combos;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,10 +23,17 @@ class PurchaseLink extends Model
         'date_issue',
         'status',
         'user_id',
+        'user_auth',
+        'date_auth',
         'user_active',
         'activate_date',
         'observation'
     ];
+
+    public function authorizedBy()
+    {
+        return $this->belongsTo(User::class, 'user_auth', 'idusuario');
+    }
 
     public function combos()
     {
@@ -73,6 +81,9 @@ class PurchaseLink extends Model
                 'amount'            => number_format($totalAmount, 2, '.', ''), // Ej. 120.00
                 'date_purchase'     => $row->date_purchase,
                 'date_issue'        => $row->date_issue,
+                'user_auth'       => $row->user_auth,
+                'authorized_by_name' => $row->authorizedBy?->usuario,
+                'date_auth'        => $row->date_auth,
                 'status'            => $row->status ?? null,
             ];
         }

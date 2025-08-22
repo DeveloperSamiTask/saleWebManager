@@ -212,6 +212,8 @@
     "Payment List": "Lista de Pagos",
     "New Payment": "Nuevo Pago",
     "Promotions": "Promociones",
-    "Validate Payment Link": "Validar Pago Link"
+    "Validate Payment Link": "V. Pago Link",
+    "Validate Payment Entries Link": "V. Entradas Pago Link",
+    "Validate paid meals link": "V. Comidas Pago Link"
 
 }

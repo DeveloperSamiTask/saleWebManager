@@ -178,16 +178,29 @@ $(function () {
                     targets: -1,
                     title: "Acciones",
                     render: function (a, e, t, s) {
-                        return `
+                        // Si no está autorizado → mostrar botón "Autorizar"
+                        if (!t.user_auth) {
+                            return `
                             <div class="d-flex align-items-center">
-                                    <a href="qr/download/${t.code}"
-                                    class="text-body"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Descargar QR">
-                                        <i class="mdi mdi-qrcode-plus mdi-24px mx-1"></i>
-                                    </a>
-                                </div>`;
+                                <button
+                                    class="btn btn-sm btn-success btnAuthorize"
+                                    title="Autorizar">
+                                    <i class="mdi mdi-check-circle-outline"></i> Autorizar
+                                </button>
+                            </div>`;
+                        }
+
+                        // Si ya está autorizado → mostrar botón de descarga de QR
+                        return `
+                        <div class="d-flex align-items-center">
+                            <a href="qr/download/${t.code}"
+                            class="btn btn-sm btn-primary"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Autorizado por: ${t.authorized_by_name} | Fecha: ${t.date_auth}">
+                                <i class="mdi mdi-qrcode-plus"></i>
+                            </a>
+                        </div>`;
                     },
                 },
             ],
@@ -443,12 +456,16 @@ $(function () {
                 );
         }, 300);
 
-    e.on("click", ".btn-acepted", function () {
+    e.on("draw.dt", function () {
+        $('[data-bs-toggle="tooltip"]').tooltip();
+    });
+
+    e.on("click", ".btnAuthorize", function () {
         let row = $(this).closest("tr");
         let rowData = $(this).closest("table").DataTable().row(row).data();
         Swal.fire({
             title: "Estas seguro?",
-            text: `Aceptaras el Cambio de Documento de la Entrada: ${rowData.detcart}`,
+            text: `Autorizaras el uso del PAGO LINK: ${rowData.code}`,
             icon: "warning",
             showCancelButton: !0,
             confirmButtonText: "Si, aceptar",
@@ -460,35 +477,27 @@ $(function () {
             buttonsStyling: !1,
         }).then(function (t) {
             if (t.value) {
-                $.blockUI({
-                    message:
-                        '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
-                    css: { backgroundColor: "transparent", border: "0" },
-                    overlayCSS: { opacity: 0.5 },
-                });
+                blockUI();
                 $.ajax({
-                    url: "updatedDocument",
+                    url: "Autorize",
                     type: "post",
                     data: {
                         id: rowData.id,
-                        detcart: rowData.detcart,
-                        document: rowData.dniAfter,
                         _token: csrfToken,
                     },
                 })
                     .done((response) => {
-                        console.log(response);
                         e.ajax.reload();
 
                         Toast.fire({
                             icon: "success",
-                            title: "Se ha cambiad el Documento",
+                            title: response.message,
                         });
                     })
                     .fail((response) => {
                         Toast.fire({
                             icon: "error",
-                            title: "Error al cambiar documento, contactar con SISTEMAS",
+                            title: response.responseText,
                         });
                         console.log(response.responseText);
                     })
@@ -497,102 +506,6 @@ $(function () {
                     });
             }
         });
-    });
-
-    const f = document.getElementById("addNewCouponForm");
-
-    const fv = FormValidation.formValidation(f, {
-        fields: {
-            names: {
-                validators: {
-                    notEmpty: { message: "Ingresa nombres y apellidos" },
-                },
-            },
-            description: {
-                validators: {
-                    notEmpty: { message: "Ingresa la descripción del cupón" },
-                },
-            },
-            document: {
-                validators: {
-                    notEmpty: { message: "Ingresa el documento de identidad" },
-                },
-            },
-            date_use: {
-                validators: {
-                    notEmpty: { message: "Ingresa la fecha de uso" },
-                },
-            },
-        },
-        plugins: {
-            trigger: new FormValidation.plugins.Trigger(),
-            bootstrap5: new FormValidation.plugins.Bootstrap5({
-                eleValidClass: "is-valid",
-                rowSelector: function (t, e) {
-                    switch (e) {
-                        case "formValidationName":
-                        case "formValidationEmail":
-                        case "formValidationPass":
-                        case "formValidationConfirmPass":
-                        case "formValidationFile":
-                        case "formValidationDob":
-                        case "formValidationSelect2":
-                        case "formValidationLang":
-                        case "formValidationTech":
-                        case "formValidationHobbies":
-                        case "formValidationBio":
-                        case "formValidationGender":
-                            return ".col-md-6";
-                        case "formValidationPlan":
-                            return ".col-xl-3";
-                        case "formValidationSwitch":
-                        case "formValidationCheckbox":
-                            return ".col-12";
-                        default:
-                            return ".row";
-                    }
-                },
-            }),
-            submitButton: new FormValidation.plugins.SubmitButton(),
-            autoFocus: new FormValidation.plugins.AutoFocus(),
-        },
-    });
-
-    $(document).on("click", ".view-image-btn", function () {
-        const imageUrl = $(this).data("image");
-        $("#imagePreview").attr("src", imageUrl);
-    });
-
-    fv.on("core.form.valid", function () {
-        blockUI();
-
-        let formData = new FormData(f);
-        formData.append("_token", csrfToken);
-
-        fetch("insertCoupon", {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error en la solicitud");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                e.ajax.reload();
-                Toast.fire({
-                    icon: data.icon,
-                    title: data.message,
-                });
-                $("#addNewCoupon").modal("hide");
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-            })
-            .finally(() => {
-                $.unblockUI();
-            });
     });
 
     function formatDate(date) {

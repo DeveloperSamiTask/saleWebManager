@@ -55,6 +55,25 @@ class PaymentLinkController extends Controller
         ]);
     }
 
+    public function AuthorizePayment(Request $request){
+        try {
+            $purchase = PurchaseLink::findOrFail($request->id);
+            $purchase->user_auth = session('user')['idusuario'];
+            $purchase->date_auth = now();
+            $purchase->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pago Link autorizado correctamente.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al autorizar el Pago Link: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function create()
     {
         $data['title'] = "Agregar Pago Link";
@@ -112,7 +131,7 @@ class PaymentLinkController extends Controller
             return response()->json([
                 'success' => true,
                 'icon' => 'success',
-                'message' => 'Enlace de pago registrado correctamente.',
+                'message' => 'Enlace de pago registrado correctamente. Espere la autorización.',
                 'download_url' => route('qr.download', ['code' => $purchase->code]),
             ]);
         } catch (\Exception $e) {
