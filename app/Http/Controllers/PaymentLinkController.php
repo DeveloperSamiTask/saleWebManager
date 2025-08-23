@@ -65,6 +65,7 @@ class PaymentLinkController extends Controller
         try {
             $purchase = PurchaseLink::findOrFail($request->id);
             $purchase->user_auth = session('user')['idusuario'];
+            $purchase->code_auth = $request->code;
             $purchase->date_auth = now();
             $purchase->save();
 

@@ -463,26 +463,36 @@ $(function () {
     e.on("click", ".btnAuthorize", function () {
         let row = $(this).closest("tr");
         let rowData = $(this).closest("table").DataTable().row(row).data();
+
         Swal.fire({
-            title: "Estas seguro?",
-            text: `Autorizaras el uso del PAGO LINK: ${rowData.code}`,
+            title: "¿Estás seguro?",
+            text: `Autorizarás el uso del PAGO LINK: ${rowData.code}`,
             icon: "warning",
-            showCancelButton: !0,
-            confirmButtonText: "Si, aceptar",
+            input: "text", // 👈 Aquí el input
+            inputPlaceholder: "Ingrese el código de validación",
+            showCancelButton: true,
+            confirmButtonText: "Sí, aceptar",
             cancelButtonText: "Cancelar",
             customClass: {
                 confirmButton: "btn btn-primary me-3 waves-effect waves-light",
                 cancelButton: "btn btn-outline-secondary waves-effect",
             },
-            buttonsStyling: !1,
-        }).then(function (t) {
-            if (t.value) {
+            buttonsStyling: false,
+            preConfirm: (codigo) => {
+                if (!codigo) {
+                    Swal.showValidationMessage("⚠️ Debes ingresar un código");
+                }
+                return codigo;
+            },
+        }).then(function (result) {
+            if (result.isConfirmed) {
                 blockUI();
                 $.ajax({
                     url: "Autorize",
                     type: "post",
                     data: {
                         id: rowData.id,
+                        code: result.value, // 👈 Capturamos el código ingresado
                         _token: csrfToken,
                     },
                 })

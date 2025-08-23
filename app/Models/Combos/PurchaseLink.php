@@ -24,6 +24,7 @@ class PurchaseLink extends Model
         'status',
         'user_id',
         'user_auth',
+        'code_auth',
         'date_auth',
         'user_active',
         'activate_date',

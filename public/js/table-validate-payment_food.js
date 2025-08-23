@@ -140,19 +140,10 @@ $(function () {
     }
 
     function updateStatusBadge(status, id) {
-        const statusLabels = {
-            unused: { text: "SIN USAR", color: "danger" },
-            used: { text: "USADO", color: "success" },
-        };
-
-        const { text, color } = statusLabels[status] || {
-            text: status.toUpperCase(),
-            color: "secondary",
-        };
 
         $("#status").html(`
-        <button class="btn btn-sm btn-${color}" id ="btnPrint" data-id="${id}">
-            <i class="mdi mdi-file-pdf-box me-1"></i> ${text}
+        <button class="btn btn-sm btn-danger" id ="btnPrint" data-id="${id}">
+            <i class="mdi mdi-file-pdf-box me-1"></i> Imprimir
         </button>
     `);
     }
