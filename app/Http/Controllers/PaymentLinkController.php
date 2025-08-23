@@ -26,6 +26,9 @@ use Endroid\QrCode\Label\Font\OpenSans;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 
+use ZipArchive;
+
+
 class PaymentLinkController extends Controller
 {
     public function list()
@@ -154,33 +157,52 @@ class PaymentLinkController extends Controller
             return response()->json(['icon' => 'error', 'message' => 'Compra no encontrada.'], 404);
         }
 
+        // Contenido QR base
         $qrContent = $purchase->code;
 
-        $builder = new Builder(
+        // === QR 1: ENTRADA (con logo) ===
+        $builderEntrada = new Builder(
             writer: new PngWriter(),
-            writerOptions: [],
-            validateResult: false,
             data: $qrContent,
-            encoding: new Encoding('UTF-8'),
-            errorCorrectionLevel: ErrorCorrectionLevel::High,
             size: 300,
             margin: 10,
-            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
             foregroundColor: new Color(30, 30, 30),
             backgroundColor: new Color(255, 255, 255),
-            logoPath: public_path('img/logo.png'), // sin logo
-            labelText: $qrContent,
-            labelFont: new OpenSans(20),
+            logoPath: public_path('img/logo.png'),
+            labelText: $qrContent .' ENTRADA',
+            labelFont: new OpenSans(16),
             labelAlignment: LabelAlignment::Center
         );
+        $resultEntrada = $builderEntrada->build();
 
-        $result = $builder->build();
+        // === QR 2: COMIDA (sin logo) ===
+        $builderComida = new Builder(
+            writer: new PngWriter(),
+            data: $qrContent,
+            size: 300,
+            margin: 10,
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            foregroundColor: new Color(30, 30, 30),
+            backgroundColor: new Color(255, 255, 255),
+            labelText: $qrContent . ' COMIDA',
+            labelFont: new OpenSans(16),
+            labelAlignment: LabelAlignment::Center
+        );
+        $resultComida = $builderComida->build();
 
-        $filename = 'qr_' . $purchase->code . '.png';
+        // Crear un ZIP temporal
+        $zip = new ZipArchive();
+        $zipFileName = 'qrs_' . $purchase->code . '.zip';
+        $zipPath = storage_path('app/public/' . $zipFileName);
 
-        return response($result->getString())
-            ->header('Content-Type', $result->getMimeType())
-            ->header('Content-Disposition', "attachment; filename={$filename}");
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            $zip->addFromString('qr_entrada.png', $resultEntrada->getString());
+            $zip->addFromString('qr_comida.png', $resultComida->getString());
+            $zip->close();
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
     }
 
     //Info: Promociones
