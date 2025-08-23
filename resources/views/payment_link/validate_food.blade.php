@@ -114,8 +114,7 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th>Nombres y Apellidos</th>
-                            <th>DNI</th>
+                            <th>Combos</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
@@ -125,32 +124,33 @@
         <!--/ Row grouping -->
     </div>
 
-    <div class="modal fade" id="validateModal" tabindex="-1" aria-labelledby="validateModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="validateModalLabel">Validar Código</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formValidateDni">
-                        <div class="modal-body">
-                            <input type="hidden" id="hiddenRecordId" name="record_id">
-                            <p class="fs-5"><strong>Nombre:</strong> <span id="modalName"></span></p>
-                            <div class="mb-3">
-                                <label for="inputDni" class="form-label">Ingrese el DNI:</label>
-                                <input type="text" class="form-control" id="inputDni" name="input_dni" required>
-                            </div>
-                        </div>
+<div class="modal fade" id="validateModal" tabindex="-1" aria-labelledby="validateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="validateModalLabel">Validar Combo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formValidateCombo">
+                    <input type="hidden" id="hiddenRecordId" name="record_id">
 
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Validar</button>
-                        </div>
-                    </form>
-                </div>
+                    <p class="fs-5"><span id="modalComboName"></span></p>
+                    <p><strong>Cantidad disponible:</strong> <span id="modalQuantity"></span></p>
+
+                    <div class="mb-3">
+                        <label for="inputQuantity" class="form-label">Cantidad a validar:</label>
+                        <input type="number" class="form-control" id="inputQuantity" name="quantity" min="1" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btnValidateCombo">Validar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 @endsection()
 
 @section('styles')
@@ -163,5 +163,5 @@
 @endsection()
 
 @section('scripts')
-    <script src="{{ asset('js/table-validate-payment.js') }}"></script>
+    <script src="{{ asset('js/table-validate-payment_food.js') }}"></script>
 @endsection

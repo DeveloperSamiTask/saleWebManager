@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Combos\PurchaseCombo;
 use App\Models\Combos\PurchaseComboMember;
+use App\Models\Combos\PurchaseComboValidation;
 use App\Models\Combos\PurchaseLink;
 use App\Models\PromotionsLink;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\Label\Font\OpenSans;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
 
 class PaymentLinkController extends Controller
 {
@@ -55,7 +57,8 @@ class PaymentLinkController extends Controller
         ]);
     }
 
-    public function AuthorizePayment(Request $request){
+    public function AuthorizePayment(Request $request)
+    {
         try {
             $purchase = PurchaseLink::findOrFail($request->id);
             $purchase->user_auth = session('user')['idusuario'];
@@ -264,6 +267,22 @@ class PaymentLinkController extends Controller
         return view('payment_link.validate', ['data' => $data]);
     }
 
+    public function validateFormFood()
+    {
+        session()->forget('validated_combos');
+        $purchaseComboMembers = PurchaseComboMember::whereHas('purchaseCombo', function ($query) {
+            $query->whereHas('purchaseLink', function ($query) {
+                $query->whereDate('date_issue', now());
+            });
+        });
+
+        $data['title'] = "Validar Alimentos Pago Link";
+        $data['paymentLink_total'] = $purchaseComboMembers->count();
+        $data['paymentLink_validados'] = $purchaseComboMembers->where('status_entrie', 'used')->count();
+        return view('payment_link.validate_food', ['data' => $data]);
+    }
+
+
     public function getQrDetails($code, Request $request)
     {
         session()->forget('validated_members');
@@ -320,7 +339,7 @@ class PaymentLinkController extends Controller
                 $data[] = [
                     'id'     => $member->id,
                     'names'  => $member->name,
-                    'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'). ' ('. $combo->quantity . ')',
+                    'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción') . ' (' . $combo->quantity . ')',
                     'document'    => $member->dni,
                     'user'    => $member->user,
                     'activate'    => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : 'No activado',
@@ -368,6 +387,248 @@ class PaymentLinkController extends Controller
 
         return $total;
     }
+
+    public function getQrDetailsByCombo($code, Request $request)
+    {
+        try {
+            $link = $this->findPurchaseLinkByCodeCombos($code);
+
+            $isValidation = $request->query('validate') === '1';
+
+            if ($isValidation && !$this->isValidIssueDate($link->date_issue)) {
+                return response()->json([
+                    'message' => 'Este código solo es válido para el día: ' . Carbon::parse($link->date_issue)->format('d/m/Y'),
+                    'status' => 'invalid_date'
+                ], 403);
+            }
+
+            $data = $this->formatCombosData($link);
+
+            return response()->json([
+                'data' => $data,
+                'link' => $this->formatLinkData($link),
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'No se encontró el código QR ingresado.',
+                'status' => 'not_found'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error("Error en getQrDetailsByCombo: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Ocurrió un error inesperado.',
+                'status' => 'error'
+            ], 500);
+        }
+    }
+
+    private function findPurchaseLinkByCodeCombos($code)
+    {
+        return PurchaseLink::with([
+            'combos.combo',
+            'combos.members',
+            'combos.validations', // 👈 añadimos las validaciones
+        ])
+            ->where('code', $code)
+            ->firstOrFail();
+    }
+
+    private function formatCombosData($link)
+    {
+        $data = [];
+
+        foreach ($link->combos as $combo) {
+            // Total validado sumando todas las validaciones
+            $validatedQty = $combo->validations->sum('validated_qty');
+
+            // Determinar estado
+            if ($validatedQty == 0) {
+                $status = 'unused';
+            } elseif ($validatedQty < $combo->quantity) {
+                $status = 'partial';
+            } else {
+                $status = 'used';
+            }
+
+            // Tomamos la última validación para mostrar hora/usuario
+            $lastValidation = $combo->validations->last();
+
+            $data[] = [
+                'id'            => $combo->id,
+                'combo'         => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'),
+                'quantity'      => $combo->quantity,
+                'validated_qty' => $validatedQty,
+                'status'        => $status,
+                'validated_at'  => $lastValidation ? $lastValidation->validated_at : null,
+                'validated_by'  => $lastValidation ? $lastValidation->validated_by : null,
+            ];
+        }
+
+        return $data;
+    }
+
+    public function validateCombo(Request $request)
+    {
+        $request->validate([
+            'record_id' => 'required|exists:purchase_combo,id',
+            'quantity'  => 'required|integer|min:1',
+        ]);
+
+        $combo = PurchaseCombo::with('combo')->findOrFail($request->record_id);
+
+        // 🟢 Calcular total validado hasta ahora
+        $totalValidated = PurchaseComboValidation::where('purchase_link_combo_id', $combo->id)
+            ->sum('validated_qty');
+
+        $remaining = $combo->quantity - $totalValidated;
+
+        // 🚨 Si ya no quedan unidades, bloquear
+        if ($remaining <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ya se validaron todas las unidades de este combo',
+            ], 400);
+        }
+
+        // 🚨 Si el usuario intenta validar más de lo que queda
+        if ($request->quantity > $remaining) {
+            return response()->json([
+                'success' => false,
+                'message' => "Solo quedan {$remaining} unidades por validar",
+            ], 400);
+        }
+
+        // 1️⃣ Guardar validación en la BD
+        $validation = PurchaseComboValidation::create([
+            'purchase_link_combo_id' => $combo->id,
+            'validated_qty'          => $request->quantity,
+            'validated_at'           => now(),
+            'validated_by'           => auth()->id(),
+        ]);
+
+        // 2️⃣ Guardar también en la sesión
+        $validatedCombos = session('validated_combos', []);
+
+        $validatedCombos[] = [
+            'id'          => $combo->id,
+            'name'        => $combo->combo->name ?? 'Sin nombre',
+            'description' => $combo->combo->description ?? 'Sin descripción',
+            'quantity'    => $request->quantity,
+            'hora'        => now()->format('H:i:s'),
+        ];
+
+        session(['validated_combos' => $validatedCombos]);
+
+        // 3️⃣ Calcular estado
+        $newTotalValidated = $totalValidated + $request->quantity;
+        $status = $newTotalValidated < $combo->quantity ? 'partial' : 'used';
+
+        $data = [
+            'id'            => $combo->id,
+            'combo'         => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'),
+            'quantity'      => $combo->quantity,
+            'validated_qty' => $validation->validated_qty,
+            'status'        => $status,
+            'validated_at'  => $validation->validated_at,
+            'validated_by'  => $validation->validated_by,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => $combo->combo->name . ' Combo validado correctamente',
+            'data'    => $data,
+        ]);
+    }
+
+    public function printFood(Request $request)
+    {
+        try {
+            $id = $request->input('id');
+
+            // 1️⃣ Traemos la compra con sus combos
+            $purchase = PurchaseLink::with('combos.combo')->findOrFail($id);
+
+            // 2️⃣ Actualizamos estado general de la compra (usada / sin usar)
+            $unusedCombos = $purchase->combos()->whereDoesntHave('validations')->count();
+
+            $purchase->status = $unusedCombos > 0 ? 'unused' : 'used';
+            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->activate_date = now();
+            $purchase->save();
+
+            // 3️⃣ Recuperamos lo validado en la sesión
+            $validated = session('validated_combos', []);
+
+            // Agrupar lo validado por combo_id
+            $agrupadosPorCombo = collect($validated)->groupBy('id');
+
+            $data = [];
+
+            foreach ($agrupadosPorCombo as $comboId => $validaciones) {
+                $combo = $purchase->combos->firstWhere('id', $comboId);
+
+                if (!$combo) continue; // por seguridad
+
+                $cantidad       = $combo->quantity;
+                $precioUnitario = $combo->combo->price ?? 0;
+                $descripcion    = $combo->combo->description ?? '';
+                $nombre         = $combo->combo->name ?? '';
+
+                $validadosPrevios = PurchaseComboValidation::where('purchase_link_combo_id', $comboId)
+                    ->sum('validated_qty');
+
+                Log::info("Combo ID: {$comboId}, Validados Previos: {$validadosPrevios}");
+
+                $validados = $validaciones->sum('quantity');
+
+                $pendientes = max(0, $cantidad - $validadosPrevios);
+
+                $data[] = [
+                    'combo'       => strtoupper($nombre),
+                    'descripcion' => strtoupper($descripcion),
+                    'cantidad'    => $cantidad,
+                    'validados'   => $validados,
+                    'pendientes'  => $pendientes,
+                    'subtotal'    => $cantidad * $precioUnitario,
+                ];
+            }
+
+            $total = array_sum(array_column($data, 'subtotal'));
+
+            // 4️⃣ Renderizamos la vista del ticket
+            $html = view('payment_link.printFood', [
+                'data'             => $data,
+                'purchase'         => $purchase,
+                'total'            => $total,
+                'user'             => session('user')['usuario'] ?? 'Desconocido',
+                'agrupadosPorCombo' => $agrupadosPorCombo,
+                'validated'        => $validated, // 👈 Enviamos también por si en la vista quieres ver hora exacta
+            ])->render();
+
+            // 5️⃣ Generamos el PDF
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+
+            $dompdf = new \Dompdf\Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A5', 'portrait');
+            $dompdf->render();
+
+            return Response::make($dompdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="comprobante.pdf"',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Excepción: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     public function dniValidate(Request $request)
     {
@@ -429,7 +690,6 @@ class PaymentLinkController extends Controller
             ],
         ]);
     }
-
 
     public function print(Request $request)
     {
@@ -531,15 +791,15 @@ class PaymentLinkController extends Controller
     }
 
     public function updateMember(Request $request, $id)
-{
-    $member = PurchaseComboMember::findOrFail($id);
+    {
+        $member = PurchaseComboMember::findOrFail($id);
 
-    $member->name = $request->input('name');
-    $member->dni = $request->input('document');
-    $member->status_entrie = $request->input('is_active'); // 'used' o 'unused'
+        $member->name = $request->input('name');
+        $member->dni = $request->input('document');
+        $member->status_entrie = $request->input('is_active'); // 'used' o 'unused'
 
-    $member->save();
+        $member->save();
 
-    return response()->json(['message' => 'Actualizado correctamente']);
-}
+        return response()->json(['message' => 'Actualizado correctamente']);
+    }
 }

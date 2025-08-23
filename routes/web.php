@@ -102,9 +102,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/StorePromotion', [PaymentLinkController::class, 'storePromotion']);
         Route::post('/StatusPromotion', [PaymentLinkController::class, 'status']);
         Route::get('/Validar_Pago_link', [PaymentLinkController::class, 'validateForm'])->name('paymentLink.validate'); // Api pagos
-        Route::get('/Validar_Comidas_Pago_link', [PaymentLinkController::class, 'validateForm'])->name('paymentLink.validate_food'); // Api pagos
+        Route::get('/Validar_Comidas_Pago_link', [PaymentLinkController::class, 'validateFormFood'])->name('paymentLink.validate_food'); // Api pagos
         Route::get('/qr/details/{code}', [PaymentLinkController::class, 'getQrDetails'])->name('qr.details');
+        Route::get('/qr/details_food/{code}', [PaymentLinkController::class, 'getQrDetailsByCombo'])->name('qr.details_food');
         Route::post('/validate/dni', [PaymentLinkController::class, 'dniValidate']);
+        Route::post('/validate/combos', [PaymentLinkController::class, 'validateCombo']);
+        Route::get('/printFood', [PaymentLinkController::class, 'printFood'])->name('printFood');
         Route::get('/print', [PaymentLinkController::class, 'print'])->name('print');
         Route::get('/Ver/{id}', [PaymentLinkController::class, 'invoice'])->name('paymentLink.show');
         Route::get('member/{id}', [PaymentLinkController::class, 'member'])->name('paymentLink.show');

@@ -32,4 +32,9 @@ class PurchaseCombo extends Model
     {
         return $this->hasMany(PurchaseComboMember::class, 'purchase_combo_id');
     }
+
+    public function validations()
+    {
+        return $this->hasMany(PurchaseComboValidation::class, 'purchase_link_combo_id');
+    }
 }
