@@ -211,9 +211,13 @@
     "Payment Link": "Pago Link",
     "Payment List": "Lista de Pagos",
     "New Payment": "Nuevo Pago",
+    "New": "Nuevo",
     "Promotions": "Promociones",
     "Validate Payment Link": "V. Pago Link",
     "Validate Payment Entries Link": "V. Entradas Pago Link",
-    "Validate paid meals link": "V. Comidas Pago Link"
+    "Validate paid meals link": "V. Comidas Pago Link",
+    "Courtesy Pass": "Pase de Cortesía",
+    "Paid Link Reports": "Reportes Pago Link",
+    "Validation combos": "Validaciones Combos"
 
 }

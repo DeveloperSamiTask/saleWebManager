@@ -163,5 +163,5 @@
 @endsection()
 
 @section('scripts')
-    <script src="{{ asset('js/table-validate-payment_food.js') }}"></script>
+    <script src="{{ asset('js/table-validate-payment_food.js') }}?v={{ time() }}"></script>
 @endsection

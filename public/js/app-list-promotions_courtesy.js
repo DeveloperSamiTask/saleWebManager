@@ -19,15 +19,19 @@ $(function () {
     var startDate = formatDate(oneMonthAgo);
     var endDate = formatDate(today);
     var e,
-        s = $(".datatables-entries"),
-        status = {
-            unused: {
-                title: "NO USADO",
+        s = $(".datatables-promotions"),
+        invoice = {
+            1: {
+                title: "PENDIENTE",
                 class: "badge rounded-pill bg-label-warning",
             },
-            used: {
-                title: "USADO",
+            2: {
+                title: "ACEPTADO",
                 class: "badge rounded-pill bg-label-success",
+            },
+            3: {
+                title: "ANULADO",
+                class: "badge rounded-pill bg-label-danger",
             },
         };
     $("#flatpickr-range").flatpickr({
@@ -45,44 +49,25 @@ $(function () {
                     css: { backgroundColor: "transparent", border: "0" },
                     overlayCSS: { opacity: 0.5 },
                 });
-
                 var Checked = $(".switch-input").prop("checked");
+
                 var isChecked = Checked ? "1" : "0";
+
+                console.log(isChecked);
 
                 var startDate = selectedDates[0].toISOString();
                 var endDate = selectedDates[1].toISOString();
                 $.ajax({
-                    url: "Lista_Pagos",
+                    url: "ShowPromotions",
                     type: "GET",
                     data: {
-                        startDate: startDate,
-                        endDate: endDate,
+                        start_date: startDate,
+                        end_date: endDate,
                         isChecked: isChecked,
                     },
                 })
                     .done((response) => {
                         e.clear().rows.add(response.data).draw();
-
-                        // Procesar los datos recibidos para los totales
-                        let totalCombos = response.data.length;
-                        let usedPayments = 0;
-                        let unusedPayments = 0;
-
-                        response.data.forEach(function (row) {
-                            if (
-                                row.status &&
-                                row.status.toLowerCase() === "used"
-                            ) {
-                                usedPayments++;
-                            } else {
-                                unusedPayments++;
-                            }
-                        });
-
-                        // Actualizar los contadores
-                        $("#total").text(totalCombos);
-                        $("#shift1").text(usedPayments);
-                        $("#shift2").text(unusedPayments);
                     })
                     .fail(function (error) {
                         console.error("error:", error.responseText);
@@ -102,7 +87,7 @@ $(function () {
     s.length &&
         (e = s.DataTable({
             ajax: {
-                url: "Lista_Pagos",
+                url: "ShowPromotions",
                 data: function (d) {
                     var selectedDates = $("#flatpickr-range").val(); // Obtén las fechas seleccionadas
 
@@ -110,23 +95,15 @@ $(function () {
                         var dates = selectedDates.split(" Hasta "); // Separa las fechas
                         d.startDate = dates[0]; // Asigna la fecha de inicio
                         d.endDate = dates[1] ?? dates[0]; // Asigna la fecha de fin (puede ser la misma si no se seleccionó un rango)
-                        d.isChecked = "0";
                     }
                 },
             },
             columns: [
                 { data: "id" },
-                { data: "code" },
-                { data: "names" },
-                { data: "combos" },
+                { data: "name" },
                 { data: "members" },
-                { data: "validated_members" },
-                { data: "validated_combos" },
-                { data: "amount" },
-                { data: "date_purchase" },
-                { data: "date_issue" },
+                { data: "price" },
                 { data: "status" },
-                { data: "" },
             ],
             columnDefs: [
                 {
@@ -139,73 +116,48 @@ $(function () {
                         return "";
                     },
                 },
-
                 {
                     targets: 1,
-                    render: function (e, t, a, n) {
-                        return `<a href="Ver/${e}" target="_blank"><span>#${e}</span></a>`;
+                    responsivePriority: 1,
+                    render: function (t, e, s, n) {
+                        var a = s.name,
+                            o = s.description;
+                        return (
+                            '<div class="d-flex justify-content-start align-items-center product-name"><div class="avatar-wrapper me-3"><div class="avatar rounded-2 bg-label-secondary">' +
+                            '</div></div><div class="d-flex flex-column"><span class="text-nowrap text-heading fw-medium">' +
+                            a +
+                            '</span><small class="text-truncate d-none d-sm-block">' +
+                            o +
+                            "</small></div></div>"
+                        );
                     },
                 },
-
                 {
                     targets: 2,
                     render: function (e, t, a, n) {
-                        return `${e} - ${a.document}`;
+                        return `${e}`;
                     },
                 },
                 {
                     targets: 3,
                     render: function (e, t, a, n) {
-                        return e;
-                    },
-                },
-                {
-                    targets: 4,
-                    render: function (e, t, a, n) {
-                        return e;
-                    },
-                },
-                {
-                    targets: -2,
-                    render: function (e, t, a, n) {
-                        const info = status[e] || {
-                            title: "DESCONOCIDO",
-                            class: "badge rounded-pill bg-label-secondary",
-                        };
-                        return `<span class="${info.class}">${info.title}</span>`;
+                        return `S/. ${e}`;
                     },
                 },
                 {
                     targets: -1,
-                    title: "Acciones",
-                    render: function (a, e, t, s) {
-                        // Si no está autorizado → mostrar botón "Autorizar"
-                        if (!t.user_auth) {
-                            return `
-                            <div class="d-flex align-items-center">
-                                <button
-                                    class="btn btn-sm btn-success btnAuthorize"
-                                    title="Autorizar">
-                                    <i class="mdi mdi-check-circle-outline"></i> Autorizar
-                                </button>
-                            </div>`;
-                        }
-
-                        // Si ya está autorizado → mostrar botón de descarga de QR
-                        return `
-                        <div class="d-flex align-items-center">
-                            <a href="qr/download/${t.code}"
-                            class="btn btn-sm btn-primary"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            title="Autorizado por: ${t.authorized_by_name} | Fecha: ${t.date_auth}">
-                                <i class="mdi mdi-qrcode-plus"></i>
-                            </a>
-                        </div>`;
+                    responsivePriority: 3,
+                    render: function (t, e, n, s) {
+                        const checkedAttribute = t == 1 ? "checked" : "";
+                        return (
+                            '<label class="switch switch-lg"><input type="checkbox" class="switch-input btn-status" ' +
+                            checkedAttribute +
+                            '><span class="switch-toggle-slider"><span class="switch-on"></span><span class="switch-off"></span></span></label>'
+                        );
                     },
                 },
             ],
-            order: [[6, "desc"]],
+            order: [[3, "desc"]],
             dom: '<"row mx-2"<"col-md-2"<"me-3"l>><"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0 gap-3"fB>>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
             language: {
                 sLengthMenu: "Mostrar _MENU_",
@@ -224,7 +176,7 @@ $(function () {
                             text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -267,7 +219,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -298,7 +250,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -329,7 +281,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -360,7 +312,7 @@ $(function () {
                             text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 6, 7],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -389,11 +341,15 @@ $(function () {
                     ],
                 },
                 {
-                    text: '<i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Agregar Pago</span>',
+                    text: '<i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Agregar Promocion</span>',
                     className:
-                        "add-new btn btn-primary ms-n1 waves-effect waves-light",
-                    action: function () {
-                        window.location.href = "Agregar-pago";
+                        "create-new btn btn-primary waves-effect waves-light",
+                    attr: {
+                        "data-bs-toggle": "modal",
+                        "data-bs-target": "#addNewPromotion",
+                    },
+                    init: function (e, t, a) {
+                        $(t).removeClass("btn-secondary");
                     },
                 },
             ],
@@ -401,7 +357,7 @@ $(function () {
                 details: {
                     display: $.fn.dataTable.Responsive.display.modal({
                         header: function (e) {
-                            return "Details of " + e.data().full_name;
+                            return "Details of " + e.data().name;
                         },
                     }),
                     type: "column",
@@ -426,27 +382,6 @@ $(function () {
                     },
                 },
             },
-            initComplete: function () {
-                var array = s.DataTable().rows().data();
-
-                let totalCombos = array.length;
-                let usedPayments = 0;
-                let unusedPayments = 0;
-
-                array.each(function (row) {
-                    // Ajusta el nombre del campo según el backend
-                    if (row.status == "used") {
-                        usedPayments++;
-                    } else {
-                        unusedPayments++;
-                    }
-                });
-
-                // Actualizar los contadores
-                $("#total").text(totalCombos); // Total de pagos
-                $("#shift1").text(usedPayments); // Pagos usados
-                $("#shift2").text(unusedPayments); // Pagos no usados
-            },
         })),
         setTimeout(() => {
             $(".dataTables_filter .form-control").removeClass(
@@ -457,58 +392,101 @@ $(function () {
                 );
         }, 300);
 
-    e.on("draw.dt", function () {
-        $('[data-bs-toggle="tooltip"]').tooltip();
+    e.on("click", ".btn-status", function () {
+        blockUI();
+
+        let row = $(this).closest("tr");
+        let rowData = $(this).closest("table").DataTable().row(row).data(),
+            isChecked = $(this).prop("checked");
+
+        let id = rowData.id,
+            status = isChecked ? "1" : "0";
+
+        let csrfToken = $('meta[name="csrf-token"]').attr("content");
+        let formData = {
+            id: id,
+            status: status,
+            _token: csrfToken, // Agregar el token CSRF aquí
+        };
+
+        $.ajax({
+            url: "StatusPromotion",
+            method: "POST",
+            data: formData,
+            dataType: "json",
+        })
+            .done(function (response) {
+                if (response.success) {
+                    console.log("La categoría se actualizó correctamente.");
+                    Toast.fire({
+                        icon: response.icon,
+                        title: response.message,
+                    });
+                } else {
+                    console.error(
+                        "Hubo un error al actualizar la categoría:",
+                        response.error
+                    );
+                }
+            })
+            .fail(function (xhr, status, error) {
+                Toast.fire({
+                    icon: error.icon,
+                    title: error.message,
+                });
+                console.error("Hubo un error en la solicitud AJAX:", error);
+            })
+            .always(function () {
+                $.unblockUI();
+            });
     });
 
-    e.on("click", ".btnAuthorize", function () {
+    e.on("click", ".btn-acepted", function () {
         let row = $(this).closest("tr");
         let rowData = $(this).closest("table").DataTable().row(row).data();
-
         Swal.fire({
-            title: "¿Estás seguro?",
-            text: `Autorizarás el uso del PAGO LINK: ${rowData.code}`,
+            title: "Estas seguro?",
+            text: `Aceptaras el Cambio de Documento de la Entrada: ${rowData.detcart}`,
             icon: "warning",
-            input: "text", // 👈 Aquí el input
-            inputPlaceholder: "Ingrese el código de validación",
-            showCancelButton: true,
-            confirmButtonText: "Sí, aceptar",
+            showCancelButton: !0,
+            confirmButtonText: "Si, aceptar",
             cancelButtonText: "Cancelar",
             customClass: {
                 confirmButton: "btn btn-primary me-3 waves-effect waves-light",
                 cancelButton: "btn btn-outline-secondary waves-effect",
             },
-            buttonsStyling: false,
-            preConfirm: (codigo) => {
-                if (!codigo) {
-                    Swal.showValidationMessage("⚠️ Debes ingresar un código");
-                }
-                return codigo;
-            },
-        }).then(function (result) {
-            if (result.isConfirmed) {
-                blockUI();
+            buttonsStyling: !1,
+        }).then(function (t) {
+            if (t.value) {
+                $.blockUI({
+                    message:
+                        '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+                    css: { backgroundColor: "transparent", border: "0" },
+                    overlayCSS: { opacity: 0.5 },
+                });
                 $.ajax({
-                    url: "Autorize",
+                    url: "updatedDocument",
                     type: "post",
                     data: {
                         id: rowData.id,
-                        code: result.value, // 👈 Capturamos el código ingresado
+                        detcart: rowData.detcart,
+                        document: rowData.dniAfter,
                         _token: csrfToken,
                     },
                 })
                     .done((response) => {
+                        console.log(response);
                         e.ajax.reload();
 
                         Toast.fire({
                             icon: "success",
-                            title: response.message,
+                            title: "Se ha cambiad el Documento",
                         });
                     })
                     .fail((response) => {
                         Toast.fire({
                             icon: "error",
-                            title: response.responseText,
+                            title: "Error al cambiar documento, contactar con SISTEMAS",
                         });
                         console.log(response.responseText);
                     })
@@ -517,6 +495,115 @@ $(function () {
                     });
             }
         });
+    });
+
+    const f = document.getElementById("addNewPromotionForm");
+
+    const fv = FormValidation.formValidation(f, {
+        fields: {
+            name: {
+                validators: {
+                    notEmpty: { message: "Ingresa el nombre de la promoción" },
+                },
+            },
+            description: {
+                validators: {
+                    notEmpty: {
+                        message: "Ingresa la descripción de la promoción",
+                    },
+                },
+            },
+            price: {
+                validators: {
+                    notEmpty: { message: "Ingresa el precio" },
+                },
+            },
+            members: {
+                validators: {
+                    notEmpty: { message: "Ingresa la cantidad" },
+                },
+            },
+        },
+        plugins: {
+            trigger: new FormValidation.plugins.Trigger(),
+            bootstrap5: new FormValidation.plugins.Bootstrap5({
+                eleValidClass: "is-valid",
+                rowSelector: function (t, e) {
+                    switch (e) {
+                        case "formValidationName":
+                        case "formValidationEmail":
+                        case "formValidationPass":
+                        case "formValidationConfirmPass":
+                        case "formValidationFile":
+                        case "formValidationDob":
+                        case "formValidationSelect2":
+                        case "formValidationLang":
+                        case "formValidationTech":
+                        case "formValidationHobbies":
+                        case "formValidationBio":
+                        case "formValidationGender":
+                            return ".col-md-6";
+                        case "formValidationPlan":
+                            return ".col-xl-3";
+                        case "formValidationSwitch":
+                        case "formValidationCheckbox":
+                            return ".col-12";
+                        default:
+                            return ".row";
+                    }
+                },
+            }),
+            submitButton: new FormValidation.plugins.SubmitButton(),
+            autoFocus: new FormValidation.plugins.AutoFocus(),
+        },
+    });
+
+    fv.on("core.form.valid", function () {
+        blockUI();
+
+        let formData = new FormData(f);
+        formData.append("_token", csrfToken);
+
+        fetch("StorePromotion", {
+            method: "POST",
+            body: formData,
+        })
+            .then(async (response) => {
+                const data = await response.json();
+
+                if (!response.ok) {
+                    Toast.fire({
+                        icon: data.icon || "error",
+                        title:
+                            data.message || "Ocurrió un error en el servidor",
+                    });
+
+                    if (data.errors) {
+                        console.warn("Errores de validación:", data.errors);
+                    }
+
+                    throw new Error(data.message || "Error desconocido");
+                }
+
+                // Si todo salió bien
+                e.ajax.reload();
+                Toast.fire({
+                    icon: data.icon,
+                    title: data.message,
+                });
+                $("#addNewPromotion").modal("hide");
+            })
+            .catch((error) => {
+                // Captura cualquier error inesperado
+                console.error("Error inesperado:", error);
+                Toast.fire({
+                    icon: "error",
+                    title: "Error al guardar: " + error.message,
+                });
+            })
+            .finally(() => {
+                $.unblockUI();
+            });
     });
 
     function formatDate(date) {

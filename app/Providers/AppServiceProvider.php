@@ -130,6 +130,40 @@ class AppServiceProvider extends ServiceProvider
                 'roles' => [1, 3, 4],
                 'companies' => [1],
                 'header' => true,
+                'text' => 'Pase de Cortesía',
+                'dataI18n' => 'Courtesy Pass',
+            ],
+            [
+                'roles' => [1, 3, 4],
+                'companies' => [1],
+                'icon' => 'mdi mdi-file-chart',
+                'text' => 'Influencers',
+                'dataI18n' => 'Influencers',
+                'submenu' => [
+                    [
+                        'route' => 'paymentLink.index',
+                        'text' => 'Lista',
+                        'dataI18n' => 'List',
+                    ],
+                    [
+                        'route' => 'paymentLink.add',
+                        'text' => 'Nuevo',
+                        'dataI18n' => 'New',
+                    ],
+                ],
+            ],
+            [
+                'roles' => [1, 3, 4],
+                'companies' => [1],
+                'route' => 'courtesy.promotions',
+                'icon' => 'mdi mdi-percent-box-outline',
+                'text' => 'Promociones',
+                'dataI18n' => 'Promotions',
+            ],
+            [
+                'roles' => [1, 3, 4],
+                'companies' => [1],
+                'header' => true,
                 'text' => 'Controllers',
                 'dataI18n' => 'Controllers',
             ],
@@ -164,7 +198,6 @@ class AppServiceProvider extends ServiceProvider
                 'text' => 'Reportes',
                 'dataI18n' => 'Reports',
             ],
-
             [
                 'roles' => [1, 2, 3, 4],
                 'companies' => [1],
@@ -181,6 +214,20 @@ class AppServiceProvider extends ServiceProvider
                         'route' => 'listEntries',
                         'text' => 'Detalle Entrada',
                         'dataI18n' => 'detail entries',
+                    ],
+                ],
+            ],
+            [
+                'roles' => [1, 3, 4],
+                'companies' => [1],
+                'icon' => 'mdi mdi-file-chart',
+                'text' => 'Reporte Pago Link',
+                'dataI18n' => 'Paid Link Reports',
+                'submenu' => [
+                    [
+                        'route' => 'reports.payment_link.combos',
+                        'text' => 'Validaciones Combos',
+                        'dataI18n' => 'Validation combos',
                     ],
                 ],
             ],

@@ -61,7 +61,11 @@ class PurchaseLink extends Model
             $validatedMembers = 0;
             $totalAmount = 0;
 
+            $totalCombos = 0;
+            $validatedCombos = 0;
+
             foreach ($row->combos as $combo) {
+
                 $members = $combo->members;
                 $totalMembers += $members->count();
                 $validatedMembers += $members->where('status_entrie', 'used')->count();
@@ -69,6 +73,11 @@ class PurchaseLink extends Model
                 $price = $combo->combo->price ?? 0;
                 $quantity = $combo->quantity ?? 0;
                 $totalAmount += $price * $quantity;
+
+                $totalCombos += $quantity;
+
+                $validatedCombos += PurchaseComboValidation::where('purchase_link_combo_id', $combo->id)
+                    ->sum('validated_qty');
             }
 
             $data[] = [
@@ -77,8 +86,10 @@ class PurchaseLink extends Model
                 'names'             => trim($row->names . ' ' . $row->lastname),
                 'document'          => $row->document_number,
                 'combos'            => $comboNames,
-                'members'           => (string) $totalMembers,
-                'validated_members' => (string) $validatedMembers,
+                'members'            => (string) $totalMembers,
+                'validated_members'  => (string) $validatedMembers,
+                'total_combos'       => (string) $totalCombos,
+                'validated_combos'   => (string) $validatedCombos,
                 'amount'            => number_format($totalAmount, 2, '.', ''), // Ej. 120.00
                 'date_purchase'     => $row->date_purchase,
                 'date_issue'        => $row->date_issue,

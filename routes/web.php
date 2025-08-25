@@ -9,6 +9,7 @@ use App\Http\Controllers\ValidateWebs;
 use App\Http\Controllers\CashierReport;
 use App\Http\Controllers\CouponManagementController;
 use App\Http\Controllers\CouponsController;
+use App\Http\Controllers\CourtesyPassController;
 use App\Http\Controllers\DniController;
 use App\Http\Controllers\Notify;
 use App\Http\Controllers\PartnerController;
@@ -114,6 +115,16 @@ Route::middleware('auth')->group(function () {
         Route::put('member/{id}', [PaymentLinkController::class, 'updateMember']);
     });
 
+    Route::prefix('PaseCortesia')->group(function () {
+        Route::get('/Crear', [PaymentLinkController::class, 'create'])->name('courtesy.add');
+        Route::post('/store', [PaymentLinkController::class, 'storePayment']);
+
+        Route::get('/Promociones', [CourtesyPassController::class, 'promotions'])->name('courtesy.promotions');
+        Route::get('/ShowPromotions', [CourtesyPassController::class, 'showPromotions']);
+        Route::post('/StorePromotion', [CourtesyPassController::class, 'storePromotion']);
+        Route::post('/StatusPromotion', [CourtesyPassController::class, 'status']);
+    });
+
     Route::prefix('Cupon')->group(function () {
         Route::get('/', [CouponManagementController::class, 'index'])->name('coupon.index'); // Mostrar lista de cupones
         Route::post('/DNI', [CouponManagementController::class, 'searchDNI'])->name('cupon.dni'); // Formulario de creación
@@ -126,6 +137,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/Validacion/{code}', [CouponManagementController::class, 'validatePdf'])->name('cupon.validateCode'); // Imprimir PDF
         Route::get('/Search/{code}', [CouponManagementController::class, 'search'])->name('cupon.search'); // Formulario para validar
         Route::post('/Validate', [CouponManagementController::class, 'validateCoupon'])->name('cupon.validateCoupon'); // Formulario para validar
+    });
+
+    Route::prefix('Reportes')->group(function () {
+        Route::get('/PagoLink/Combos', [PaymentLinkController::class, 'indexCombo'])->name('reports.payment_link.combos'); // Vista lista de usuarios
+        Route::get('/PagoLink/showCombos', [PaymentLinkController::class, 'reportCombos']); // Api usuarios
     });
 
     Route::prefix('Usuarios')->group(function () {

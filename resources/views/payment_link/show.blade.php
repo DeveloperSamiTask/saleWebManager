@@ -177,5 +177,5 @@
 
         console.log(code);
     </script>
-    <script src="{{ asset('js/show-payment.js') }}"></script>
+    <script src="{{ asset('js/show-payment.js') }}?v={{ time() }}"></script>
 @endsection

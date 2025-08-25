@@ -107,6 +107,7 @@
                             <th>Combos</th>
                             <th>Integrantes</th>
                             <th>Validados</th>
+                            <th>C. Validados</th>
                             <th>Monto</th>
                             <th>Fecha de Compra</th>
                             <th>Fecha de Uso</th>
@@ -144,5 +145,5 @@
 
 @section('scripts')
     <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
-    <script src="{{ asset('js/app-list-paymentlink.js') }}"></script>
+    <script src="{{ asset('js/app-list-paymentlink.js') }}?v={{ time() }}"></script>
 @endsection
