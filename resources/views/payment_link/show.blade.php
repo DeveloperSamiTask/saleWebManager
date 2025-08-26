@@ -91,7 +91,7 @@
                                     <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
                                         data-bs-target="#navs-justified-home" aria-controls="navs-justified-home"
                                         aria-selected="true">
-                                        <i class="tf-icons mdi mdi-home-outline me-1"></i>
+                                        <i class="tf-icons mdi mdi-ticket-account me-1"></i>
                                         Entradas
                                         <span
                                             class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-danger ms-1">3</span>
@@ -101,7 +101,7 @@
                                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                                         data-bs-target="#navs-justified-profile" aria-controls="navs-justified-profile"
                                         aria-selected="false">
-                                        <i class="tf-icons mdi mdi-account-outline me-1"></i>
+                                        <i class="tf-icons mdi mdi-food-outline me-1"></i>
                                         Alimentos
                                     </button>
                                 </li>
