@@ -84,41 +84,81 @@
                             </div>
                         </div>
                     </div>
-                    <div class="table-responsive text-nowrap">
-                        <div class="card-datatable table-responsive">
-                            <table class="dt-row-grouping table table-bordered">
+                    <div class="card-header p-0">
+                        <div class="nav-align-top">
+                            <ul class="nav nav-tabs nav-fill" role="tablist">
+                                <li class="nav-item">
+                                    <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                                        data-bs-target="#navs-justified-home" aria-controls="navs-justified-home"
+                                        aria-selected="true">
+                                        <i class="tf-icons mdi mdi-home-outline me-1"></i>
+                                        Entradas
+                                        <span
+                                            class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-danger ms-1">3</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                                        data-bs-target="#navs-justified-profile" aria-controls="navs-justified-profile"
+                                        aria-selected="false">
+                                        <i class="tf-icons mdi mdi-account-outline me-1"></i>
+                                        Alimentos
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tab-content p-0">
+                        <div class="tab-pane fade show active" id="navs-justified-home" role="tabpanel">
+                            <div class="table-responsive text-nowrap">
+                                <div class="card-datatable table-responsive">
+                                    <table class="dt-row-grouping table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Nombres y Apellidos</th>
+                                                <th></th>
+                                                <th>DNI</th>
+                                                <th>Usuario</th>
+                                                <th>Fecha Uso</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-md-0 mb-3">
+
+                                    </div>
+                                    <div class="col-md-6 d-flex justify-content-md-end mt-2">
+                                        <div class="invoice-calculations">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="w-px-150">Total:</span>
+                                                <h6 class="mb-0 pt-1" id="total"> </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="my-0">
+                        </div>
+                        <div class="tab-pane fade" id="navs-justified-profile" role="tabpanel">
+                            <table class="table_combos table table-bordered">
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th>Nombres y Apellidos</th>
-                                        <th></th>
-                                        <th>DNI</th>
-                                        <th>Usuario</th>
-                                        <th>Fecha Uso</th>
+                                        <th>Combos</th>
+                                        <th>Cantidad</th>
+                                        <th>Validados</th>
                                         <th>Estado</th>
-                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                             </table>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-md-0 mb-3">
-
-                            </div>
-                            <div class="col-md-6 d-flex justify-content-md-end mt-2">
-                                <div class="invoice-calculations">
-                                    <div class="d-flex justify-content-between">
-                                        <span class="w-px-150">Total:</span>
-                                        <h6 class="mb-0 pt-1" id="total"> </h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="my-0">
-
                 </div>
 
             </div>
@@ -175,7 +215,6 @@
         let urlParts = window.location.pathname.split('/');
         let code = urlParts[urlParts.length - 1];
 
-        console.log(code);
     </script>
     <script src="{{ asset('js/show-payment.js') }}?v={{ time() }}"></script>
 @endsection

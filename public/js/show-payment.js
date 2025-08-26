@@ -140,6 +140,103 @@ $(function () {
                 ).draw();
             }));
 
+    var m,
+        c = $(".table_combos"),
+        f =
+            c.length &&
+            ((m = c.DataTable({
+                columns: [{ data: "" }, { data: "combo" }, {data: "quantity"}, {data:"validated_qty"},  { data: "status" }],
+                columnDefs: [
+                    {
+                        className: "control",
+                        orderable: !1,
+                        targets: 0,
+                        visible: !1,
+                        searchable: !1,
+                        render: function (e, t, a, s) {
+                            return "";
+                        },
+                    },
+                    {
+                        targets: 1,
+                        render: function (e, t, a, s) {
+                            return `<span class="text-dark text-uppercase">${a.combo}</span>`;
+                        },
+                    },
+                    {
+                        targets: -1,
+                        render: function (e, t, a, s) {
+                            let statusText = "";
+
+                            switch (a.status) {
+                                case "unused":
+                                    statusText = "SIN USAR";
+                                    break;
+                                case "partial":
+                                    statusText = "PARCIAL";
+                                    break;
+                                case "used":
+                                    statusText = "USADO";
+                                    break;
+                                default:
+                                    statusText =
+                                        a.status?.toUpperCase() ??
+                                        "DESCONOCIDO";
+                            }
+                            const isUsed = a.status === "used";
+                            const btnClass = isUsed
+                                ? "btn-success"
+                                : "btn-danger";
+
+                            return `
+                            <button
+                                class="btn btn-sm ${btnClass} btnValidate"
+                                data-id="${a.id}"
+                                data-names="${a.names}"
+                                data-status="${a.status}"
+                                type="button">
+                                ${statusText}
+                            </button>`;
+                        },
+                    },
+                ],
+                order: [[1, "asc"]],
+                dom: '<"row"<"col-sm-12 d-flex justify-content-end"f>>t',
+                pageLength: -1,
+                lengthMenu: [[-1], ["Todos"]],
+                language: {
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                    infoFiltered: "(filtrado de _MAX_ registros totales)",
+                    infoPostFix: "",
+                    loadingRecords: "Cargando...",
+                    zeroRecords: "No se encontraron resultados",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    paginate: {
+                        first: "Primero",
+                        previous: "Anterior",
+                        next: "Siguiente",
+                        last: "Último",
+                    },
+                    aria: {
+                        sortAscending: ": activar para ordenar ascendente",
+                        sortDescending: ": activar para ordenar descendente",
+                    },
+                },
+            })),
+            $(".dt-row-grouping tbody").on("click", "tr.group", function () {
+                var e = t.order()[0];
+                (2 === e[0] && "asc" === e[1]
+                    ? t.order([2, "desc"])
+                    : t.order([2, "asc"])
+                ).draw();
+            }));
+
+    // Captura el valor inicial del input al cargar la página
+
     handleQRCodeChange(code);
 
     // Controlador principal del cambio de QR
@@ -153,12 +250,22 @@ $(function () {
             .done(renderQRInfo)
             .fail(showQRFetchError)
             .always($.unblockUI);
+
+        fetchQRCombos(code)
+            .done(renderQRCombos) // pinta combos
     }
 
     // === LÓGICA DE FETCH ===
     function fetchQRDetails(code) {
         return $.ajax({
             url: `/PagoLink/qr/details/${code}?validate=0`,
+            type: "GET",
+        });
+    }
+
+    function fetchQRCombos(code) {
+        return $.ajax({
+            url: `/PagoLink/qr/details_food/${code}?validate=0`,
             type: "GET",
         });
     }
@@ -172,8 +279,18 @@ $(function () {
         updateStatusBadge(link.status, link.id);
     }
 
+    function renderQRCombos(response) {
+        const { data, link } = response;
+
+        updateDataTableCombo(data);
+    }
+
     function updateDataTable(data) {
         $(".dt-row-grouping").DataTable().clear().rows.add(data).draw();
+    }
+
+    function updateDataTableCombo(data) {
+        $(".table_combos").DataTable().clear().rows.add(data).draw();
     }
 
     function updateUserInfo(link) {
