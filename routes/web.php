@@ -135,8 +135,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/Status', [CouponManagementController::class, 'changeStatus'])->name('cupon.status'); // Cambiar Estado
         Route::get('/Validar_Cupon', [CouponManagementController::class, 'viewValidate'])->name('cupon.validate'); // Formulario para validar
         Route::get('/Validacion/{code}', [CouponManagementController::class, 'validatePdf'])->name('cupon.validateCode'); // Imprimir PDF
+        Route::get('/ValidacionCBowling/{code}', [CouponManagementController::class, 'validatePdfCB'])->name('cupon.validateCode'); // Imprimir PDF
         Route::get('/Search/{code}', [CouponManagementController::class, 'search'])->name('cupon.search'); // Formulario para validar
+        Route::get('/SearchCBowling/{code}', [CouponManagementController::class, 'searchCB'])->name('cupon.searchCB'); // Formulario para validar
         Route::post('/Validate', [CouponManagementController::class, 'validateCoupon'])->name('cupon.validateCoupon'); // Formulario para validar
+        Route::post('/ValidateCBowling', [CouponManagementController::class, 'validateCB'])->name('cupon.validateCB'); // Formulario para validar
     });
 
     Route::prefix('Reportes')->group(function () {

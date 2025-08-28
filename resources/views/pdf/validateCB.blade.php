@@ -48,7 +48,7 @@
 @endphp
 <body>
     <h4>Validación Cupón</h4>
-    <p>Fecha: {{ Carbon::parse($coupon->used_date)->format('d/m/Y H:i:s') }}</p>
+    <p>Fecha: {{ Carbon::parse($coupon->txt_foto)->format('d/m/Y H:i:s') }}</p>
     <table border="1">
         <thead>
             <tr>
@@ -58,8 +58,8 @@
         </thead>
         <tbody>
             <tr>
-                <td class="combo-cell">{{ $coupon->code }}</td>
-                <td>{{ $coupon->promotion->name }}</td>
+                <td class="combo-cell">{{ $coupon->int_retoque }}</td>
+                <td>{{ $coupon->txt_motivo }}</td>
             </tr>
         </tbody>
     </table>

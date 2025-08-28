@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ReniecHelper;
 use App\Models\Companies;
 use App\Models\Coupons;
+use App\Models\Coupons\Bowling;
 use App\Models\Promotions;
 use App\Models\Templates;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -146,6 +147,36 @@ class CouponManagementController extends Controller
         return response()->json(['icon' => 'success', 'message' => 'Cupón validado correctamente']);
     }
 
+    public function searchCB($code)
+    {
+
+        $coupon = Bowling::where('int_retoque', $code)->first();
+
+        if (!$coupon) {
+            return $this->response('error', 'Cupón no encontrado', 404);
+        }
+
+        return match (true) {
+            $coupon->int_stado == 1 => $this->response(
+                'warning',
+                'Este cupón ya ha sido utilizado el ' . optional(Carbon::parse($coupon->used_date))->format('d/m/Y H:i:s')
+            ),
+            default => $this->response('success', 'Cupón encontrado', 200, $coupon),
+        };
+    }
+
+    public function validateCB(Request $request){
+
+        $coupon = Bowling::where('int_retoque', $request->code)->first();
+
+        $coupon->int_stado = 1;
+        $coupon->txt_foto = now();
+        $coupon->save();
+
+        return response()->json(['icon' => 'success', 'message' => 'Cupón validado correctamente']);
+    }
+
+
     public function changeStatus(Request $request)
     {
         $coupon = Coupons::find($request->id);
@@ -215,6 +246,28 @@ class CouponManagementController extends Controller
             ->header('Content-Disposition', 'inline; filename="' . $code . '.pdf"');
     }
 
+        public function validatePdfCB($code)
+    {
+
+        // Buscar el cupón en la base de datos
+        $coupon = Bowling::where('int_retoque', $code)->first();
+
+        $html = view('pdf.validateCB', compact('coupon'))->render();
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+
+        $dompdf->setPaper([0, 0, 200, 426]);
+
+        $dompdf->render();
+
+        return response($dompdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $code . '.pdf"');
+    }
 
     public function searchDNI(Request $request)
     {

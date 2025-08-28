@@ -37,9 +37,9 @@
                         dropdownParent: e.parent(),
                     });
             });
-            csrfToken = document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content");
+        csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute("content");
 
         $("#code").on("input", function () {
             var e = $("#code").val().trim();
@@ -58,6 +58,17 @@
             event.preventDefault();
             var e = $("#code").val();
             validateR(e);
+        });
+
+        $("#searchCodeCB").click(function () {
+            var e = $("#c_cupon").val();
+            searchCB(e);
+        });
+
+        $("#validateCouponCB").click(function (event) {
+            event.preventDefault();
+            var e = $("#c_cupon").val();
+            validateCB(e);
         });
 
         function searchCode(i) {
@@ -132,6 +143,86 @@
                     });
 
                     window.open(`Validacion/${i}`, "_blank");
+                })
+                .catch((error) => {
+                    console.error(
+                        "There was a problem with the fetch operation:",
+                        error
+                    );
+                })
+                .finally(() => {
+                    $.unblockUI();
+                });
+        }
+
+        function searchCB(i) {
+            blockUI();
+
+            fetch("SearchCBowling/" + i, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        return response.json().then((err) => {
+                            throw err;
+                        });
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    const row = data.data;
+                    document.getElementById("coupon-alert").innerHTML = "";
+                    displayCouponInfo(row);
+
+                    $("#reason").val(row.txt_motivo);
+                    $("#c_expiration").val(row.txt_vence);
+                    $("#c_names").val(
+                        `${row.txt_apellido} ${row.txt_nomClient}`
+                    );
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+
+                    const form = document.getElementById("formCoupon"); // Asegúrate de que el formulario tenga el id 'formID'
+                    form.reset();
+
+                    $("#code").val(i);
+
+                    showAlert(
+                        error.message || "Hubo un problema con la operación",
+                        "danger"
+                    );
+                })
+                .finally(() => {
+                    $.unblockUI();
+                });
+        }
+
+        function validateCB(i) {
+            blockUI();
+            fetch("ValidateCBowling", {
+                method: "POST",
+                body: JSON.stringify({ code: i, _token: csrfToken }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    Toast.fire({
+                        icon: data.icon,
+                        title: data.message,
+                    });
+
+                    window.open(`ValidacionCBowling/${i}`, "_blank");
                 })
                 .catch((error) => {
                     console.error(
