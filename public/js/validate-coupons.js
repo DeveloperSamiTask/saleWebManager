@@ -229,6 +229,11 @@
                         "There was a problem with the fetch operation:",
                         error
                     );
+
+                     showAlert(
+                        error.message || "Hubo un problema con la operación",
+                        "danger"
+                    );
                 })
                 .finally(() => {
                     $.unblockUI();

@@ -168,15 +168,23 @@ class CouponManagementController extends Controller
 
     public function validateCB(Request $request)
     {
-
         $coupon = Bowling::where('int_retoque', $request->code)->first();
 
-        Log::info('Validating coupon with code: ' . $coupon);
+        Log::info('Validating coupon with code: ', [$coupon]);
 
         if (!$coupon) {
-            return $this->response(['icon' => 'error',  'message' => 'Cupón no encontrado'], 404);
+            return $this->response(['icon' => 'error', 'message' => 'Cupón no encontrado'], 404);
         }
 
+        // ✅ Validar si ya está usado
+        if ($coupon->int_stado == 1) {
+            return response()->json([
+                'icon' => 'warning',
+                'message' => 'Este cupón ya fue validado el ' . optional(Carbon::parse($coupon->txt_foto))->format('d/m/Y H:i:s')
+            ], 400);
+        }
+
+        // ✅ Marcar como validado
         $coupon->int_stado = 1;
         $coupon->txt_foto = now();
         $coupon->save();
