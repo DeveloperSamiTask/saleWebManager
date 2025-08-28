@@ -12,11 +12,12 @@ class Bowling extends Model
     protected $connection = 'lagranja_cupon';
 
     protected $table = 'tbl_bowling';
-    protected $primaryKey = 'id_colegio';
+    protected $primaryKey = 'id_Colegio';
 
     protected $fillable = [
+        'txt_foto',
         'int_stado',
-        'txt_foto'
+        'int_retoque'
     ];
 
     public $timestamps = false;

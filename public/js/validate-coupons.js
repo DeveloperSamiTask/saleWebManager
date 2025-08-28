@@ -236,7 +236,7 @@
         }
 
         function showAlert(message, type) {
-            let alertBox = document.getElementById("coupon-alert");
+            let alertBox = document.getElementById("coupon-alert-bowling");
 
             alertBox.innerHTML = `
                 <div class="alert alert-${type} alert-dismissible fade show" role="alert">

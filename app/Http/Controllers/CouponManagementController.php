@@ -13,6 +13,7 @@ use Dompdf\Options;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Log;
 
 class CouponManagementController extends Controller
 {
@@ -159,15 +160,22 @@ class CouponManagementController extends Controller
         return match (true) {
             $coupon->int_stado == 1 => $this->response(
                 'warning',
-                'Este cupón ya ha sido utilizado el ' . optional(Carbon::parse($coupon->used_date))->format('d/m/Y H:i:s')
+                'Este cupón ya ha sido utilizado el ' . optional(Carbon::parse($coupon->txt_foto))->format('d/m/Y H:i:s')
             ),
             default => $this->response('success', 'Cupón encontrado', 200, $coupon),
         };
     }
 
-    public function validateCB(Request $request){
+    public function validateCB(Request $request)
+    {
 
         $coupon = Bowling::where('int_retoque', $request->code)->first();
+
+        Log::info('Validating coupon with code: ' . $coupon);
+
+        if (!$coupon) {
+            return $this->response(['icon' => 'error',  'message' => 'Cupón no encontrado'], 404);
+        }
 
         $coupon->int_stado = 1;
         $coupon->txt_foto = now();
@@ -246,7 +254,7 @@ class CouponManagementController extends Controller
             ->header('Content-Disposition', 'inline; filename="' . $code . '.pdf"');
     }
 
-        public function validatePdfCB($code)
+    public function validatePdfCB($code)
     {
 
         // Buscar el cupón en la base de datos

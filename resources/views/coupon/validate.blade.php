@@ -185,7 +185,7 @@
                                 <div class="card-body">
                                     <form id="formCouponBowling">
                                         <div class="row">
-                                            <div id="coupon-alert"></div>
+                                            <div id="coupon-alert-bowling"></div>
                                             <div class="col-lg-10 mx-auto">
                                                 <h5 class="mb-4">Información Cupón</h5>
                                                 <div class="row g-3">
