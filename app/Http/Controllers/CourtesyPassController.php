@@ -217,34 +217,39 @@ class CourtesyPassController extends Controller
         );
         $resultEntrada = $builderEntrada->build();
 
-        // === QR 2: COMIDA (sin logo) ===
-        $builderComida = new Builder(
-            writer: new PngWriter(),
-            data: $qrContent,
-            size: 300,
-            margin: 10,
-            errorCorrectionLevel: ErrorCorrectionLevel::High,
-            foregroundColor: new Color(30, 30, 30),
-            backgroundColor: new Color(255, 255, 255),
-            labelText: $qrContent . ' COMIDA',
-            labelFont: new OpenSans(16),
-            labelAlignment: LabelAlignment::Center
-        );
-        $resultComida = $builderComida->build();
-
         // Crear un ZIP temporal
         $zip = new ZipArchive();
         $zipFileName = 'qrs_' . $purchase->code . '.zip';
         $zipPath = storage_path('app/public/' . $zipFileName);
 
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            // Siempre agregamos el QR de entrada
             $zip->addFromString('qr_entrada.png', $resultEntrada->getString());
-            $zip->addFromString('qr_comida.png', $resultComida->getString());
+
+            // 👇 Solo agregamos el QR de comida si food == 1
+            if ($purchase->food == 1) {
+                $builderComida = new Builder(
+                    writer: new PngWriter(),
+                    data: $qrContent,
+                    size: 300,
+                    margin: 10,
+                    errorCorrectionLevel: ErrorCorrectionLevel::High,
+                    foregroundColor: new Color(30, 30, 30),
+                    backgroundColor: new Color(255, 255, 255),
+                    labelText: $qrContent . ' COMIDA',
+                    labelFont: new OpenSans(16),
+                    labelAlignment: LabelAlignment::Center
+                );
+                $resultComida = $builderComida->build();
+                $zip->addFromString('qr_comida.png', $resultComida->getString());
+            }
+
             $zip->close();
         }
 
         return response()->download($zipPath)->deleteFileAfterSend(true);
     }
+
 
     public function list()
     {
@@ -400,6 +405,32 @@ class CourtesyPassController extends Controller
         return Carbon::parse($dateIssue)->isSameDay(Carbon::today());
     }
 
+    private function formatMembersData($link)
+    {
+        $data = [];
+
+        foreach ($link->combos as $combo) {
+            foreach ($combo->members as $member) {
+                $data[] = [
+                    'id'     => $member->id,
+                    'names'  => $member->name,
+                    'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción') . ' (' . $combo->quantity . ')',
+                    'document'    => $member->dni,
+                    'user'    => $member->user,
+                    'activate'    => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : 'No activado',
+                    'status' => $member->status_entrie ?? null,
+                    'button' => (session('user')['idusuario'] ?? null) == 1
+                        ? '<button class="btn btn-warning btn-sm edit-btn" data-id="' . $member->id . '">
+                            <i class="mdi mdi-pencil-outline"></i>
+                        </button>'
+                        : '',
+                ];
+            }
+        }
+
+        return $data;
+    }
+
     public function getQrDetailsByCombo($code, Request $request)
     {
         try {
@@ -453,6 +484,11 @@ class CourtesyPassController extends Controller
         $data = [];
 
         foreach ($link->combos as $combo) {
+
+            if (!$combo->combo || $combo->combo->has_food != 1) {
+                continue;
+            }
+
             // Total validado sumando todas las validaciones
             $validatedQty = $combo->validations->sum('validated_qty');
 
@@ -639,32 +675,6 @@ class CourtesyPassController extends Controller
         }
     }
 
-    private function formatMembersData($link)
-    {
-        $data = [];
-
-        foreach ($link->combos as $combo) {
-            foreach ($combo->members as $member) {
-                $data[] = [
-                    'id'     => $member->id,
-                    'names'  => $member->name,
-                    'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción') . ' (' . $combo->quantity . ')',
-                    'document'    => $member->dni,
-                    'user'    => $member->user,
-                    'activate'    => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : 'No activado',
-                    'status' => $member->status_entrie ?? null,
-                    'button' => (session('user')['idusuario'] ?? null) == 1
-                        ? '<button class="btn btn-warning btn-sm edit-btn" data-id="' . $member->id . '">
-                            <i class="mdi mdi-pencil-outline"></i>
-                        </button>'
-                        : '',
-                ];
-            }
-        }
-
-        return $data;
-    }
-
     private function formatLinkData($link)
     {
         $total = $this->calcularTotal($link);
@@ -674,7 +684,7 @@ class CourtesyPassController extends Controller
             'code'     => $link->code,
             'names'    => trim($link->names . ' ' . $link->lastname),
             'document' => $link->document_type . ': ' . $link->document_number,
-            'date' => Carbon::parse($link->date_purchase)->format('d/m/Y h:i A'),
+            'date' => Carbon::parse($link->created_at)->format('d/m/Y h:i A'),
             'date_issue' => $link->activate_date
                 ? Carbon::parse($link->activate_date)->format('d/m/Y h:i A') // si ya está activado
                 : Carbon::parse($link->date_issue)->format('d/m/Y'),
