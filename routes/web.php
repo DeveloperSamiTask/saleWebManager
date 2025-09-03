@@ -141,6 +141,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/qr/details/{code}', [CourtesyPassController::class, 'getQrDetails'])->name('qr.details');
 
         Route::get('/qr/details_food/{code}', [CourtesyPassController::class, 'getQrDetailsByCombo'])->name('qr.details_food');
+
+        //Download QRs
+        Route::get('/qr/download/{code}', [CourtesyPassController::class, 'downloadQrCode'])->name('qr.download');
+
     });
 
     Route::prefix('Cupon')->group(function () {
