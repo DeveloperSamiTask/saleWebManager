@@ -141,12 +141,12 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Influencers',
                 'submenu' => [
                     [
-                        'route' => 'paymentLink.index',
+                        'route' => 'courtesy.index',
                         'text' => 'Lista',
                         'dataI18n' => 'List',
                     ],
                     [
-                        'route' => 'paymentLink.add',
+                        'route' => 'courtesy.add',
                         'text' => 'Nuevo',
                         'dataI18n' => 'New',
                     ],

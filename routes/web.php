@@ -16,6 +16,7 @@ use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PaymentLinkController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserController;
+use App\Models\CourtesyPass;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,13 +117,30 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('PaseCortesia')->group(function () {
-        Route::get('/Crear', [PaymentLinkController::class, 'create'])->name('courtesy.add');
-        Route::post('/store', [PaymentLinkController::class, 'storePayment']);
-
+        //Promociones
         Route::get('/Promociones', [CourtesyPassController::class, 'promotions'])->name('courtesy.promotions');
         Route::get('/ShowPromotions', [CourtesyPassController::class, 'showPromotions']);
         Route::post('/StorePromotion', [CourtesyPassController::class, 'storePromotion']);
         Route::post('/StatusPromotion', [CourtesyPassController::class, 'status']);
+
+        //Pases Cortesia Lista
+        Route::get('/Lista', [CourtesyPassController::class, 'list'])->name('courtesy.index');
+        Route::get('/Lista_Cortesias', [CourtesyPassController::class, 'listCourtesyPass']);
+
+
+        //Formulario creacion
+
+        Route::get('/Nueva-Cortesia', [CourtesyPassController::class, 'create'])->name('courtesy.add');
+        Route::post('/store', [CourtesyPassController::class, 'store']);
+
+        //Invoice
+        Route::get('/Ver/{id}', [CourtesyPassController::class, 'invoice'])->name('paymentLink.show');
+        Route::get('wwwwwwwww/{id}', [CourtesyPassController::class, 'member'])->name('paymentLink.show');
+        Route::put('member/{id}', [CourtesyPassController::class, 'updateMember']);
+
+        Route::get('/qr/details/{code}', [CourtesyPassController::class, 'getQrDetails'])->name('qr.details');
+
+        Route::get('/qr/details_food/{code}', [CourtesyPassController::class, 'getQrDetailsByCombo'])->name('qr.details_food');
     });
 
     Route::prefix('Cupon')->group(function () {

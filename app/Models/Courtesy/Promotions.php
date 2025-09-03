@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Promotions extends Model
 {
     use HasFactory;
+    
     public $table = 'promotions_courtesy';
 
     public static function show($startDate, $endDate)
