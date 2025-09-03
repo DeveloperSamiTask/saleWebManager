@@ -139,12 +139,20 @@ Route::middleware('auth')->group(function () {
         Route::put('member/{id}', [CourtesyPassController::class, 'updateMember']);
 
         Route::get('/qr/details/{code}', [CourtesyPassController::class, 'getQrDetails'])->name('qr.details');
-
         Route::get('/qr/details_food/{code}', [CourtesyPassController::class, 'getQrDetailsByCombo'])->name('qr.details_food');
 
         //Download QRs
         Route::get('/qr/download/{code}', [CourtesyPassController::class, 'downloadQrCode'])->name('qr.download');
 
+        //Validaciones
+        Route::get('/Validar_Pase_Cortesia', [CourtesyPassController::class, 'validateForm'])->name('courtesy.validate'); // Api pagos
+        Route::get('/Validar_Comidas_Pase_Cortesia', [CourtesyPassController::class, 'validateFormFood'])->name('courtesy.validate_food'); // Api pagos
+
+        Route::post('/validate/dni', [CourtesyPassController::class, 'dniValidate']);
+        Route::post('/validate/combos', [CourtesyPassController::class, 'validateCombo']);
+
+        Route::get('/print', [CourtesyPassController::class, 'print'])->name('print');
+        Route::get('/printFood', [CourtesyPassController::class, 'printFood'])->name('printFood');
     });
 
     Route::prefix('Cupon')->group(function () {
