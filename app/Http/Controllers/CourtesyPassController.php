@@ -414,7 +414,7 @@ class CourtesyPassController extends Controller
                 ], 403);
             }
 
-            $data = $this->formatCombosData($link);
+            $data = $link->food == 1 ? $this->formatCombosData($link) : [];
 
             return response()->json([
                 'data' => $data,
