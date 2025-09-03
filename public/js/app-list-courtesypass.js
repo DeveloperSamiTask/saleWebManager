@@ -393,7 +393,7 @@ $(function () {
                     className:
                         "add-new btn btn-primary ms-n1 waves-effect waves-light",
                     action: function () {
-                        window.location.href = "Agregar-pago";
+                        window.location.href = "Nueva-Cortesia";
                     },
                 },
             ],

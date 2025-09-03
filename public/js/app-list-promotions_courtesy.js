@@ -564,6 +564,10 @@ $(function () {
         let formData = new FormData(f);
         formData.append("_token", csrfToken);
 
+        if (!f.querySelector('[name="has_food"]').checked) {
+            formData.set("has_food", 0);
+        }
+
         fetch("StorePromotion", {
             method: "POST",
             body: formData,

@@ -26,16 +26,6 @@
                                     <h5 class="mb-4">1. Informacion de Compra</h5>
                                     <div class="row g-4">
                                         <div class="col-md-4">
-                                            <div class="input-group input-group-merge">
-                                                <span class="input-group-text"><i class="mdi mdi-barcode fs-3"></i></span>
-                                                <div class="form-floating form-floating-outline">
-                                                    <input type="text" id="code" name="code" class="form-control"
-                                                        placeholder="Codigo de Compra" />
-                                                    <label for="code">Codigo de Compra</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
                                             <div class="form-floating form-floating-outline">
                                                 <input class="form-control" type="text" id="lastname" name="lastname"
                                                     placeholder="Apellidos" aria-label="Apellidos"
@@ -87,7 +77,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3 col-12">
+                                        <div class="col-md-4 col-12">
                                             <div class="form-floating form-floating-outline">
                                                 <input type="text" class="form-control" placeholder="YYYY-MM-DD"
                                                     id="date_issue" name="date_issue" />
@@ -95,7 +85,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6 col-12">
+                                        <div class="col-md-12 col-12">
                                             <div class="form-floating form-floating-outline">
                                                 <input class="form-control" type="text" id="observation"
                                                     name="observation" placeholder="Observación" aria-label="Observación"

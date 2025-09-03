@@ -4,13 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Courtesy\Combo;
 use App\Models\Courtesy\ComboMember;
+use App\Models\Courtesy\ComboValidation;
 use App\Models\Courtesy\Link;
 use App\Models\Courtesy\Promotions;
-use App\Models\CourtesyPass;
+
+use Dompdf\Dompdf;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\Label\Font\OpenSans;
+
+use ZipArchive;
 
 class CourtesyPassController extends Controller
 {
@@ -48,6 +61,7 @@ class CourtesyPassController extends Controller
             $promotion->price = $request->price;
             $promotion->description = $request->description;
             $promotion->members = $request->members;
+            $promotion->has_food = $request->has_food ?? 0;
             $promotion->status = session('user')['idusuario'];
             $promotion->save();
 
@@ -90,6 +104,15 @@ class CourtesyPassController extends Controller
         return view('courtesy.create', $data);
     }
 
+    private function generateCode($length = 6)
+    {
+        $code = '';
+        for ($i = 0; $i < $length; $i++) {
+            $code .= mt_rand(0, 9); // agrega un dígito de 0-9
+        }
+        return $code;
+    }
+
     public function store(Request $request)
     {
         try {
@@ -101,18 +124,35 @@ class CourtesyPassController extends Controller
                 ], 409);
             }
 
+            $combos = json_decode($request->input('combos'), true);
+
+            // Verificar si alguno de los combos tiene alimento activado
+            $hasFood = false;
+
+            foreach ($combos as $combo) {
+                $comboModel = Promotions::find($combo['combo_id']); // o el modelo correcto
+                Log::info("Combo ID: {$combo['combo_id']}, Has Food: " . ($comboModel->has_food ?? 'N/A'));
+                if ($comboModel && $comboModel->has_food == 1) {
+                    $hasFood = true;
+                    break; // con uno basta
+                }
+            }
+
             $purchase = Link::create([
-                'code' => $request->code,
-                'lastname' => $request->lastname,
-                'names' => $request->names,
-                'document_type' => $request->document,
+                'code'           => $this->generateCode(6),
+                'lastname'       => $request->lastname,
+                'names'          => $request->names,
+                'document_type'  => $request->document,
                 'document_number' => $request->number_doc,
-                'phone' => $request->phone,
-                'date_issue' => $request->date_issue,
-                'status' => 'unused',
-                'user_id' => session('user')['idusuario'],
-                'observation' => $request->observation,
+                'phone'          => $request->phone,
+                'date_issue'     => $request->date_issue,
+                'status'         => 'unused',
+                'user_id'        => session('user')['idusuario'],
+                'observation'    => $request->observation,
+                'food'           => $hasFood ? 1 : 0, // 👈 aquí va
             ]);
+
+
 
             $combos = json_decode($request->input('combos'), true);
 
@@ -148,6 +188,62 @@ class CourtesyPassController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function downloadQrCode($code)
+    {
+        $purchase = Link::where('code', $code)->first();
+
+        if (!$purchase) {
+            return response()->json(['icon' => 'error', 'message' => 'Compra no encontrada.'], 404);
+        }
+
+        // Contenido QR base
+        $qrContent = $purchase->code;
+
+        // === QR 1: ENTRADA (con logo) ===
+        $builderEntrada = new Builder(
+            writer: new PngWriter(),
+            data: $qrContent,
+            size: 300,
+            margin: 10,
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            foregroundColor: new Color(30, 30, 30),
+            backgroundColor: new Color(255, 255, 255),
+            logoPath: public_path('img/logo.png'),
+            labelText: $qrContent . ' ENTRADA',
+            labelFont: new OpenSans(16),
+            labelAlignment: LabelAlignment::Center
+        );
+        $resultEntrada = $builderEntrada->build();
+
+        // === QR 2: COMIDA (sin logo) ===
+        $builderComida = new Builder(
+            writer: new PngWriter(),
+            data: $qrContent,
+            size: 300,
+            margin: 10,
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            foregroundColor: new Color(30, 30, 30),
+            backgroundColor: new Color(255, 255, 255),
+            labelText: $qrContent . ' COMIDA',
+            labelFont: new OpenSans(16),
+            labelAlignment: LabelAlignment::Center
+        );
+        $resultComida = $builderComida->build();
+
+        // Crear un ZIP temporal
+        $zip = new ZipArchive();
+        $zipFileName = 'qrs_' . $purchase->code . '.zip';
+        $zipPath = storage_path('app/public/' . $zipFileName);
+
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            $zip->addFromString('qr_entrada.png', $resultEntrada->getString());
+            $zip->addFromString('qr_comida.png', $resultComida->getString());
+            $zip->close();
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
     }
 
     public function list()
@@ -302,6 +398,245 @@ class CourtesyPassController extends Controller
     private function isValidIssueDate($dateIssue)
     {
         return Carbon::parse($dateIssue)->isSameDay(Carbon::today());
+    }
+
+    public function getQrDetailsByCombo($code, Request $request)
+    {
+        try {
+            $link = $this->findPurchaseLinkByCodeCombos($code);
+
+            $isValidation = $request->query('validate') === '1';
+
+            if ($isValidation && !$this->isValidIssueDate($link->date_issue)) {
+                return response()->json([
+                    'message' => 'Este código solo es válido para el día: ' . Carbon::parse($link->date_issue)->format('d/m/Y'),
+                    'status' => 'invalid_date'
+                ], 403);
+            }
+
+            $data = $this->formatCombosData($link);
+
+            return response()->json([
+                'data' => $data,
+                'link' => $this->formatLinkData($link),
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'No se encontró el código QR ingresado.',
+                'status' => 'not_found'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error("Error en getQrDetailsByCombo: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Ocurrió un error inesperado.',
+                'status' => 'error'
+            ], 500);
+        }
+    }
+
+    private function findPurchaseLinkByCodeCombos($code)
+    {
+        return Link::with([
+            'combos.combo',
+            'combos.members',
+            'combos.validations', // 👈 añadimos las validaciones
+        ])
+            ->where('code', $code)
+            ->firstOrFail();
+    }
+
+    private function formatCombosData($link)
+    {
+        $data = [];
+
+        foreach ($link->combos as $combo) {
+            // Total validado sumando todas las validaciones
+            $validatedQty = $combo->validations->sum('validated_qty');
+
+            // Determinar estado
+            if ($validatedQty == 0) {
+                $status = 'unused';
+            } elseif ($validatedQty < $combo->quantity) {
+                $status = 'partial';
+            } else {
+                $status = 'used';
+            }
+
+            // Tomamos la última validación para mostrar hora/usuario
+            $lastValidation = $combo->validations->last();
+
+            $data[] = [
+                'id'            => $combo->id,
+                'combo'         => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'),
+                'quantity'      => $combo->quantity,
+                'validated_qty' => $validatedQty,
+                'status'        => $status,
+                'validated_at'  => $lastValidation ? $lastValidation->validated_at : null,
+                'validated_by'  => $lastValidation ? $lastValidation->validated_by : null,
+            ];
+        }
+
+        return $data;
+    }
+
+    public function validateCombo(Request $request)
+    {
+        $request->validate([
+            'record_id' => 'required|exists:purchase_combo,id',
+            'quantity'  => 'required|integer|min:1',
+        ]);
+
+        $combo = Combo::with('combo')->findOrFail($request->record_id);
+
+        // 🟢 Calcular total validado hasta ahora
+        $totalValidated = ComboValidation::where('purchase_link_combo_id', $combo->id)
+            ->sum('validated_qty');
+
+        $remaining = $combo->quantity - $totalValidated;
+
+        // 🚨 Si ya no quedan unidades, bloquear
+        if ($remaining <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ya se validaron todas las unidades de este combo',
+            ], 400);
+        }
+
+        // 🚨 Si el usuario intenta validar más de lo que queda
+        if ($request->quantity > $remaining) {
+            return response()->json([
+                'success' => false,
+                'message' => "Solo quedan {$remaining} unidades por validar",
+            ], 400);
+        }
+
+        // 1️⃣ Guardar validación en la BD
+        $validation = ComboValidation::create([
+            'purchase_link_combo_id' => $combo->id,
+            'validated_qty'          => $request->quantity,
+            'validated_at'           => now(),
+            'validated_by'           => auth()->id(),
+        ]);
+
+        // 2️⃣ Guardar también en la sesión
+        $validatedCombos = session('validated_combos', []);
+
+        $validatedCombos[] = [
+            'id'          => $combo->id,
+            'name'        => $combo->combo->name ?? 'Sin nombre',
+            'description' => $combo->combo->description ?? 'Sin descripción',
+            'quantity'    => $request->quantity,
+            'hora'        => now()->format('H:i:s'),
+        ];
+
+        session(['validated_combos' => $validatedCombos]);
+
+        // 3️⃣ Calcular estado
+        $newTotalValidated = $totalValidated + $request->quantity;
+        $status = $newTotalValidated < $combo->quantity ? 'partial' : 'used';
+
+        $data = [
+            'id'            => $combo->id,
+            'combo'         => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción'),
+            'quantity'      => $combo->quantity,
+            'validated_qty' => $validation->validated_qty,
+            'status'        => $status,
+            'validated_at'  => $validation->validated_at,
+            'validated_by'  => $validation->validated_by,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => $combo->combo->name . ' Combo validado correctamente',
+            'data'    => $data,
+        ]);
+    }
+
+    public function printFood(Request $request)
+    {
+        try {
+            $id = $request->input('id');
+
+            // 1️⃣ Traemos la compra con sus combos
+            $purchase = Link::with('combos.combo')->findOrFail($id);
+
+            // 2️⃣ Actualizamos estado general de la compra (usada / sin usar)
+            $unusedCombos = $purchase->combos()->whereDoesntHave('validations')->count();
+
+            $purchase->status = $unusedCombos > 0 ? 'unused' : 'used';
+            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->activate_date = now();
+            $purchase->save();
+
+            // 3️⃣ Recuperamos lo validado en la sesión
+            $validated = session('validated_combos', []);
+
+            // Agrupar lo validado por combo_id
+            $agrupadosPorCombo = collect($validated)->groupBy('id');
+
+            $data = [];
+
+            foreach ($agrupadosPorCombo as $comboId => $validaciones) {
+                $combo = $purchase->combos->firstWhere('id', $comboId);
+
+                if (!$combo) continue; // por seguridad
+
+                $cantidad       = $combo->quantity;
+                $precioUnitario = $combo->combo->price ?? 0;
+                $descripcion    = $combo->combo->description ?? '';
+                $nombre         = $combo->combo->name ?? '';
+
+                $validadosPrevios = ComboValidation::where('purchase_link_combo_id', $comboId)
+                    ->sum('validated_qty');
+
+                $validados = $validaciones->sum('quantity');
+
+                $pendientes = max(0, $cantidad - $validadosPrevios);
+
+                $data[] = [
+                    'combo'       => strtoupper($nombre),
+                    'descripcion' => strtoupper($descripcion),
+                    'cantidad'    => $cantidad,
+                    'validados'   => $validados,
+                    'pendientes'  => $pendientes,
+                    'subtotal'    => $cantidad * $precioUnitario,
+                ];
+            }
+
+            $total = array_sum(array_column($data, 'subtotal'));
+
+            // 4️⃣ Renderizamos la vista del ticket
+            $html = view('payment_link.printFood', [
+                'data'             => $data,
+                'purchase'         => $purchase,
+                'total'            => $total,
+                'user'             => session('user')['usuario'] ?? 'Desconocido',
+                'agrupadosPorCombo' => $agrupadosPorCombo,
+                'validated'        => $validated, // 👈 Enviamos también por si en la vista quieres ver hora exacta
+            ])->render();
+
+            // 5️⃣ Generamos el PDF
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+
+            $dompdf = new \Dompdf\Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A5', 'portrait');
+            $dompdf->render();
+
+            return Response::make($dompdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="comprobante.pdf"',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Excepción: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     private function formatMembersData($link)

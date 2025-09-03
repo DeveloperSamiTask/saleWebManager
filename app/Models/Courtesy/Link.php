@@ -27,7 +27,8 @@ class Link extends Model
         'date_auth',
         'user_active',
         'activate_date',
-        'observation'
+        'observation',
+        'food'
     ];
 
     public function authorizedBy()

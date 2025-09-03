@@ -186,11 +186,6 @@
 
         const fv = FormValidation.formValidation(f, {
             fields: {
-                code: {
-                    validators: {
-                        notEmpty: { message: "Ingresa el codigo de compra" },
-                    },
-                },
                 lastname: {
                     validators: {
                         notEmpty: {

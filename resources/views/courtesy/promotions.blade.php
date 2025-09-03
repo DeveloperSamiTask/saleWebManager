@@ -56,7 +56,7 @@
                         <div class="col-12 col-md-3">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="price" name="price" class="form-control"
-                                    placeholder="Ingresar precio">
+                                    placeholder="Ingresar precio" value="0">
                                 <label for="price">Precio</label>
                             </div>
                         </div>
@@ -73,6 +73,16 @@
                                     placeholder="Ingresar la descripción">
                                 <label for="description">Descripción Promoción</label>
                             </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="switch switch-lg">
+                                <input type="checkbox" class="switch-input" name="has_food" value="1">
+                                <span class="switch-toggle-slider">
+                                    <span class="switch-on"></span>
+                                    <span class="switch-off"></span>
+                                </span>
+                                <span class="switch-label">Activar si la promoción contiene alimentos.</span>
+                            </label>
                         </div>
 
                         <div class="col-12 text-center">
