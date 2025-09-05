@@ -6,7 +6,7 @@
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4">
             <span class="text-muted fw-light">Formulario/</span>
-            Pago Link
+            Pase de Cortesía
         </h4>
         <!-- Sticky Actions -->
         <div class="row">
@@ -15,7 +15,7 @@
                     <form id="paymentLinkForm">
                         <div
                             class="card-header sticky-element bg-label-secondary d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row">
-                            <h5 class="card-title mb-sm-0 me-2">Formulario Pago Link</h5>
+                            <h5 class="card-title mb-sm-0 me-2">Formulario Pase de Cortesía</h5>
                             <div class="action-btns">
                                 <button class="btn btn-primary">Guardar Pago</button>
                             </div>

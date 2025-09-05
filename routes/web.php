@@ -16,7 +16,6 @@ use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PaymentLinkController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserController;
-use App\Models\CourtesyPass;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +31,18 @@ use App\Models\CourtesyPass;
 Route::get('/', [LoginController::class, 'index'])->name('login');
 Route::post('/initLogin', [LoginController::class, 'login']);
 Route::post('/Logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('test', function () {
+    return view('courtesy.duplicate');
+});
+
+Route::get('courtesy/mail/{code}', [CourtesyPassController::class, 'viewMail'])
+    ->name('courtesy.mail');
+Route::post('courtesy/authorize', [CourtesyPassController::class, 'authCourtesy'])->name('courtesy.authorize');
+Route::post('courtesy/verify', [CourtesyPassController::class, 'verifyCourtesy'])->name('courtesy.verify');
+
+Route::get('PaseCortesia/qr/details/{code}', [CourtesyPassController::class, 'getQrDetails'])->where('code', '.*')->name('qr.details');
+
 
 // Agrupar todas las rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {
@@ -135,10 +146,9 @@ Route::middleware('auth')->group(function () {
 
         //Invoice
         Route::get('/Ver/{id}', [CourtesyPassController::class, 'invoice'])->name('paymentLink.show');
-        Route::get('wwwwwwwww/{id}', [CourtesyPassController::class, 'member'])->name('paymentLink.show');
+        Route::get('member/{id}', [CourtesyPassController::class, 'member'])->name('paymentLink.show');
         Route::put('member/{id}', [CourtesyPassController::class, 'updateMember']);
 
-        Route::get('/qr/details/{code}', [CourtesyPassController::class, 'getQrDetails'])->name('qr.details');
         Route::get('/qr/details_food/{code}', [CourtesyPassController::class, 'getQrDetailsByCombo'])->name('qr.details_food');
 
         //Download QRs
@@ -153,6 +163,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/print', [CourtesyPassController::class, 'print'])->name('print');
         Route::get('/printFood', [CourtesyPassController::class, 'printFood'])->name('printFood');
+
+        //Autorizar Pase Cortesia
+        Route::post('/Autorize', [CourtesyPassController::class, 'authCourtesy']);
     });
 
     Route::prefix('Cupon')->group(function () {

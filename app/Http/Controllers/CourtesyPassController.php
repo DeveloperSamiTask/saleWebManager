@@ -8,6 +8,8 @@ use App\Models\Courtesy\ComboValidation;
 use App\Models\Courtesy\Link;
 use App\Models\Courtesy\Promotions;
 
+use App\Jobs\MailValidateCourtesy as JobVCourtesy;
+
 use Dompdf\Dompdf;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -175,6 +177,9 @@ class CourtesyPassController extends Controller
                 }
             }
 
+            // Enviar correo en segundo plano
+            JobVCourtesy::dispatch($purchase->code);
+
             return response()->json([
                 'success' => true,
                 'icon' => 'success',
@@ -280,26 +285,6 @@ class CourtesyPassController extends Controller
         ]);
     }
 
-    public function AuthorizeCourtesy(Request $request)
-    {
-        try {
-            $purchase = Link::findOrFail($request->id);
-            $purchase->user_auth = session('user')['idusuario'];
-            $purchase->code_auth = $request->code;
-            $purchase->date_auth = now();
-            $purchase->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Pago Link autorizado correctamente.',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al autorizar el Pago Link: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
 
     public function validateForm()
     {
@@ -670,7 +655,11 @@ class CourtesyPassController extends Controller
     {
         session()->forget('validated_members');
         try {
-            $link = $this->findPurchaseLinkByCode($code);
+            $decrypted = openssl_decrypt(urldecode($code), 'AES-128-ECB', env('COURTESY_KEY'));
+
+            $finalCode = $decrypted !== false ? $decrypted : $code;
+
+            $link = $this->findPurchaseLinkByCode($finalCode);
 
             $isValidation = $request->query('validate') === '1';
 
@@ -856,5 +845,89 @@ class CourtesyPassController extends Controller
         }
 
         return $total;
+    }
+
+    public function viewMail($code)
+    {
+        return view('courtesy.authorize', ['code' => $code]);
+    }
+
+
+    public function verifyCourtesy(Request $request)
+    {
+        $decode = urldecode($request->id);
+        $decrypted = openssl_decrypt($decode, 'AES-128-ECB', env('COURTESY_KEY'));
+
+        $courtesy = Link::where('code', $decrypted)->firstOrFail();
+
+        if (!$courtesy) {
+            return response()->json([
+                'message' => 'La cortesía no existe.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'code' => $courtesy->code,
+            'status'  => $courtesy->user_auth ? true : false,
+            'date'    => $courtesy->date_auth
+                ? Carbon::parse($courtesy->date_auth)->format('d/m/Y h:i A')
+                : null,
+        ]);
+    }
+
+    public function authCourtesy(Request $request)
+    {
+        try {
+            $decode = urldecode($request->id);
+            $decrypted = openssl_decrypt($decode, 'AES-128-ECB', env('COURTESY_KEY'));
+
+            if (!$decrypted) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Código inválido o no se pudo desencriptar.',
+                ], 400);
+            }
+
+            $purchase = Link::where('code', $decrypted)->firstOrFail();
+
+            if ($purchase->date_auth) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este Pase de Cortesía ya fue validado previamente.',
+                ], 400);
+            }
+
+            if ($request->action === 'authorize') {
+                $purchase->user_auth = 1;
+                $purchase->code_auth = "1";
+                $purchase->date_auth = now();
+                $purchase->status = 'authorized'; // 👈 si tienes un campo status
+            } elseif ($request->action === 'cancel') {
+                $purchase->user_auth = 1;
+                $purchase->code_auth = "2";
+                $purchase->date_cancel = now();
+                $purchase->status = 'canceled';
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Acción no válida.',
+                ], 400);
+            }
+
+            $purchase->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => $request->action === 'authorize'
+                    ? 'Pago Link autorizado correctamente.'
+                    : 'Pago Link anulado correctamente.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar el Pago Link: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

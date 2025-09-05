@@ -55,7 +55,7 @@
                                 </div>
                             </div>
                             <div>
-                                <h4 class="fw-medium">Nº COMPRA: <b id="code"></b></h4>
+                                <h4 class="fw-medium">CODIGO CUPON: <b id="code"></b></h4>
                                 <div class="mb-1">
                                     <span>Fecha Emitido:</span>
                                     <span id="d_purchase"></span>
