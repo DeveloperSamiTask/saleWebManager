@@ -163,7 +163,7 @@ class PaymentLinkController extends Controller
 
         // === QR 1: ENTRADA (con logo) ===
         $builderEntrada = new Builder(
-            writer: new PngWriter(),    
+            writer: new PngWriter(),
             data: $qrContent,
             size: 300,
             margin: 10,
@@ -655,13 +655,21 @@ class PaymentLinkController extends Controller
 
     public function dniValidate(Request $request)
     {
+        $id = trim($request->input('id'));
         $dni = trim($request->input('dni'));
 
         $member = PurchaseComboMember::with('purchaseCombo.combo')
-            ->where('dni', $dni)
+            ->where('id', $id)
             ->first();
 
         if (!$member) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró el registro.',
+            ], 404);
+        }
+
+        if ($member->dni != $dni) {
             return response()->json([
                 'success' => false,
                 'message' => 'DNI incorrecto.',

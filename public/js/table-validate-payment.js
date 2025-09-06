@@ -261,6 +261,7 @@ $(function () {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
             data: {
+                id: $("#hiddenRecordId").val(),
                 dni: dniIngresado,
             },
             beforeSend: function () {
