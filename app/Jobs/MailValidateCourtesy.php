@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class MailValidateCourtesy implements ShouldQueue
@@ -37,6 +38,18 @@ class MailValidateCourtesy implements ShouldQueue
         $encrypted = openssl_encrypt($this->code, 'AES-128-ECB', env('COURTESY_KEY'));
         $encoded = urlencode($encrypted);
 
-        Mail::to('sistemas@lagranjavilla.com')->send(new CourtesyMail($encoded));
+        try {
+            Mail::to(['sistemas@lagranjavilla.com', 'no-reply@sistemas-gv.com'])
+                ->send(new CourtesyMail($encoded));
+
+            Log::info("Correo de cortesía enviado correctamente.", [
+                'destinatarios' => ['sistemas@lagranjavilla.com', 'no-reply@sistemas-gv.com'],
+                'code' => $this->code
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error al enviar correo de cortesía: " . $e->getMessage(), [
+                'code' => $this->code
+            ]);
+        }
     }
 }
