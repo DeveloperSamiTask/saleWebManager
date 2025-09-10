@@ -127,7 +127,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Promotions',
             ],
             [
-                'roles' => [1, 2],
+                'roles' => [1, 2, 5],
                 'companies' => [1],
                 'header' => true,
                 'text' => 'Pase de Cortesía',
