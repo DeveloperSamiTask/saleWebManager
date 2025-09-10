@@ -119,7 +119,7 @@ class AppServiceProvider extends ServiceProvider
                 ],
             ],
             [
-                'roles' => [1, 3, 4],
+                'roles' => [1, 3, 5],
                 'companies' => [1],
                 'route' => 'paymentLink.promotions',
                 'icon' => 'mdi mdi-percent-box-outline',
@@ -127,7 +127,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Promotions',
             ],
             [
-                'roles' => [1, 2, 4],
+                'roles' => [1, 2],
                 'companies' => [1],
                 'header' => true,
                 'text' => 'Pase de Cortesía',
@@ -150,7 +150,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Validate courtesy pass food',
             ],
             [
-                'roles' => [1, 4],
+                'roles' => [1, 5],
                 'companies' => [1],
                 'icon' => 'mdi mdi-file-chart',
                 'text' => 'Influencers',
@@ -169,7 +169,7 @@ class AppServiceProvider extends ServiceProvider
                 ],
             ],
             [
-                'roles' => [1, 4],
+                'roles' => [1, 5],
                 'companies' => [1],
                 'route' => 'courtesy.promotions',
                 'icon' => 'mdi mdi-percent-box-outline',
