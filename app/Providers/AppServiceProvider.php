@@ -119,7 +119,7 @@ class AppServiceProvider extends ServiceProvider
                 ],
             ],
             [
-                'roles' => [1, 3, 5],
+                'roles' => [1, 3, 4],
                 'companies' => [1],
                 'route' => 'paymentLink.promotions',
                 'icon' => 'mdi mdi-percent-box-outline',
