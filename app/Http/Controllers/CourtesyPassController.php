@@ -861,7 +861,7 @@ class CourtesyPassController extends Controller
 
     public function verifyCourtesy(Request $request)
     {
-        $decoded   = base64_decode(urldecode($code));
+        $decoded   = base64_decode(urldecode($request->id));
         $decrypted = openssl_decrypt(
             $decoded,
             'AES-128-ECB',
@@ -890,7 +890,7 @@ class CourtesyPassController extends Controller
     public function authCourtesy(Request $request)
     {
         try {
-            $decoded   = base64_decode(urldecode($code));
+            $decoded   = base64_decode(urldecode($request->id));
             $decrypted = openssl_decrypt(
                 $decoded,
                 'AES-128-ECB',
