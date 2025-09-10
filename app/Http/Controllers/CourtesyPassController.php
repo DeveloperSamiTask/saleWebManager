@@ -655,7 +655,8 @@ class CourtesyPassController extends Controller
     {
         session()->forget('validated_members');
         try {
-            $decrypted = openssl_decrypt(urldecode($code), 'AES-128-ECB', env('COURTESY_KEY'));
+            $decoded = base64_decode(urldecode($code));
+            $decrypted = openssl_decrypt($decoded, 'AES-128-ECB', env('COURTESY_KEY'));
 
             $finalCode = $decrypted !== false ? $decrypted : $code;
 
@@ -855,8 +856,8 @@ class CourtesyPassController extends Controller
 
     public function verifyCourtesy(Request $request)
     {
-        $decode = urldecode($request->id);
-        $decrypted = openssl_decrypt($decode, 'AES-128-ECB', env('COURTESY_KEY'));
+        $decoded = base64_decode(urldecode($request->id));
+        $decrypted = openssl_decrypt($decoded, 'AES-128-ECB', env('COURTESY_KEY'));
 
         $courtesy = Link::where('code', $decrypted)->firstOrFail();
 
@@ -879,8 +880,8 @@ class CourtesyPassController extends Controller
     public function authCourtesy(Request $request)
     {
         try {
-            $decode = urldecode($request->id);
-            $decrypted = openssl_decrypt($decode, 'AES-128-ECB', env('COURTESY_KEY'));
+            $decoded = base64_decode(urldecode($request->id));
+            $decrypted = openssl_decrypt($decoded, 'AES-128-ECB', env('COURTESY_KEY'));
 
             if (!$decrypted) {
                 return response()->json([
