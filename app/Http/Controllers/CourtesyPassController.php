@@ -183,7 +183,7 @@ class CourtesyPassController extends Controller
             return response()->json([
                 'success' => true,
                 'icon' => 'success',
-                'message' => 'Enlace de pago registrado correctamente. Espere la autorización.',
+                'message' => 'Pase de cortesia creado correctamente. Espere la autorización.',
                 'download_url' => route('qr.download', ['code' => $purchase->code]),
             ]);
         } catch (\Exception $e) {

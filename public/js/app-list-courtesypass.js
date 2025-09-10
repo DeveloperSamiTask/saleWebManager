@@ -389,7 +389,7 @@ $(function () {
                     ],
                 },
                 {
-                    text: '<i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Agregar Pago</span>',
+                    text: '<i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Nuevo Pase cortesia</span>',
                     className:
                         "add-new btn btn-primary ms-n1 waves-effect waves-light",
                     action: function () {

@@ -17,7 +17,7 @@
                             class="card-header sticky-element bg-label-secondary d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row">
                             <h5 class="card-title mb-sm-0 me-2">Formulario Pase de Cortesía</h5>
                             <div class="action-btns">
-                                <button class="btn btn-primary">Guardar Pago</button>
+                                <button class="btn btn-primary">Guardar Pase</button>
                             </div>
                         </div>
                         <div class="card-body">
