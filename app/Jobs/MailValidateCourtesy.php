@@ -35,15 +35,20 @@ class MailValidateCourtesy implements ShouldQueue
      */
     public function handle()
     {
-        $encrypted = openssl_encrypt($this->code, 'AES-128-ECB', env('COURTESY_KEY'));
-        $encoded   = urlencode(base64_encode($encrypted));
+        $encrypted = openssl_encrypt(
+            $this->code,
+            'AES-128-ECB',
+            env('COURTESY_KEY'),
+            OPENSSL_RAW_DATA
+        );
+        $encoded = urlencode(base64_encode($encrypted));
 
         try {
-            Mail::to(['sistemas@lagranjavilla.com', 'no-reply@sistemas-gv.com'])
+            Mail::to(['sistemas.ti@samitask.com', 'no-reply@sistemas-gv.com'])
                 ->send(new CourtesyMail($encoded));
 
             Log::info("Correo de cortesía enviado correctamente.", [
-                'destinatarios' => ['sistemas@lagranjavilla.com', 'no-reply@sistemas-gv.com'],
+                'destinatarios' => ['sistemas.ti@samitask.com', 'no-reply@sistemas-gv.com'],
                 'code' => $this->code
             ]);
         } catch (\Exception $e) {
