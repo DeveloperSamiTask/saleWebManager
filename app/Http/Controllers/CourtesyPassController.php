@@ -868,7 +868,7 @@ class CourtesyPassController extends Controller
             'date'    => $courtesy->date_auth
                 ? Carbon::parse($courtesy->date_auth)->format('d/m/Y h:i A')
                 : null,
-        ]);
+        ]); 
     }
 
     public function authCourtesy(Request $request)
