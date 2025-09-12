@@ -877,6 +877,13 @@ class CourtesyPassController extends Controller
 
             $purchase = Link::where('code', $request->id)->firstOrFail();
 
+            if (!$purchase) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El Pase de Cortesía no existe.',
+                ], 404);
+            }
+
             if ($purchase->date_auth) {
                 return response()->json([
                     'success' => false,
