@@ -655,17 +655,8 @@ class CourtesyPassController extends Controller
     {
         session()->forget('validated_members');
         try {
-            $decoded   = base64_decode(urldecode($code));
-            $decrypted = openssl_decrypt(
-                $decoded,
-                'AES-128-ECB',
-                env('COURTESY_KEY'),
-                OPENSSL_RAW_DATA
-            );
 
-            $finalCode = $decrypted !== false ? $decrypted : $code;
-
-            $link = $this->findPurchaseLinkByCode($finalCode);
+            $link = $this->findPurchaseLinkByCode($code);
 
             $isValidation = $request->query('validate') === '1';
 
@@ -861,15 +852,8 @@ class CourtesyPassController extends Controller
 
     public function verifyCourtesy(Request $request)
     {
-        $decoded   = base64_decode(urldecode($request->id));
-        $decrypted = openssl_decrypt(
-            $decoded,
-            'AES-128-ECB',
-            env('COURTESY_KEY'),
-            OPENSSL_RAW_DATA
-        );
 
-        $courtesy = Link::where('code', $decrypted)->firstOrFail();
+        $courtesy = Link::where('code', $request->id)->firstOrFail();
 
         if (!$courtesy) {
             return response()->json([
@@ -890,22 +874,8 @@ class CourtesyPassController extends Controller
     public function authCourtesy(Request $request)
     {
         try {
-            $decoded   = base64_decode(urldecode($request->id));
-            $decrypted = openssl_decrypt(
-                $decoded,
-                'AES-128-ECB',
-                env('COURTESY_KEY'),
-                OPENSSL_RAW_DATA
-            );
 
-            if (!$decrypted) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Código inválido o no se pudo desencriptar.',
-                ], 400);
-            }
-
-            $purchase = Link::where('code', $decrypted)->firstOrFail();
+            $purchase = Link::where('code', $request->id)->firstOrFail();
 
             if ($purchase->date_auth) {
                 return response()->json([

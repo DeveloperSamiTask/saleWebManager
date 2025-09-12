@@ -98,7 +98,7 @@
                                         <div class="col-md-12 mt-4 mb-3">
                                             <div class="d-flex justify-content-end mb-2">
                                                 <button type="button" class="btn btn-primary" id="addCombo">
-                                                    <i class="mdi mdi-plus"></i> Agregar Combo
+                                                    <i class="mdi mdi-plus"></i> Agregar Promoción
                                                 </button>
                                             </div>
 

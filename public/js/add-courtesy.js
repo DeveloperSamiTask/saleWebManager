@@ -176,7 +176,7 @@
             } else {
                 $("#comboTableBody").html(`
             <tr class="combo-empty-message">
-                <td colspan="3" class="text-center text-muted">📦 Elige tus combos para comenzar</td>
+                <td colspan="3" class="text-center text-muted">📦 Elige tus promociones para comenzar</td>
             </tr>
         `);
             }
@@ -279,7 +279,7 @@
             if (combos.length === 0) {
                 Toast.fire({
                     icon: "warning",
-                    title: "Agrega al menos un combo con cantidad mayor a 0.",
+                    title: "Agrega al menos una promoción con cantidad mayor a 0.",
                 });
                 return;
             }
