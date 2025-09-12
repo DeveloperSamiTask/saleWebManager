@@ -307,13 +307,21 @@ class CourtesyPassController extends Controller
 
     public function dniValidate(Request $request)
     {
+        $id = trim($request->input('id'));
         $dni = trim($request->input('dni'));
 
         $member = ComboMember::with('purchaseCombo.combo')
-            ->where('dni', $dni)
+            ->where('id', $id)
             ->first();
 
         if (!$member) {
+            return response()->json([
+                'success' => false,
+                'message' => 'DNI incorrecto.',
+            ], 404);
+        }
+
+        if ($member->dni != $dni) {
             return response()->json([
                 'success' => false,
                 'message' => 'DNI incorrecto.',
@@ -868,7 +876,7 @@ class CourtesyPassController extends Controller
             'date'    => $courtesy->date_auth
                 ? Carbon::parse($courtesy->date_auth)->format('d/m/Y h:i A')
                 : null,
-        ]); 
+        ]);
     }
 
     public function authCourtesy(Request $request)
