@@ -98,7 +98,7 @@
             <div class="card-datatable table-responsive">
                 <table class="datatables-entries table">
                     <thead class="table-light">
-                        <tr>    
+                        <tr>
                             <th></th>
                             <th>codigo</th>
                             <th>Entrada</th>
@@ -112,6 +112,8 @@
                             <th>Fecha de Compra</th>
                             <th>Fecha de Ingreso</th>
                             <th>Estado</th>
+                            <th>Tipo Documento</th>
+                            <th>Numero Documento</th>
                         </tr>
                     </thead>
                 </table>

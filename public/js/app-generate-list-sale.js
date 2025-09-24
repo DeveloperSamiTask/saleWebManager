@@ -152,6 +152,8 @@ $(function () {
                     { data: "purchase" },
                     { data: "income" },
                     { data: "status" },
+                    {data: "type_doc" },
+                    {data: "number_doc" },
                 ],
                 columnDefs: [
                     {
@@ -192,7 +194,7 @@ $(function () {
                         },
                     },
                     {
-                        targets: 5,
+                        targets: [5,13,14],
                         visible: !1,
                         render: function (e, t, a, n) {
                             return e;
@@ -222,7 +224,7 @@ $(function () {
                         },
                     },
                     {
-                        targets: -1,
+                        targets: -3,
                         render: function (a) {
                             return (
                                 '<span class="' +
@@ -254,7 +256,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -300,7 +302,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -334,7 +336,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -368,7 +370,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -402,7 +404,7 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
                                     ],
                                     format: {
                                         body: function (e, t, a) {

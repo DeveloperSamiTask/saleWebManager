@@ -70,6 +70,8 @@ class CashierReport extends Controller
             }
 
             $cart->invoice = 1;
+            $cart->type_doc = $request->input('typeDoc');
+            $cart->number_doc = $request->input('number');
             $cart->save();
             return response()->json(['message' => 'Se ha validado la venta.']);
         } catch (\Exception $e) {

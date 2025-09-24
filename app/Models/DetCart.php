@@ -145,6 +145,8 @@ class DetCart extends Model
                 'used' => $cartDet->ticketdateuse,
                 'coupon' => optional($cartDet->cart)->coupon,
                 'dni' => optional($cartDet->client)->charClienteDni, // Aquí obtenemos el campo charClientdni
+                'type_doc' => optional($cartDet->cart)->type_doc,
+                'number_doc' => optional($cartDet->cart)->number_doc,
             ];
         }
         return $data;

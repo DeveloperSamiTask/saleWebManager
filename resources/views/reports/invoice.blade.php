@@ -223,21 +223,40 @@
                         </div>
                         <hr class="my-0">
                         @if (!$ticket['invoice'])
-                            <div class="card-body" id="
-                            ">
-                                <div class="row">
-                                    <div class="col-md-6 mb-md-0 mb-3">
-                                        <!-- Contenido aquí -->
+                            <div class="card-body" id="cardSubmit">
+                                <div class="row align-items-center">
+                                    <div class="col-md-5 mb-md-0 mb-3">
+                                        <!-- Contenido adicional aquí -->
                                     </div>
-                                    <div class="col-md-6 d-flex justify-content-md-end mt-2">
-                                        <div class="invoice-calculations">
-                                            <button class="btn btn-primary d-grid w-100 mb-3 waves-effect waves-light"
-                                                id="btn-generate">
-                                                <span
-                                                    class="d-flex align-items-center justify-content-center text-nowrap"><i
-                                                        class="mdi mdi-invoice scaleX-n1-rtl me-1"></i>Generado</span>
-                                            </button>
+                                    <div class="col-md-2 d-flex justify-content-md-end mb-3 mb-md-0">
+                                        <div class="input-group">
+                                            <select class="select2 form-select form-select-lg" id="typeDoc">
+                                                <option selected disabled>Tipo Documento</option>
+                                                <option value="BOLETA">BOLETA</option>
+                                                <option value="FACTURA">FACTURA</option>
+                                            </select>
                                         </div>
+                                    </div>
+
+                                    <div class="col-md-3 d-flex justify-content-md-end mb-3 mb-md-0">
+                                        <div class="input-group input-group-merge">
+                                            <span class="input-group-text" id="prefix_doc"><i
+                                                    class="mdi mdi-numeric fs-3" ></i></span>
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control" id="number-input"
+                                                    placeholder="Número de Documento">
+                                                <label for="username-input">Número de Documento</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 d-flex justify-content-md-end">
+                                        <button class="btn btn-primary d-grid w-100 waves-effect waves-light btn-lg"
+                                            id="btn-generate">
+                                            <span class="d-flex align-items-center justify-content-center text-nowrap">
+                                                <i class="mdi mdi-invoice scaleX-n1-rtl me-1"></i> Generar
+                                            </span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
