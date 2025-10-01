@@ -113,6 +113,7 @@
                             <th>Fecha de Uso</th>
                             <th>Estado</th>
                             <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                 </table>
