@@ -152,8 +152,8 @@ $(function () {
                     { data: "purchase" },
                     { data: "income" },
                     { data: "status" },
-                    {data: "type_doc" },
-                    {data: "number_doc" },
+                    { data: "type_doc" },
+                    { data: "number_doc" },
                 ],
                 columnDefs: [
                     {
@@ -170,7 +170,7 @@ $(function () {
                     {
                         targets: 1,
                         render: function (e, t, a, n) {
-                            return `<a href="javascript:void(0)"><span>${e}</span></a>`;
+                            return `<div class='d-inline-flex' data-bs-toggle='tooltip' data-bs-html='true' title='<span><span class="fw-medium">${a.phone}</span><br> <span class="fw-medium">${a.email}</span></span>'><a href="javascript:void(0)"><span>${e}</span></a><div></div>`;
                         },
                     },
 
@@ -194,7 +194,7 @@ $(function () {
                         },
                     },
                     {
-                        targets: [5,13,14],
+                        targets: [5, 13, 14],
                         visible: !1,
                         render: function (e, t, a, n) {
                             return e;
@@ -256,7 +256,8 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        13, 14,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -302,7 +303,8 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        13, 14,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -336,7 +338,8 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        13, 14,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -370,7 +373,8 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        13, 14,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -404,7 +408,8 @@ $(function () {
                                 className: "dropdown-item",
                                 exportOptions: {
                                     columns: [
-                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+                                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                        13, 14,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -587,6 +592,13 @@ $(function () {
                     "form-select-sm"
                 );
         }, 300);
+    e.on("draw.dt", function () {
+        [].slice
+            .call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            .map(function (a) {
+                return new bootstrap.Tooltip(a, { boundary: document.body });
+            });
+    });
     function formatDate(date) {
         var year = date.getFullYear();
         var month = (date.getMonth() + 1).toString().padStart(2, "0");
