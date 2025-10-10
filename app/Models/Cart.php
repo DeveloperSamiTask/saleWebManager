@@ -68,6 +68,7 @@ class Cart extends Model
             'type_doc' => $cart->intCartTdoc,
             'dni' => optional($cart->client)->charClienteDni,
             'mail' => optional($cart->client)->sClieMail,
+            'phone' => optional($cart->client)->sClieTelf,
             'ruc' => $cart->charCartRuc,
             'rs' => $cart->varCartRsocial,
             'address' => $cart->varCartDirec,

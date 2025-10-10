@@ -1,4 +1,4 @@
-|@extends('layouts/layout')
+@extends('layouts/layout')
 
 @section('content')
     <!-- Content -->
@@ -96,52 +96,63 @@
                         </div>
                         <hr class="my-0">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between flex-wrap">
-                                <div class="my-3">
-                                    @if ($ticket['type_doc'] == 1)
-                                        <h6 class="pb-2">Boletear a:</h6>
-                                    @else
-                                        <h6 class="pb-2">Facturar a:</h6>
-                                    @endif
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td class="pe-3 fw-medium">Comprador:</td>
-                                                <td>{{ $ticket['client'] }}</td>
-                                            </tr>
+                            <div class="row">
+                                <!-- Columna izquierda -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold mb-3">
+                                            {{ $ticket['type_doc'] == 1 ? 'Boletear a:' : 'Facturar a:' }}
+                                        </h6>
+
+                                        <div class="d-flex flex-column gap-1">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="fw-medium text-muted">Comprador:</span>
+                                                <span>{{ $ticket['client'] }}</span>
+                                            </div>
+
                                             @if ($ticket['type_doc'] == 1)
-                                                <tr>
-                                                    <td class="pe-3 fw-medium">Dni :</td>
-                                                    <td>{{ $ticket['dni'] }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="pe-3 fw-medium">Correo Electrónico :</td>
-                                                    <td>{{ $ticket['mail'] }}</td>
-                                                </tr>
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="fw-medium text-muted">DNI:</span>
+                                                    <span>{{ $ticket['dni'] }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="fw-medium text-muted">Correo:</span>
+                                                    <span>{{ $ticket['mail'] }}</span>
+                                                </div>
+                                            @else
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="fw-medium text-muted">Razón Social:</span>
+                                                    <span>{{ $ticket['rs'] }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="fw-medium text-muted">RUC:</span>
+                                                    <span>{{ $ticket['ruc'] }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="fw-medium text-muted">Correo:</span>
+                                                    <span>{{ $ticket['mail'] }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="fw-medium text-muted">Dirección:</span>
+                                                    <span>{{ $ticket['address'] }}</span>
+                                                </div>
                                             @endif
+                                        </div>
+                                    </div>
+                                </div>
 
-                                            @if ($ticket['type_doc'] == 2)
-                                                <tr>
-                                                    <td class="pe-3 fw-medium">Razon Social :</td>
-                                                    <td>{{ $ticket['rs'] }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="pe-3 fw-medium">RUC :</td>
-                                                    <td>{{ $ticket['ruc'] }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="pe-3 fw-medium">Correo Electrónico :</td>
-                                                    <td>{{ $ticket['mail'] }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="pe-3 fw-medium">Dirección :</td>
-                                                    <td>{{ $ticket['address'] }}</td>
-                                                </tr>
-                                            @endif
+                                <!-- Columna derecha -->
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold mb-3 text-end">Datos extras</h6>
 
-                                        </tbody>
-                                    </table>
-
+                                        <div class="d-flex flex-column gap-1 text-end">
+                                            <div>
+                                                <span class="fw-medium text-muted me-2">Número Celular:</span>
+                                                <span>{{ $ticket['phone'] ?? '—' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -241,7 +252,7 @@
                                     <div class="col-md-3 d-flex justify-content-md-end mb-3 mb-md-0">
                                         <div class="input-group input-group-merge">
                                             <span class="input-group-text" id="prefix_doc"><i
-                                                    class="mdi mdi-numeric fs-3" ></i></span>
+                                                    class="mdi mdi-numeric fs-3"></i></span>
                                             <div class="form-floating form-floating-outline">
                                                 <input type="text" class="form-control" id="number-input"
                                                     placeholder="Número de Documento">
