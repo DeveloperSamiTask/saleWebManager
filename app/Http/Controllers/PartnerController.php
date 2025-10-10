@@ -40,6 +40,13 @@ class PartnerController extends Controller
             ]);
         }
 
+        if ($client->partner->isEmpty()) {
+            return response()->json([
+                'icon' => 'info',
+                'message' => 'Se encontró usuario, pero no es socio. '. $client->sClieApel . ' ' . $client->sClieName,
+            ]);
+        }
+
         return response()->json($client);
     }
 

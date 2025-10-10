@@ -1271,6 +1271,7 @@ $(function () {
                     $.unblockUI();
                     return;
                 }
+
                 $("#editCodeHidden").val(data.cClieCode);
                 $("#editcode").val(data.partner[0].nTarjNumb);
                 $("#editpattername").val(`${data.sClieApepat}`);
@@ -1288,7 +1289,6 @@ $(function () {
                 $("#editaddress").val(data.sClieAddr);
                 $("#editphone").val(data.sClieTelf);
                 $("#editmail").val(data.sClieMail);
-                console.log(data);
                 if (data.proxy) {
                     $("#EditaccordionOne").collapse("show");
                     $("#editproxyPatter").val(data.proxy.proxy_pattername);
@@ -1366,7 +1366,7 @@ $(function () {
         toast: true,
         position: "top",
         showConfirmButton: false,
-        timer: 4000,
+        timer: 5000,
         timerProgressBar: true,
         didOpen: (toast) => {
             toast.onmouseenter = Swal.stopTimer;

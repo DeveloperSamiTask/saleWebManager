@@ -239,7 +239,7 @@
                             </div>
                             <div class="col-sm-4 col-xxl-4 col-xl-12">
                                 <select class="form-select" name="" id="selectSearch">
-                                    <option value="charClienteDni">DNI</option>
+                                    <option value="charClienteDni" selected>DNI</option>
                                     <option value="cClieCode">Código</option>
                                 </select>
                             </div>
