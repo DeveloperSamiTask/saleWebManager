@@ -42,7 +42,7 @@ class UserController extends Controller
         $user = new User();
         $user->fill([
             'usuario'   => $request->user_name,
-            'clave'     => Hash::make($request->password),
+            'clave'     => password_hash($request->password, PASSWORD_DEFAULT),
             'idrol'     => $request->user_role,
             'companies' => is_array($request->user_companies)
                 ? implode(',', $request->user_companies)
@@ -74,7 +74,7 @@ class UserController extends Controller
         ]);
 
         if ($request->filled('password')) {
-            $user->clave = Hash::make($request->password);
+            $user->clave = password_hash($request->password, PASSWORD_DEFAULT);
         }
 
         return response()->json([

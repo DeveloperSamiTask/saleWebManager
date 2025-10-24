@@ -216,7 +216,7 @@ class FdtPassController extends Controller
             errorCorrectionLevel: ErrorCorrectionLevel::High,
             foregroundColor: new Color(30, 30, 30),
             backgroundColor: new Color(255, 255, 255),
-            logoPath: public_path('img/logo.png'),
+            logoPath: public_path('img/fdt.png'),
             labelText: $qrContent . ' ENTRADA',
             labelFont: new OpenSans(16),
             labelAlignment: LabelAlignment::Center
