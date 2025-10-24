@@ -10,6 +10,7 @@ use App\Http\Controllers\CashierReport;
 use App\Http\Controllers\CouponManagementController;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\CourtesyPassController;
+use App\Http\Controllers\FdtPassController;
 use App\Http\Controllers\DniController;
 use App\Http\Controllers\Notify;
 use App\Http\Controllers\PartnerController;
@@ -168,6 +169,48 @@ Route::middleware('auth')->group(function () {
         Route::post('/Autorize', [CourtesyPassController::class, 'authCourtesy']);
     });
 
+    Route::prefix('FDT')->group(function () {
+        //Promociones
+        Route::get('/Promociones', [FdtPassController::class, 'promotions'])->name('fdt.promotions');
+        Route::get('/ShowPromotions', [FdtPassController::class, 'showPromotions']);
+        Route::post('/StorePromotion', [FdtPassController::class, 'storePromotion']);
+        Route::post('/StatusPromotion', [FdtPassController::class, 'status']);
+
+        //Pases Cortesia Lista
+        Route::get('/Lista', [FdtPassController::class, 'list'])->name('fdt.index');
+        Route::get('/Lista_Cortesias', [FdtPassController::class, 'listCourtesyPass']);
+
+
+        //Formulario creacion
+
+        Route::get('/Nueva-Cortesia', [FdtPassController::class, 'create'])->name('fdt.add');
+        Route::post('/store', [FdtPassController::class, 'store']);
+
+        //Invoice
+        Route::get('/Ver/{id}', [FdtPassController::class, 'invoice'])->name('paymentLink.show');
+        Route::get('member/{id}', [FdtPassController::class, 'member'])->name('paymentLink.show');
+        Route::put('member/{id}', [FdtPassController::class, 'updateMember']);
+
+        Route::get('/qr/details/{code}', [FdtPassController::class, 'getQrDetails'])->where('code', '.*')->name('qr.details');
+        Route::get('/qr/details_food/{code}', [FdtPassController::class, 'getQrDetailsByCombo'])->name('qr.details_food');
+
+        //Download QRs
+        Route::get('/qr/download/{code}', [FdtPassController::class, 'downloadQrCode'])->name('qr.download');
+
+        //Validaciones
+        Route::get('/Validar_Pase_Cortesia', [FdtPassController::class, 'validateForm'])->name('fdt.validate'); // Api pagos
+        Route::get('/Validar_Comidas_Pase_Cortesia', [FdtPassController::class, 'validateFormFood'])->name('fdt.validate_food'); // Api pagos
+
+        Route::post('/validate/dni', [FdtPassController::class, 'dniValidate']);
+        Route::post('/validate/combos', [FdtPassController::class, 'validateCombo']);
+
+        Route::get('/print', [FdtPassController::class, 'print'])->name('print');
+        Route::get('/printFood', [FdtPassController::class, 'printFood'])->name('printFood');
+
+        //Autorizar Pase Cortesia
+        Route::post('/Autorize', [FdtPassController::class, 'authCourtesy']);
+    });
+
     Route::prefix('Cupon')->group(function () {
         Route::get('/', [CouponManagementController::class, 'index'])->name('coupon.index'); // Mostrar lista de cupones
         Route::post('/DNI', [CouponManagementController::class, 'searchDNI'])->name('cupon.dni'); // Formulario de creación
@@ -196,7 +239,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/Create', [UserController::class, 'store'])->name('users.store'); // Guardar usuario
         Route::post('/Update', [UserController::class, 'update'])->name('users.update'); // Actualizar usuario
     });
-
 
     Route::prefix('Plantillas')->group(function () {
         Route::get('/', [TemplateController::class, 'index'])->name('template.index'); // Vista lista de plantillas

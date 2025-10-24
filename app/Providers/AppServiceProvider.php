@@ -177,6 +177,57 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Promotions',
             ],
             [
+                'roles' => [1, 2, 5],
+                'companies' => [1],
+                'header' => true,
+                'text' => 'Pase Cortesía FDT',
+                'dataI18n' => 'FDT Pass Courtesy',
+            ],
+            [
+                'roles' => [1, 2],
+                'companies' => [1],
+                'route' => 'fdt.validate',
+                'icon' => 'mdi mdi-halloween',
+                'text' => 'FDT. Entradas Pase Cortesia',
+                'dataI18n' => 'Validate courtesy pass FDT entries',
+            ],
+            [
+                'roles' => [1, 2],
+                'companies' => [1],
+                'route' => 'fdt.validate_food',
+                'icon' => 'mdi mdi-coffin',
+                'text' => 'FDT. Comidas Pase Cortesia',
+                'dataI18n' => 'Validate courtesy pass FDT food',
+            ],
+            [
+                'roles' => [1, 5],
+                'companies' => [1],
+                'icon' => 'mdi mdi-ghost',
+                'text' => 'Pases FDT',
+                'dataI18n' => 'FDT Pass',
+                'submenu' => [
+                    [
+                        'route' => 'fdt.index',
+                        'text' => 'Lista',
+                        'dataI18n' => 'List',
+                    ],
+                    [
+                        'route' => 'fdt.add',
+                        'text' => 'Nuevo',
+                        'dataI18n' => 'New',
+                    ],
+                ],
+            ],
+            [
+                'roles' => [1, 5],
+                'companies' => [1],
+                'route' => 'fdt.promotions',
+                'icon' => 'mdi mdi-percent-box-outline',
+                'text' => 'Promociones',
+                'dataI18n' => 'Promotions',
+            ],
+            [
+
                 'roles' => [1, 3, 4],
                 'companies' => [1],
                 'header' => true,
