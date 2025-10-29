@@ -176,7 +176,6 @@ $(function () {
             title: "¿Estás seguro?",
             text: `Autorizarás el uso del Pase de Cortesía.`,
             icon: "warning",
-            input: "text",
             showCancelButton: true,
             confirmButtonText: "Sí, aprobar",
             cancelButtonText: "Cancelar",
