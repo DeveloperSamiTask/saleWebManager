@@ -37,11 +37,11 @@ class MailValidateCourtesy implements ShouldQueue
     {
 
         try {
-            Mail::to(['sistemas.ti@samitask.com', 'no-reply@sistemas-gv.com'])
+            Mail::to(['sistemas.ti@samitask.com', 'no-reply@sistemas-gv.com', 'samy@lagranjavilla.com'])
                 ->send(new CourtesyMail($this->code));
 
             Log::info("Correo de cortesía enviado correctamente.", [
-                'destinatarios' => ['sistemas.ti@samitask.com', 'no-reply@sistemas-gv.com'],
+                'destinatarios' => ['sistemas.ti@samitask.com', 'no-reply@sistemas-gv.com', 'samy@lagranjavilla.com'],
                 'code' => $this->code
             ]);
         } catch (\Exception $e) {
