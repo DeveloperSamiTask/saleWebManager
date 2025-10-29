@@ -45,7 +45,9 @@ Route::get('courtesyfdt/mail/{code}', [FdtPassController::class, 'viewMail'])
 
 Route::post('courtesy/authorize', [CourtesyPassController::class, 'authCourtesy'])->name('courtesy.authorize');
 Route::post('courtesyfdt/authorize', [FdtPassController::class, 'authCourtesy'])->name('courtesyfdt.authorize');
+
 Route::post('courtesy/verify', [CourtesyPassController::class, 'verifyCourtesy'])->name('courtesy.verify');
+Route::post('courtesyfdt/verify', [FdtPassController::class, 'verifyCourtesy'])->name('courtesyfdt.verify');
 
 Route::get('PaseCortesia/qr/details/{code}', [CourtesyPassController::class, 'getQrDetails'])->where('code', '.*')->name('qr.details');
 

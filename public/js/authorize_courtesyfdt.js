@@ -292,7 +292,7 @@ $(function () {
         blockUI();
 
         $.ajax({
-            url: `/courtesy/verify`,
+            url: `/courtesyfdt/verify`,
             type: "POST",
             data: {
                 id: code,
