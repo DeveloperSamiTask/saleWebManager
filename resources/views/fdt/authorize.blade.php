@@ -198,7 +198,7 @@
         let urlParts = window.location.pathname.split('/');
         let code = urlParts[urlParts.length - 1];
     </script>
-    <script src="{{ asset('js/authorize_courtesy.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/authorize_courtesyfdt.js') }}?v={{ time() }}"></script>
 
 </body>
 

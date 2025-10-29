@@ -23,7 +23,7 @@ class FdtMail extends Mailable
      */
     public function __construct($code)
     {
-        $this->url = route('courtesy.mail', ['code' => $code]);
+        $this->url = route('courtesyfdt.mail', ['code' => $code]);
     }
 
     /**
