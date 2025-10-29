@@ -50,6 +50,7 @@ Route::post('courtesy/verify', [CourtesyPassController::class, 'verifyCourtesy']
 Route::post('courtesyfdt/verify', [FdtPassController::class, 'verifyCourtesy'])->name('courtesyfdt.verify');
 
 Route::get('PaseCortesia/qr/details/{code}', [CourtesyPassController::class, 'getQrDetails'])->where('code', '.*')->name('qr.details');
+Route::get('PaseCortesiaFdt/qr/details/{code}', [FdtPassController::class, 'getQrDetails'])->where('code', '.*')->name('qrfdt.details');
 
 
 // Agrupar todas las rutas protegidas por autenticación
