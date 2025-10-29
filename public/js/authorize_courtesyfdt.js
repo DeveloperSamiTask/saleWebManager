@@ -186,22 +186,15 @@ $(function () {
                 cancelButton: "btn btn-outline-secondary waves-effect",
             },
             buttonsStyling: false,
-            preConfirm: (codigo) => {
-                if (!codigo) {
-                    Swal.showValidationMessage("⚠️ Debes ingresar un código");
-                }
-                return codigo;
-            },
         }).then(function (result) {
             if (result.isConfirmed) {
                 blockUI();
                 $.ajax({
-                    url: "/courtesy/authorize", // 👈 Ajusta la ruta
+                    url: "/courtesyfdt/authorize", // 👈 Ajusta la ruta
                     type: "POST",
                     data: {
                         id: code,
                         action: "authorize",
-                        code: result.value,
                     },
                 })
                     .done((response) => {
