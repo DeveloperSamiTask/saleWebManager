@@ -258,14 +258,14 @@ $(function () {
     // === LÓGICA DE FETCH ===
     function fetchQRDetails(code) {
         return $.ajax({
-            url: `/PaseCortesia/qr/details/${code}?validate=0`,
+            url: `/PaseCortesiaFdt/qr/details/${code}?validate=0`,
             type: "GET",
         });
     }
 
     function fetchQRCombos(code) {
         return $.ajax({
-            url: `/PaseCortesia/qr/details_food/${code}?validate=0`,
+            url: `/PaseCortesiaFdt/qr/details_food/${code}?validate=0`,
             type: "GET",
         });
     }
