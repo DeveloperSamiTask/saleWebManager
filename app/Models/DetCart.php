@@ -11,7 +11,7 @@ class DetCart extends Model
 
     protected $table = 'cartdet';
     protected $primaryKey = 'intCartdetId';
-    protected $fillable = ['charCartdetDni', 'ticketstatus', 'ticketdateuse', 'cashier', 'box'];
+    protected $fillable = ['intCartId', 'charCartdetDni', 'ticketstatus', 'ticketdateuse', 'cashier', 'box'];
     public $timestamps = false;
 
 
@@ -75,6 +75,40 @@ class DetCart extends Model
             'status' => $cartdet->ticketstatus,
             'used' => $cartdet->ticketdateuse,
         ];
+    }
+
+    public static function findTicketFdtById($id)
+    {
+        $cartdet = self::select('intCartId')->where('intCartdetId', $id)->first();
+
+        if (!$cartdet) {
+            return null;
+        }
+
+        $cartdets = self::where('intCartId', $cartdet->intCartId)->get();
+
+        return $cartdets->map(function ($item) {
+            $ticketType = match ($item->intBoletoId) {
+                11 => 'Entrada General Terror',
+                17 => 'Entrada Light Terror',
+                default => 'Desconocido'
+            };
+
+            $fullName = implode(' ', [$item->varCartdetApepat, $item->varCartdetApemat, $item->varCartdetNombres]);
+
+            return [
+                'id'        => $item->intCartdetId,
+                'document'  => $item->charCartdetDni,
+                'name'      => $fullName,
+                'product' => $ticketType,
+                'price'     => $item->decCartdetStotal,
+                'status'    => $item->ticketstatus,
+                'used'      => $item->ticketdateuse,
+                'purchase'  => optional($item->cart)->dateCartFreg,
+                'income'    => $item->dateCartdetFreg,
+                'sure'      => $item->varCartdetseguro,
+            ];
+        });
     }
 
     public static function findEntriesById($id)
@@ -202,6 +236,21 @@ class DetCart extends Model
             'total' => $totalCount,
             'active' => $activeCount,
             'inactive' => $inactiveCount,
+        ];
+    }
+
+    public static function countTicketsForTodayFDT()
+    {
+        $today = now()->format('Y-m-d');
+
+        $combosForToday = self::whereDate('dateCartdetFreg', $today)
+            ->whereIn('intBoletoId', [11, 17])
+            ->get(['ticketstatus']);
+
+        return [
+            'total'    => $combosForToday->count(),
+            'active'   => $combosForToday->where('ticketstatus', 1)->count(),
+            'inactive' => $combosForToday->where('ticketstatus', 0)->count(),
         ];
     }
 }

@@ -46,6 +46,14 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Generate Coupon',
             ],
             [
+                'roles' => [1, 2],
+                'companies' => [1],
+                'route' => 'Boleteria.fdt',
+                'icon' => 'mdi mdi-ghost-off',
+                'text' => 'FDT Entradas',
+                'dataI18n' => 'Generate Coupon FDT',
+            ],
+            [
                 'roles' => [],
                 'companies' => [1],
                 'route' => 'validateList',
@@ -177,7 +185,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Promotions',
             ],
             [
-                'roles' => [1, 2, 5],
+                'roles' => [1, 2, 3, 4, 5],
                 'companies' => [1],
                 'header' => true,
                 'text' => 'Pase Cortesía FDT',
@@ -200,7 +208,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Validate courtesy pass FDT food',
             ],
             [
-                'roles' => [1, 3, 5],
+                'roles' => [1, 3, 4,5],
                 'companies' => [1],
                 'icon' => 'mdi mdi-ghost',
                 'text' => 'Pases FDT',
@@ -219,7 +227,7 @@ class AppServiceProvider extends ServiceProvider
                 ],
             ],
             [
-                'roles' => [1, 3, 5],
+                'roles' => [1, 3,  4,5],
                 'companies' => [1],
                 'route' => 'fdt.promotions',
                 'icon' => 'mdi mdi-percent-box-outline',

@@ -19,6 +19,12 @@ class SaleWebs extends Controller
         return view('sale_web.ticket', $data);
     }
 
+    public function fdt()
+    {
+        $data['title'] = "Boleteria";
+        return view('sale_web.fdt_ticket', $data);
+    }
+
     public function getTicket(Request $request)
     {
         $ticket = DetCart::findTicketById($request->input('ticket'));
@@ -61,6 +67,12 @@ class SaleWebs extends Controller
     public function tickets()
     {
         $tickets = DetCart::countTicketsForToday();
+        return response()->json([$tickets]);
+    }
+
+    public function tickets_fdt()
+    {
+        $tickets = DetCart::countTicketsForTodayFDT();
         return response()->json([$tickets]);
     }
 
@@ -163,6 +175,96 @@ class SaleWebs extends Controller
         return response()->json(['pdfUrl' => asset('validate/' . $code . '.pdf')]);
     }
 
+    public function printfdtQr(Request $request)
+    {
+        $ids = $request->input('ids'); // String con IDs separados por coma
+        $method = $request->input('method');
+        $boxValue = session('box');
+        $idUsuario = session('user')['idusuario'];
 
+        // 1. Generar código único
+        do {
+            $code = Str::upper(Str::random(10));
+        } while (Ticket::where('code', $code)->exists());
 
+        // 2. Guardar Ticket
+        $ticket = new Ticket();
+        $ticket->code_coupon = $code;
+        $ticket->tickets = $ids;
+        $ticket->code = $code;
+        $ticket->method = $method;
+        $ticket->status_coupon = 1;
+        $ticket->date_used = now();
+        $ticket->save();
+
+        // 3. Convertir IDs y obtener datos de DetCart
+        $ticketCodesArray = explode(',', $ids);
+        $data = [];
+
+        foreach ($ticketCodesArray as $id) {
+            $cart = DetCart::find($id);
+            if ($cart) {
+                // Actualizar estado del ticket
+                $cart->ticketstatus = 1;
+                $cart->ticketdateuse = now();
+                $cart->cashier = $idUsuario;
+                $cart->box = $boxValue;
+                $cart->save();
+
+                // Determinar el tipo de producto según intBoletoId
+                $ticketType = match ($cart->intBoletoId) {
+                    11 => 'ENTRADA GENERAL TERROR',
+                    17 => 'ENTRADA LIGHT TERROR',
+                    default => 'ENTRADA DESCONOCIDA'
+                };
+
+                // Agregar datos al array
+                $data[] = [
+                    'id' => $cart->intCartdetId,
+                    'producto' => strtoupper($ticketType),
+                    'precio' => $cart->decCartdetStotal,
+                ];
+            }
+        }
+
+        // 4. Calcular total
+        $total = array_sum(array_column($data, 'precio'));
+
+        // 5. Generar HTML PDF
+        $html = view('sale_web/print_fdt', [
+            'code' => $code,
+            'data' => $data,
+            'total' => $total,
+            'fecha' => now()->format('d/m/Y H:i:s'),
+        ])->render();
+
+        // 6. PDF con Dompdf
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper([0, 0, 200, 426]); // Ajusta el tamaño según necesites
+        $dompdf->render();
+
+        // 7. Guardar PDF temporal
+        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/validate/fdt_' . $code . '.pdf';
+        file_put_contents($pdfPath, $dompdf->output());
+
+        // 8. Responder con URL
+        return response()->json([
+            'success' => true,
+            'pdfUrl' => asset('validate/fdt_' . $code . '.pdf')
+        ]);
+    }
+
+    public function getTicketsFdt(Request $request)
+    {
+        $tickets = DetCart::findTicketFdtById($request->input('ticket'));
+
+        if ($tickets) {
+            return response()->json(['success' => true, 'tickets' => $tickets]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'No existe entrada']);
+        }
+    }
 }

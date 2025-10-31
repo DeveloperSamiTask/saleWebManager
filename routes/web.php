@@ -62,11 +62,15 @@ Route::middleware('auth')->group(function () {
 
     // Rutas para SaleWebs
     Route::get('/Boleteria', [SaleWebs::class, 'index'])->name('Boleteria');
+    Route::get('/Boleteria_FDT', [SaleWebs::class, 'fdt'])->name('Boleteria.fdt');
     Route::post('viewTicket', [SaleWebs::class, 'getTicket']);
+    Route::post('viewFDTTicket', [SaleWebs::class, 'getTicketsFdt']);
     Route::post('sendWhatsapp', [SaleWebs::class, 'whatsapp']);
     Route::get('token/{token}', [SaleWebs::class, 'generateQr']);
     Route::post('printQR', [SaleWebs::class, 'printQr']);
+    Route::post('printFDTQR', [SaleWebs::class, 'printfdtQr']);
     Route::get('ticketsValidate', [SaleWebs::class, 'tickets']);
+    Route::get('ticketsValidateFDT', [SaleWebs::class, 'tickets_fdt']);
 
     // Rutas para ValidateWebs
     Route::get('/Validar_Lista', [ValidateWebs::class, 'index'])->name('validateList');
