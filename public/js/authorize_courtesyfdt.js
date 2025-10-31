@@ -128,6 +128,8 @@ $(function () {
     function updateUserInfo(link, user) {
         $("#code").text(link.code);
         $("#created_by").text(user)
+        console.log(user);
+
         $("#d_purchase").text(link.date);
         $("#client").text("TITULAR: " + link.names);
         $("#document").text(link.document);
