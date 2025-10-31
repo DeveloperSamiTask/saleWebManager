@@ -196,6 +196,8 @@ class SaleWebs extends Controller
         $ticket->date_used = now();
         $ticket->save();
 
+        $code_entrie = "";
+
         // 3. Convertir IDs y obtener datos de DetCart
         $ticketCodesArray = explode(',', $ids);
         $data = [];
@@ -205,6 +207,7 @@ class SaleWebs extends Controller
             if ($cart) {
                 // Actualizar estado del ticket
                 $cart->ticketstatus = 1;
+                $code_entrie = $cart->intCartId;
                 $cart->ticketdateuse = now();
                 $cart->cashier = $idUsuario;
                 $cart->box = $boxValue;
@@ -216,7 +219,6 @@ class SaleWebs extends Controller
                     17 => 'ENTRADA LIGHT TERROR',
                     default => 'ENTRADA DESCONOCIDA'
                 };
-                Log::info("ID {$cart->intCartdetId} -> intBoletoId = {$cart->intBoletoId}");
 
                 // Agregar datos al array
                 $data[] = [
@@ -232,7 +234,7 @@ class SaleWebs extends Controller
 
         // 5. Generar HTML PDF
         $html = view('sale_web/print_fdt', [
-            'code' => $code,
+            'code' => $code_entrie,
             'data' => $data,
             'total' => $total,
             'fecha' => now()->format('d/m/Y H:i:s'),

@@ -37,8 +37,8 @@
 
 <body>
     <h3>Validación de Ventas Web - FDT</h3>
+    <p style="font-size: 14px">Codigo Reserva: {{$code}}</p>
     <p style="font-size: 14px">Fecha: {{ now()->format('d/m/Y H:i:s') }}</p>
-
     <table>
         <thead>
             <tr>
