@@ -115,7 +115,7 @@ $(function () {
 
     // === RENDERIZADO DE INFORMACIÓN ===
     function renderQRInfo(response) {
-        const { data, link } = response;
+        const { data, user ,link } = response;
 
         updateDataTable(data);
         updateUserInfo(link);
@@ -127,6 +127,7 @@ $(function () {
 
     function updateUserInfo(link) {
         $("#code").text(link.code);
+        $("#created_by").text(user)
         $("#d_purchase").text(link.date);
         $("#client").text("TITULAR: " + link.names);
         $("#document").text(link.document);

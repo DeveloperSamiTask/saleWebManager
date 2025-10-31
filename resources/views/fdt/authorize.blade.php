@@ -90,7 +90,7 @@
                                             <!-- paths recortados -->
                                         </svg>
                                     </span>
-                                    <span class="h4 mb-0 app-brand-text fw-bold">PASES DE CORTESIA</span>
+                                    <span class="h4 mb-0 app-brand-text fw-bold">PASES DE CORTESIA FDT (<b id="created_by"></b>)</span>
                                 </div>
                             </div>
 
