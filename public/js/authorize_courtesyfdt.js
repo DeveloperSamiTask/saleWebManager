@@ -125,7 +125,7 @@ $(function () {
         $(".dt-row-grouping").DataTable().clear().rows.add(data).draw();
     }
 
-    function updateUserInfo(link) {
+    function updateUserInfo(link, user) {
         $("#code").text(link.code);
         $("#created_by").text(user)
         $("#d_purchase").text(link.date);
