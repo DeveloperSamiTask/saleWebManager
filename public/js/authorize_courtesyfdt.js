@@ -118,7 +118,7 @@ $(function () {
         const { data, user ,link } = response;
 
         updateDataTable(data);
-        updateUserInfo(link);
+        updateUserInfo(link, user);
     }
 
     function updateDataTable(data) {
