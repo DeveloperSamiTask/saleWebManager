@@ -8,8 +8,7 @@ use Illuminate\Support\Str;
 use Dompdf\Dompdf;
 use App\Models\DetCart;
 use App\Models\Ticket;
-
-
+use Illuminate\Support\Facades\Log;
 
 class SaleWebs extends Controller
 {
@@ -212,11 +211,12 @@ class SaleWebs extends Controller
                 $cart->save();
 
                 // Determinar el tipo de producto según intBoletoId
-                $ticketType = match ($cart->intBoletoId) {
+                $ticketType = match (intval($cart->intBoletoId)) {
                     11 => 'ENTRADA GENERAL TERROR',
                     17 => 'ENTRADA LIGHT TERROR',
                     default => 'ENTRADA DESCONOCIDA'
                 };
+                Log::info("ID {$cart->intCartdetId} -> intBoletoId = {$cart->intBoletoId}");
 
                 // Agregar datos al array
                 $data[] = [

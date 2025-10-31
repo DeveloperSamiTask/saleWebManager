@@ -164,12 +164,12 @@ $(() => {
             lengthMenu: [10, 25, 50, 75, 100],
             buttons: [
                 {
-                    text: "Limpiar",
+                    text: "<i class='mdi mdi-refresh-circle fs-3'></i> Limpiar",
                     className:
                         "clear-data btn rounded-pill btn-danger waves-effect waves-light mt-3",
                 },
                 {
-                    text: "Enviar",
+                    text: "<i class='mdi mdi-printer fs-3'></i> Imprimir",
                     className:
                         "send-data btn rounded-pill btn-primary waves-effect waves-light mt-3",
                 },
