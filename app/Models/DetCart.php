@@ -88,7 +88,7 @@ class DetCart extends Model
         $cartdets = self::where('intCartId', $cartdet->intCartId)->get();
 
         return $cartdets->map(function ($item) {
-            $ticketType = match ($item->intBoletoId) {
+            $ticketType = match (intval($item->intBoletoId)) {
                 11 => 'Entrada General Terror',
                 17 => 'Entrada Light Terror',
                 default => 'Desconocido'
