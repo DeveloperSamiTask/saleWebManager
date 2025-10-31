@@ -418,6 +418,9 @@ $(() => {
                             " ticket(s) validado(s) correctamente",
                     });
                     entriesAmount();
+
+                        $("#ticket").focus();
+
                 }
             })
             .fail((error) => {
