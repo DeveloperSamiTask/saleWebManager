@@ -142,7 +142,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Validate courtesy pass entries',
             ],
             [
-                'roles' => [1, 2],
+                'roles' => [1],
                 'companies' => [1],
                 'route' => 'courtesy.validate_food',
                 'icon' => 'mdi mdi-food-fork-drink',
@@ -184,7 +184,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'FDT Pass Courtesy',
             ],
             [
-                'roles' => [1, 2],
+                'roles' => [1],
                 'companies' => [1],
                 'route' => 'fdt.validate',
                 'icon' => 'mdi mdi-halloween',
@@ -200,7 +200,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Validate courtesy pass FDT food',
             ],
             [
-                'roles' => [1, 5],
+                'roles' => [1, 3, 5],
                 'companies' => [1],
                 'icon' => 'mdi mdi-ghost',
                 'text' => 'Pases FDT',
@@ -219,7 +219,7 @@ class AppServiceProvider extends ServiceProvider
                 ],
             ],
             [
-                'roles' => [1, 5],
+                'roles' => [1, 3, 5],
                 'companies' => [1],
                 'route' => 'fdt.promotions',
                 'icon' => 'mdi mdi-percent-box-outline',

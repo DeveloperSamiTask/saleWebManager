@@ -22,7 +22,7 @@ class Link extends Model
         'date_purchase',
         'date_issue',
         'status',
-        'observation',  
+        'observation',
         'user_id',
         'user_auth',
         'code_auth',
@@ -32,6 +32,10 @@ class Link extends Model
         'audience_type',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'idusuario');
+    }
 
     public function authorizedBy()
     {

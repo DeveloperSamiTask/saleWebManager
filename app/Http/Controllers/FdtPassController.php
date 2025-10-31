@@ -681,6 +681,7 @@ class FdtPassController extends Controller
 
             return response()->json([
                 'data' => $data,
+                'user' => optional($link->user)->usuario,
                 'link' => $this->formatLinkData($link),
             ]);
         } catch (ModelNotFoundException $e) {
@@ -698,7 +699,7 @@ class FdtPassController extends Controller
 
     private function findPurchaseLinkByCode($code)
     {
-        return Link::with(['combos.combo', 'combos.members'])
+        return Link::with(['combos.combo', 'combos.members', 'user', 'authorizedBy'])
             ->where('code', $code)
             ->firstOrFail();
     }
