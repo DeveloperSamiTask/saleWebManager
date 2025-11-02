@@ -114,6 +114,7 @@
                             <th>Estado</th>
                             <th>Tipo Documento</th>
                             <th>Numero Documento</th>
+                            <th>Correo</th>
                         </tr>
                     </thead>
                 </table>
