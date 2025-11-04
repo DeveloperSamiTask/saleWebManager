@@ -195,7 +195,7 @@ $(function () {
                         },
                     },
                     {
-                        targets: [5, 13, 14,15],
+                        targets: [5, 13, 14, 15],
                         visible: !1,
                         render: function (e, t, a, n) {
                             return e;
@@ -204,11 +204,9 @@ $(function () {
                     {
                         targets: 6,
                         render: function (e, t, a, n) {
-                            // Verifica si t.coupon es diferente de null
                             const couponText =
                                 a.coupon != null ? ` (${a.coupon})` : "";
 
-                            // Devuelve el título más el texto del cupón si existe
                             return `${entrie[e].title} ${couponText}`;
                         },
                     },
@@ -225,7 +223,7 @@ $(function () {
                         },
                     },
                     {
-                        targets: -3,
+                        targets: -4,
                         render: function (a) {
                             return (
                                 '<span class="' +
@@ -258,7 +256,7 @@ $(function () {
                                 exportOptions: {
                                     columns: [
                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                                        13, 14, 15
+                                        13, 14, 15,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -305,7 +303,7 @@ $(function () {
                                 exportOptions: {
                                     columns: [
                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                                        13, 14, 15
+                                        13, 14, 15,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -340,7 +338,7 @@ $(function () {
                                 exportOptions: {
                                     columns: [
                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                                        13, 14, 15
+                                        13, 14, 15,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -375,7 +373,7 @@ $(function () {
                                 exportOptions: {
                                     columns: [
                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                                        13, 14, 15
+                                        13, 14, 15,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
@@ -410,7 +408,7 @@ $(function () {
                                 exportOptions: {
                                     columns: [
                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                                        13, 14, 15
+                                        13, 14, 15,
                                     ],
                                     format: {
                                         body: function (e, t, a) {
