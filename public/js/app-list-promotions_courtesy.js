@@ -41,44 +41,19 @@ $(function () {
         locale: {
             rangeSeparator: " Hasta ",
         },
-        onChange: function (selectedDates, dateStr, instance) {
-            if (selectedDates && selectedDates.length === 2) {
+        onChange: function (selectedDates) {
+            if (selectedDates.length === 2) {
                 $.blockUI({
                     message:
                         '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
                     css: { backgroundColor: "transparent", border: "0" },
                     overlayCSS: { opacity: 0.5 },
                 });
-                var Checked = $(".switch-input").prop("checked");
 
-                var isChecked = Checked ? "1" : "0";
-
-                console.log(isChecked);
-
-                var startDate = selectedDates[0].toISOString();
-                var endDate = selectedDates[1].toISOString();
-                $.ajax({
-                    url: "ShowPromotions",
-                    type: "GET",
-                    data: {
-                        start_date: startDate,
-                        end_date: endDate,
-                        isChecked: isChecked,
-                    },
-                })
-                    .done((response) => {
-                        e.clear().rows.add(response.data).draw();
-                    })
-                    .fail(function (error) {
-                        console.error("error:", error.responseText);
-                    })
-                    .always(function (response) {
-                        $.unblockUI();
-                    });
+                e.ajax.reload();
             }
         },
     });
-
     $("#flatpickr-date").flatpickr({
         monthSelectorType: "static",
         defaultDate: new Date(),
@@ -439,6 +414,10 @@ $(function () {
             .always(function () {
                 $.unblockUI();
             });
+    });
+
+    e.on("xhr.dt", function () {
+        $.unblockUI();
     });
 
     e.on("click", ".btn-acepted", function () {
