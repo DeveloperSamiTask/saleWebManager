@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $menus = [
             [
-                'roles' => [1, 2, 3, 4],
+                'roles' => [1, 2, 3, 4, 6],
                 'companies' => [1],
                 'icon' => 'mdi mdi-home-outline',
                 'text' => 'Dashboard',
@@ -274,7 +274,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Reports',
             ],
             [
-                'roles' => [1, 2, 3, 4],
+                'roles' => [1, 2, 3, 4, 6],
                 'companies' => [1],
                 'icon' => 'mdi mdi-file-chart',
                 'text' => 'Reporte Entradas',
