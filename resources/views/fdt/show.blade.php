@@ -214,5 +214,5 @@
         let code = urlParts[urlParts.length - 1];
 
     </script>
-    <script src="{{ asset('js/show-courtesy.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/show-courtesy-fdt.js') }}?v={{ time() }}"></script>
 @endsection
