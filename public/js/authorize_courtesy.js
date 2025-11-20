@@ -113,21 +113,20 @@ $(function () {
         });
     }
 
-    // === RENDERIZADO DE INFORMACIÓN ===
+    // === RENDERIZADO DE INFORMACIÓN ===   
     function renderQRInfo(response) {
         const { data, link } = response;
 
         updateDataTable(data);
-        updateUserInfo(link, user);
+        updateUserInfo(link);
     }
 
     function updateDataTable(data) {
         $(".dt-row-grouping").DataTable().clear().rows.add(data).draw();
     }
 
-    function updateUserInfo(link,user) {
+    function updateUserInfo(link) {
         $("#code").text(link.code);
-        $("#created_by").text(user)
         $("#d_purchase").text(link.date);
         $("#client").text("TITULAR: " + link.names);
         $("#document").text(link.document);
