@@ -109,8 +109,10 @@
                             <th>Validados</th>
                             <th>C. Validados</th>
                             <th>Monto</th>
-                            <th>Fecha de Compra</th>
+                            <th>Creado Por</th>
+                            <th>Creado el</th>
                             <th>Fecha de Uso</th>
+                            <th>Observacion</th>
                             <th>Estado</th>
                             <th></th>
                         </tr>

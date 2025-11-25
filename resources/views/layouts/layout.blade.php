@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="es" class="light-style layout-navbar-fixed layout-menu-fixed layout-compact " dir="ltr"
+<html lang="es" class="light-style layout-navbar-fixed layout-menu-fixed layout-wide " dir="ltr"
     data-theme="theme-default" data-assets-path="{{ asset('') }}" data-template="vertical-menu-template">
 
 <head>

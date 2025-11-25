@@ -123,8 +123,10 @@ $(function () {
                 { data: "validated_members" },
                 { data: "validated_combos" },
                 { data: "amount" },
-                { data: "date_purchase" },
+                { data: "user_created" },
+                { data: "created_at" },
                 { data: "date_issue" },
+                { data: "observation" },
                 { data: "status" },
                 { data: "" },
             ],
@@ -166,6 +168,10 @@ $(function () {
                     },
                 },
                 {
+                    targets: [8,9],
+                    visible: !1,
+                },
+                {
                     targets: -2,
                     render: function (e, t, a, n) {
                         const info = status[e] || {
@@ -205,7 +211,7 @@ $(function () {
                     },
                 },
             ],
-            order: [[6, "desc"]],
+            order: [[8, "desc"]],
             dom: '<"row mx-2"<"col-md-2"<"me-3"l>><"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0 gap-3"fB>>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
             language: {
                 sLengthMenu: "Mostrar _MENU_",
@@ -224,7 +230,7 @@ $(function () {
                             text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -267,7 +273,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -298,7 +304,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -329,7 +335,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -360,7 +366,7 @@ $(function () {
                             text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
