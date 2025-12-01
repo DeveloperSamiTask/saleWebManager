@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 
 class BowlingController extends Controller
 {
-    public function show(Request $request){
-        
+    public function list()
+    {
+        $data['title'] = "Lista Pago Link";
+        return view('bowling.index', $data);
     }
 }

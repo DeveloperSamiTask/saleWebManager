@@ -146,7 +146,7 @@ class AppServiceProvider extends ServiceProvider
                 'companies' => [1],
                 'route' => 'courtesy.validate',
                 'icon' => 'mdi mdi-instagram',
-                'text' => 'V. Entradas Pase Cortesia',
+                'text' => 'V. Entradas Pase Cortesia',  
                 'dataI18n' => 'Validate courtesy pass entries',
             ],
             [
