@@ -8,6 +8,7 @@ use App\Http\Controllers\TableEntries;
 use App\Http\Controllers\ValidateWebs;
 use App\Http\Controllers\CashierReport;
 use App\Http\Controllers\CouponManagementController;
+use App\Http\Controllers\Coupons\BowlingController;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\CourtesyPassController;
 use App\Http\Controllers\FdtPassController;
@@ -221,6 +222,37 @@ Route::middleware('auth')->group(function () {
 
         //Autorizar Pase Cortesia
         Route::post('/Autorize', [FdtPassController::class, 'authCourtesy']);
+    });
+
+    Route::prefix('Bowling')->group(function () {
+        //Lista Bowling
+        Route::get('/Lista', [BowlingController::class, 'list'])->name('bowling.index');
+        Route::get('/Lista_Pagos', [BowlingController::class, 'listPayments']);
+        Route::post('/Autorize', [BowlingController::class, 'AuthorizePayment']);
+        Route::get('/Agregar-pago', [BowlingController::class, 'create'])->name('bowling.add');
+        Route::post('/store', [BowlingController::class, 'storePayment']);
+        Route::get('/qr/download/{code}', [BowlingController::class, 'downloadQrCode'])->name('qr.download');
+
+        //promociones
+        Route::get('/Promociones', [BowlingController::class, 'promotions'])->name('bowling.promotions');
+        Route::get('/ShowPromotions', [BowlingController::class, 'showPromotions']);
+        Route::post('/StorePromotion', [BowlingController::class, 'storePromotion']);
+        Route::post('/StatusPromotion', [BowlingController::class, 'status']);
+
+        //validate qr
+        Route::get('/Validar_Pago_link', [BowlingController::class, 'validateForm'])->name('bowling.validate'); // Api pagos
+        Route::get('/Validar_Comidas_Pago_link', [BowlingController::class, 'validateFormFood'])->name('bowling.validate_food'); // Api pagos
+
+        Route::get('/qr/details/{code}', [BowlingController::class, 'getQrDetails'])->name('qr.details');
+
+        Route::get('/qr/details_food/{code}', [BowlingController::class, 'getQrDetailsByCombo'])->name('qr.details_food');
+        Route::post('/validate/dni', [BowlingController::class, 'dniValidate']);
+        Route::post('/validate/combos', [BowlingController::class, 'validateCombo']);
+        Route::get('/printFood', [BowlingController::class, 'printFood'])->name('printFood');
+        Route::get('/print', [BowlingController::class, 'print'])->name('print');
+        Route::get('/Ver/{id}', [BowlingController::class, 'invoice'])->name('bowling.show');
+        Route::get('member/{id}', [BowlingController::class, 'member'])->name('paymentLink.show');
+        Route::put('member/{id}', [BowlingController::class, 'updateMember']);
     });
 
     Route::prefix('Cupon')->group(function () {
