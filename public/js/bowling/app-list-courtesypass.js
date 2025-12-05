@@ -168,7 +168,7 @@ $(function () {
                     },
                 },
                 {
-                    targets: [8,9],
+                    targets: [8, 9],
                     visible: !1,
                 },
                 {
@@ -183,7 +183,11 @@ $(function () {
                 },
                 {
                     targets: -1,
+                    responsivePriority: 1,
+                    className: "all",
                     title: "Acciones",
+                    orderable: false,
+                    searchable: false,
                     render: function (a, e, t, s) {
                         // Si no está autorizado → mostrar botón "Autorizar"
                         if (!t.user_auth) {
@@ -407,24 +411,30 @@ $(function () {
                 details: {
                     display: $.fn.dataTable.Responsive.display.modal({
                         header: function (e) {
-                            return "Details of " + e.data().full_name;
+                            return "Detalle de " + e.data().code;
                         },
                     }),
                     type: "column",
                     renderer: function (e, t, a) {
                         a = $.map(a, function (e, t) {
-                            return "" !== e.title
-                                ? '<tr data-dt-row="' +
-                                      e.rowIndex +
-                                      '" data-dt-column="' +
-                                      e.columnIndex +
-                                      '"><td>' +
-                                      e.title +
-                                      ":</td> <td>" +
-                                      e.data +
-                                      "</td></tr>"
-                                : "";
+                            // Excluir la columna "Acciones" del modal
+                            if (e.title === "Acciones" || e.title === "") {
+                                return "";
+                            }
+
+                            return (
+                                '<tr data-dt-row="' +
+                                e.rowIndex +
+                                '" data-dt-column="' +
+                                e.columnIndex +
+                                '"><td>' +
+                                e.title +
+                                ":</td> <td>" +
+                                e.data +
+                                "</td></tr>"
+                            );
                         }).join("");
+
                         return (
                             !!a &&
                             $('<table class="table"/><tbody />').append(a)

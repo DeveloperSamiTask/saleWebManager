@@ -150,6 +150,10 @@ $(function () {
                 },
                 {
                     targets: 6,
+                    responsivePriority: 1,
+                    className:"all",
+                    orderable: false,
+                    searchable: false,
                     render: function (a, e, t, s) {
                         return (
                             '<span class="' +
@@ -373,7 +377,7 @@ $(function () {
                 details: {
                     display: $.fn.dataTable.Responsive.display.modal({
                         header: function (e) {
-                            return "Details of " + e.data().full_name;
+                            return "Details of " + e.data().detcart;
                         },
                     }),
                     type: "column",
