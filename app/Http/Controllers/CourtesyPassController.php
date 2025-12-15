@@ -903,12 +903,10 @@ class CourtesyPassController extends Controller
                 $purchase->user_auth = 1;
                 $purchase->code_auth = "1";
                 $purchase->date_auth = now();
-                $purchase->status = 'authorized'; // 👈 si tienes un campo status
             } elseif ($request->action === 'cancel') {
                 $purchase->user_auth = 1;
                 $purchase->code_auth = "2";
                 $purchase->date_cancel = now();
-                $purchase->status = 'canceled';
             } else {
                 return response()->json([
                     'success' => false,

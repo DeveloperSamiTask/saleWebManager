@@ -186,7 +186,7 @@ $(function () {
                     title: "Acciones",
                     render: function (a, e, t, s) {
                         // Si no está autorizado → mostrar botón "Autorizar"
-                        if (!t.user_auth) {
+                        if (t.code_auth == null) {
                             return `
                             <div class="d-flex align-items-center">
                                 <button
@@ -194,6 +194,13 @@ $(function () {
                                     title="Autorizar">
                                     <i class="mdi mdi-check-circle-outline"></i> Autorizar
                                 </button>
+                            </div>`;
+                        }
+
+                        if(t.code_auth == "2"){
+                            return `
+                            <div class="d-flex align-items-center">
+                                <span class="badge rounded-pill bg-label-danger">RECHAZADO</span>
                             </div>`;
                         }
 
