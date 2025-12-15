@@ -379,7 +379,7 @@ $(function () {
 
         console.log("Edit button clicked for ID:", id);
 
-        $.get("/PagoLink/member/" + id, function (data) {
+        $.get("/PaseCortesia/member/" + id, function (data) {
             $("#editId").val(data.id);
             $("#editName").val(data.name);
             $("#editDni").val(data.dni);
@@ -406,7 +406,7 @@ $(function () {
         const is_active = $("#editActive").is(":checked") ? "used" : "unused";
 
         $.ajax({
-            url: "/PagoLink/member/" + id,
+            url: "/PaseCortesia/member/" + id,
             type: "POST",
             data: {
                 _method: "PUT",
