@@ -201,7 +201,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             [
                 'roles' => [1],
-                'companies' => [1],
+                'companies' => [1,2],
                 'route' => 'courtesy.validate_food',
                 'icon' => 'mdi mdi-food-fork-drink',
                 'text' => 'V. Comidas Pase Cortesia',

@@ -680,6 +680,7 @@ class CourtesyPassController extends Controller
 
             return response()->json([
                 'data' => $data,
+                'user' => 'redes',
                 'link' => $this->formatLinkData($link),
             ]);
         } catch (ModelNotFoundException $e) {
