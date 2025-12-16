@@ -105,6 +105,7 @@ class Link extends Model
                 'status'            => $row->status ?? null,
                 'created_at'        => $row->created_at->format('Y-m-d H:i:s'),
                 'user_created'      => $row->user?->usuario,
+                'code_auth'      => $row->code_auth,
             ];
         }
 
