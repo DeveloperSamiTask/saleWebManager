@@ -453,9 +453,20 @@ $(() => {
     });
 
     $(".btn_validate").on("click", function () {
+        const ticketValue = $("#ticket").val().trim();
+
+        // Validar que el ticket no esté vacío y sea un número
+        if (ticketValue === "" || isNaN(ticketValue)) {
+            Toast.fire({
+                icon: "error",
+                title: "El ticket debe ser un número válido",
+            });
+            return; // Detiene la ejecución
+        }
+
         e.row
             .add({
-                id: $("#ticket").val(),
+                id: ticketValue,
                 document: $("#dni").val(),
                 name: $("#names").val(),
                 product: $("#shift").val() + " - " + $("#device").val(),
@@ -464,10 +475,12 @@ $(() => {
                 sure: $("#sure").val(),
             })
             .draw();
+
         Toast.fire({
             icon: "success",
             title: "Entrada Agregado",
         });
+
         resetForm();
     });
 
