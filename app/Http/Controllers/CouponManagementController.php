@@ -211,11 +211,15 @@ class CouponManagementController extends Controller
         // Buscar el cupón en la base de datos
         $client = Coupons::where('code', $code)->first();
 
+        if (!$client) {
+            abort(404, "Cupón no encontrado.");
+        }
+
         $template = Templates::where('company_id', $client->company_id)
             ->where('promotion_id', $client->promotion_id)
             ->first();
 
-        $content = $template->content;
+        $content = $template->content ?? '';
 
         // Ruta absoluta del archivo en el servidor
         $imagePath = public_path('storage/' . $client->img);
@@ -224,19 +228,168 @@ class CouponManagementController extends Controller
         if (!file_exists($imagePath)) {
             abort(404, "Imagen no encontrada.");
         }
-        // Generar la imagen del código de barras y convertirla a Base64
-        $barcodeUrl = "http://generator.barcodetools.com/barcode.png?gen=0&data=" . $client->code .
-            "&bcolor=FFFFFF&fcolor=000000&tcolor=000000&fh=14&bred=0&w2n=2.5&xdim=2&w=70px&h=220px&debug=1&btype=7&angle=90&quiet=1&balign=2&talign=0&guarg=1&text=1&tdown=1&stst=1&schk=0&cchk=1&ntxt=1&c128=0";
 
-        // Obtener la imagen del código de barras y convertirla a Base64
-        $barcodeData = base64_encode(file_get_contents($barcodeUrl));
-        $barcodeBase64 = 'data:image/png;base64,' . $barcodeData;
+        // Generar la imagen del código de barras
+        $barcodeBase64 = $this->getBarcodeImage($client->code);
 
         // Generar el PDF con la vista
         $pdf = Pdf::loadView('pdf.coupon', compact('client', 'imagePath', 'barcodeBase64', 'content'));
 
         // Mostrar el PDF en el navegador sin descargarlo
         return $pdf->stream($client->code . '.pdf');
+    }
+
+    private function getBarcodeImage($code)
+    {
+        $barcodeUrl = "http://generator.barcodetools.com/barcode.png?gen=0&data=" . urlencode($code) .
+            "&bcolor=FFFFFF&fcolor=000000&tcolor=000000&fh=14&bred=0&w2n=2.5&xdim=2&w=70px&h=220px&debug=1&btype=7&angle=90&quiet=1&balign=2&talign=0&guarg=1&text=1&tdown=1&stst=1&schk=0&cchk=1&ntxt=1&c128=0";
+        // ☝️ Cambié angle=90 a angle=0
+
+        // Intentar con cURL
+        if (function_exists('curl_init')) {
+            try {
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $barcodeUrl,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_CONNECTTIMEOUT => 10,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+                ]);
+
+                $result = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $error = curl_error($ch);
+                curl_close($ch);
+
+                if ($result && $httpCode == 200) {
+                    // Rotar la imagen 90 grados
+                    return 'data:image/png;base64,' . base64_encode($result);
+                }
+
+                Log::error("Error cURL generando barcode", [
+                    'code' => $code,
+                    'http_code' => $httpCode,
+                    'error' => $error
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Excepción cURL barcode: " . $e->getMessage());
+            }
+        }
+
+        // Fallback con file_get_contents
+        try {
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 30,
+                    'user_agent' => 'Mozilla/5.0',
+                    'ignore_errors' => true
+                ]
+            ]);
+
+            $result = @file_get_contents($barcodeUrl, false, $context);
+
+            if ($result !== false) {
+                $rotatedImage = $this->rotateImage($result, 90);
+                return 'data:image/png;base64,' . base64_encode($rotatedImage);
+            }
+        } catch (\Exception $e) {
+            Log::error("Excepción file_get_contents barcode: " . $e->getMessage());
+        }
+
+        return $this->getFallbackBarcode($code);
+    }
+
+
+    /**
+     * Genera un código de barras de respaldo si el servicio externo falla
+     *
+     * @param string $code
+     * @return string Base64 data URI
+     */
+    private function getFallbackBarcode($code)
+    {
+        // Opción 1: Imagen placeholder simple
+        // return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+        // Opción 2: Generar código de barras con librería PHP local (si la tienes instalada)
+        // Ejemplo con Picqer/php-barcode-generator:
+        // use Picqer\Barcode\BarcodeGeneratorPNG;
+        // $generator = new BarcodeGeneratorPNG();
+        // $barcode = $generator->getBarcode($code, $generator::TYPE_CODE_128);
+        // return 'data:image/png;base64,' . base64_encode($barcode);
+
+        // Opción 3: Usar otro servicio de código de barras
+        try {
+            $alternativeUrl = "https://barcode.tec-it.com/barcode.ashx?data=" . urlencode($code) .
+                "&code=Code128&translate-esc=on&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&bgcolor=%23ffffff";
+
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $alternativeUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 15,
+                CURLOPT_SSL_VERIFYPEER => false,
+            ]);
+
+            $result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($result && $httpCode == 200) {
+                return 'data:image/png;base64,' . base64_encode($result);
+            }
+        } catch (\Exception $e) {
+            Log::error("Fallback barcode también falló: " . $e->getMessage());
+        }
+
+        // Última opción: retornar imagen transparente
+        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    }
+
+    /**
+     * Rota una imagen PNG
+     *
+     * @param string $imageData Datos binarios de la imagen
+     * @param int $angle Ángulo de rotación (90, 180, 270)
+     * @return string Datos binarios de la imagen rotada
+     */
+    private function rotateImage($imageData, $angle)
+    {
+        try {
+            // Crear imagen desde string
+            $image = imagecreatefromstring($imageData);
+
+            if ($image === false) {
+                Log::error("No se pudo crear imagen desde string");
+                return $imageData; // Retornar original si falla
+            }
+
+            // Rotar la imagen
+            $rotated = imagerotate($image, -$angle, 0); // Negativo porque GD rota en sentido contrario
+
+            if ($rotated === false) {
+                imagedestroy($image);
+                return $imageData;
+            }
+
+            // Guardar en buffer
+            ob_start();
+            imagepng($rotated);
+            $rotatedData = ob_get_clean();
+
+            // Liberar memoria
+            imagedestroy($image);
+            imagedestroy($rotated);
+
+            return $rotatedData;
+        } catch (\Exception $e) {
+            Log::error("Error rotando imagen: " . $e->getMessage());
+            return $imageData; // Retornar original si hay error
+        }
     }
 
     public function validatePdf($code)
