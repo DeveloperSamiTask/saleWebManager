@@ -21,7 +21,14 @@ class Coupons extends Model
 
     public static function getCoupons($startDate, $endDate)
     {
-        $query = self::with(['company', 'promotion']);
+        $userCompanies = session('companies_array', []);
+
+        if (empty($userCompanies)) {
+            return [];
+        }
+
+        $query = self::with(['company', 'promotion'])
+            ->whereIn('of_company', $userCompanies);
 
         $query->whereBetween('created_at', [$startDate, $endDate]);
         $coupons =  $query->orderByDesc('created_at')->get();

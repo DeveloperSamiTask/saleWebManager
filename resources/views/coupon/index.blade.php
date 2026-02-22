@@ -19,22 +19,22 @@
                     <div class="col-md-2 d-flex justify-content-end">
 
                     </div>
-                   <!-- <div class="col-md-4 d-flex justify-content-end">
-                        <div class="card-header-elements ms-auto">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-primary waves-effect waves-light" id="editPartner"><i
-                                        class="mdi mdi-account-search mdi-20px"></i> &nbsp;Editar
-                                    Socio</button>
-                            </div>
-                        </div>
-                        <div class="card-header-elements ms-auto">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-primary waves-effect waves-light"
-                                    id="searchPartner"><i class="mdi mdi-credit-card-sync mdi-20px"></i> &nbsp;Renovar
-                                    Socio</button>
-                            </div>
-                        </div>
-                    </div>-->
+                    <!-- <div class="col-md-4 d-flex justify-content-end">
+                                    <div class="card-header-elements ms-auto">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-primary waves-effect waves-light" id="editPartner"><i
+                                                    class="mdi mdi-account-search mdi-20px"></i> &nbsp;Editar
+                                                Socio</button>
+                                        </div>
+                                    </div>
+                                    <div class="card-header-elements ms-auto">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-primary waves-effect waves-light"
+                                                id="searchPartner"><i class="mdi mdi-credit-card-sync mdi-20px"></i> &nbsp;Renovar
+                                                Socio</button>
+                                        </div>
+                                    </div>
+                                </div>-->
                 </div>
             </div>
             <div class="card-datatable table-responsive">
@@ -125,6 +125,19 @@
                         <h5>2. Configurar Cupón</h5>
                         <div class="col-4">
                             <div class="form-floating form-floating-outline">
+                                <select id="template_company" name="template_company" class="select2 form-select"
+                                    required data-placeholder="Selecciona la Empresa del Template"
+                                    data-allow-clear="true">
+                                    <option value=""></option>
+                                    @foreach ($userCompanies as $company)
+                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="company">Empresa Registro</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating form-floating-outline">
                                 <select id="company" name="company" class="select2 form-select"
                                     data-placeholder="Selecciona Empresa" data-allow-clear="true">
                                     <option value=""></option>
@@ -132,7 +145,7 @@
                                         <option value="{{ $company->id }}">{{ $company->name }}</option>
                                     @endforeach
                                 </select>
-                                <label for="company">Empresa</label>
+                                <label for="company">Empresa Cupon</label>
                             </div>
                         </div>
                         <div class="col-4">
@@ -150,7 +163,7 @@
                                 <label for="expired_date">Fecha de Expiración</label>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-8">
                             <div class="form-floating form-floating-outline">
                                 <input class="form-control" type="file" name="formFile" id="formFile">
                                 <label for="affiliation">Imagen</label>
@@ -456,7 +469,6 @@
     <script src="{{ asset('vendor/libs/flatpickr/flatpickr.js') }}"></script>
     <script>
         let userRole = "{{ auth()->user()->idrol }}";
-
     </script>
     <script src="{{ asset('js/coupons.js') }}"></script>
 @endsection

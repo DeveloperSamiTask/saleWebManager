@@ -300,8 +300,8 @@ $(function () {
 
                         let label = `<span class="badge bg-${statusLabels[data].class}">${statusLabels[data].text}</span>`;
 
-                        // Solo los usuarios con rol 4 o más pueden activar un estado "PENDIENTE"
-                        if (data === 4 && userRole < 4) {
+                        // Solo los usuarios con rol 4 o menor pueden activar un estado "PENDIENTE"
+                        if (data === 4 && userRole > 4) {
                             return label; // Si el rol es menor a 4, solo muestra la etiqueta sin botón
                         }
 
@@ -590,12 +590,15 @@ $(function () {
 
     $("#company").on("change", function () {
         let company = $(this).val();
+        let template = $("#template_company").val();
         if (company) {
             $.ajax({
                 url: "/Cupon/Promotions",
                 type: "post",
                 data: {
                     company_id: company,
+                    template: template,
+
                 },
                 beforeSend: function () {
                     blockUI();
@@ -688,9 +691,14 @@ $(function () {
                     notEmpty: { message: "Ingresa la fecha de nacimiento" },
                 },
             },
+            template_company: {
+                validators: {
+                    notEmpty: { message: "Selecciona empresa que emitira el cupon" },
+                },
+            },
             company: {
                 validators: {
-                    notEmpty: { message: "Selecciona la empresa" },
+                    notEmpty: { message: "Selecciona la empresa que validara el cupon" },
                 },
             },
 
