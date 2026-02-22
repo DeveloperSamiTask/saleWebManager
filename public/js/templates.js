@@ -349,11 +349,12 @@ $(function () {
 
     $("#company").on("change", function () {
         let company = $(this).val();
+        let template = $("#template_company").val();
         if (company) {
             $.ajax({
                 url: "/Cupon/Promotions",
                 type: "post",
-                data: { company_id: company },
+                data: { company_id: company, template: template},
                 beforeSend: function () {
                     blockUI();
                 },
@@ -398,10 +399,11 @@ $(function () {
         // 🔥 Resetear el select de promociones antes de cargar
         $("#promotion").empty().attr("data-loaded", "false");
 
+        $("#template_company").val(rowData.template_company_id).trigger("change");
+
         // 🔥 Cambiar la compañía y esperar a que carguen las promociones
         $("#company").val(rowData.company_id).trigger("change");
 
-        $("#template_company").val(rowData.template_company_id).trigger("change");
 
         // 🔍 Observar cambios en el select de promociones
         let observer = new MutationObserver((mutations, obs) => {

@@ -85,6 +85,7 @@ class TemplateController extends Controller
     public function update(Request $request)
     {
         $template = Templates::find($request->template_id);
+        $template->template_company = $request->template_company;
         $template->company_id = $request->company;
         $template->promotion_id = $request->promotion;
         $template->content = $request->content;

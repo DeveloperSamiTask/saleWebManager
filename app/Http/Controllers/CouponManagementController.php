@@ -33,7 +33,8 @@ class CouponManagementController extends Controller
     {
         $company_id = $request
             ->company_id;
-        $promotions = Promotions::getPromotions($company_id);
+        $template = $request->template;
+        $promotions = Promotions::getPromotions($company_id, $template);
         return response()->json($promotions);
     }
 
