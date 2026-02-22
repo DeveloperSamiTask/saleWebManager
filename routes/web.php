@@ -41,6 +41,9 @@ Route::get('test', function () {
 Route::get('courtesy/mail/{code}', [CourtesyPassController::class, 'viewMail'])
     ->name('courtesy.mail');
 
+Route::get('coupon/mail/birthday/{code}', [CouponManagementController::class, 'viewMail'])
+    ->name('birthday.mail');
+
 Route::get('courtesyfdt/mail/{code}', [FdtPassController::class, 'viewMail'])
     ->name('courtesyfdt.mail');
 
@@ -256,7 +259,7 @@ Route::middleware('auth')->group(function () {
 
 
         //Cumpeaños Bowling
-        
+
     });
 
     Route::prefix('Cupon')->group(function () {

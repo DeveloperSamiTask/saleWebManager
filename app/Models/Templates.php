@@ -29,8 +29,6 @@ class Templates extends Model
     {
         $userCompanies = session('companies_array', []);
 
-        Log::info('Empresas del usuario: ' . implode(', ', $userCompanies));
-
         if (empty($userCompanies)) {
             return [];
         }

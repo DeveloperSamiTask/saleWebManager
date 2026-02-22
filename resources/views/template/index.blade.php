@@ -3,7 +3,7 @@
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
 
-        <h4 class="py-3 mb-4"> 
+        <h4 class="py-3 mb-4">
             <span class="text-muted fw-light">Configuración /</span> Plantillas
         </h4>
 
@@ -41,7 +41,7 @@
                                             required data-placeholder="Selecciona la Empresa del Template"
                                             data-allow-clear="true">
                                             <option value=""></option>
-                                            @foreach ($companies as $company)
+                                            @foreach ($userCompanies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
                                             @endforeach
                                         </select>

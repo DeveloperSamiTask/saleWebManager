@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\MailCouponBirthday;
+use Illuminate\Support\Facades\Mail;
 
 class CouponManagementController extends Controller
 {
@@ -25,6 +27,8 @@ class CouponManagementController extends Controller
     public function index()
     {
         $data['title'] = "Cupones";
+        $userCompanyIds = session('companies_array', []);
+        $data['userCompanies'] = Companies::whereIn('id', $userCompanyIds)->get();
         $data['companies'] = Companies::all();
         return view('coupon.index', $data);
     }
@@ -67,6 +71,7 @@ class CouponManagementController extends Controller
             $couponCode = "CI-{$dateCode}-{$nextNumber}";
 
             $coupon = new Coupons();
+            $coupon->of_company = $request->template_company;
             $coupon->code = $couponCode;
             $coupon->company_id = $request->company;
             $coupon->promotion_id = $request->promotion;
@@ -88,6 +93,8 @@ class CouponManagementController extends Controller
             }
 
             $coupon->save();
+
+            MailCouponBirthday::dispatch($couponCode, $request->template_company);
 
             return response()->json(['icon' => 'success', 'message' => 'Cupón guardado correctamente', 'code' => $couponCode]);
         } catch (\Exception $e) {
@@ -464,5 +471,16 @@ class CouponManagementController extends Controller
             'message' => $message,
             'data' => $data
         ], $status);
+    }
+
+    public function viewMail($code)
+    {
+        $coupon = Coupons::where('code', $code)->first();
+
+        if (!$coupon) {
+            abort(404, "Cupón no encontrado.");
+        }
+
+        return view('emails.birthday.validate', compact('coupon'));
     }
 }
