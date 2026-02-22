@@ -17,6 +17,8 @@ class TemplateController extends Controller
     public function index()
     {
         $data['title'] = "Plantillas";
+        $userCompanyIds = session('companies_array', []);
+        $data['userCompanies'] = Companies::whereIn('id', $userCompanyIds)->get();
         $data['companies'] = Companies::all();
         return view('template.index', $data);
     }
@@ -32,6 +34,7 @@ class TemplateController extends Controller
 
         try {
             $template = new Templates();
+            $template->template_company = $request->template_company;
             $template->company_id = $request->company;
             $template->promotion_id = $request->promotion;
             $template->content = $request->content;

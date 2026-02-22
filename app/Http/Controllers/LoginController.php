@@ -31,7 +31,14 @@ class LoginController extends Controller
         }
 
         Auth::loginUsingId($user->idusuario);
-        session(['user' => $user]);
+
+        $companiesArray = explode(',', $user->companies);
+
+        session([
+            'user' => $user,
+            'companies' => $user->companies,
+            'companies_array' => $companiesArray
+        ]);
 
         $redirectRoute = $this->getRedirectRoute($user);
 

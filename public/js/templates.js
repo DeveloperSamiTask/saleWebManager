@@ -1,5 +1,4 @@
 "use strict";
-
 $(function () {
     let e, n, s;
     s = (
@@ -61,6 +60,7 @@ $(function () {
                 ajax: "Plantillas/Show",
                 columns: [
                     { data: "" },
+                    { data: "template_company" },
                     { data: "company" },
                     { data: "promotion" },
                     { data: "" },
@@ -401,6 +401,8 @@ $(function () {
         // 🔥 Cambiar la compañía y esperar a que carguen las promociones
         $("#company").val(rowData.company_id).trigger("change");
 
+        $("#template_company").val(rowData.template_company_id).trigger("change");
+
         // 🔍 Observar cambios en el select de promociones
         let observer = new MutationObserver((mutations, obs) => {
             if ($("#promotion option").length > 1) {
@@ -437,6 +439,13 @@ $(function () {
 
     const fv = FormValidation.formValidation(f, {
         fields: {
+            template_company: {
+                validators: {
+                    notEmpty: {
+                        message: "Obligatorio seleccionar una empresa para la plantilla",
+                    },
+                },
+            },
             company: {
                 validators: {
                     notEmpty: {

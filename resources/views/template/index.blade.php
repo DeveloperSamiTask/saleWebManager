@@ -16,7 +16,8 @@
                     <thead class="table-light">
                         <tr>
                             <th></th>
-                            <th>Empresa</th>
+                            <th>Paquete Empresa</th>
+                            <th>Plantilla Empresa</th>
                             <th>Promocion</th>
                             <th></th>
                         </tr>
@@ -34,6 +35,20 @@
                             </div>
                             <form id="formTemplate" class="row g-4" onsubmit="return false" enctype="multipart/form-data">
                                 <input type="hidden" name="template_id" id="template_id">
+                                <div class="col-12">
+                                    <div class="form-floating form-floating-outline">
+                                        <select id="template_company" name="template_company" class="select2 form-select"
+                                            required data-placeholder="Selecciona la Empresa del Template"
+                                            data-allow-clear="true">
+                                            <option value=""></option>
+                                            @foreach ($companies as $company)
+                                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="template_company">Empresa del Template <span
+                                                class="text-danger">*</span></label>
+                                    </div>
+                                </div>
                                 <div class="col-5">
                                     <div class="form-floating form-floating-outline">
                                         <select id="company" name="company" class="select2 form-select"

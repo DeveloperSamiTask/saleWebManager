@@ -372,8 +372,8 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Settings',
             ],
             [
-                'roles' => [1],
-                'companies' => [1],
+                'roles' => [1, 4],
+                'companies' => [1, 2],
                 'route' => 'template.index',
                 'icon' => 'mdi mdi-file-pdf-box',
                 'text' => 'Plantillas',
