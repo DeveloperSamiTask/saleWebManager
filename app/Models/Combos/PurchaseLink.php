@@ -10,6 +10,7 @@ class PurchaseLink extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql_paylink';
     protected $table = 'purchases_link';
 
     protected $fillable = [
