@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class PromotionsLink extends Model
 {
     use HasFactory;
-
+    
+    protected $connection = 'mysql_paylink';
     public $table = 'promotions_link';
 
     public static function show($startDate, $endDate)
