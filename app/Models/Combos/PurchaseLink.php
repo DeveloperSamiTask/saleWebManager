@@ -45,7 +45,13 @@ class PurchaseLink extends Model
     {
         $filterField = $isChecked == '1' ? 'date_issue' : 'date_purchase';
 
-        $coupons = self::with(['combos.combo', 'combos.members'])
+        $coupons = self::with([
+            'combos' => function ($q) {
+                $q->withSum('validations', 'validated_qty');
+            },
+            'combos.combo',
+            'combos.members'
+        ])
             ->whereBetween($filterField, [$startDate, $endDate])
             ->orderByDesc($filterField)
             ->get();
@@ -75,9 +81,7 @@ class PurchaseLink extends Model
                 $totalAmount += $price * $quantity;
 
                 $totalCombos += $quantity;
-
-                $validatedCombos += PurchaseComboValidation::where('purchase_link_combo_id', $combo->id)
-                    ->sum('validated_qty');
+                $validatedCombos += $combo->validations_sum_validated_qty ?? 0;
             }
 
             $data[] = [
