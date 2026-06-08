@@ -10,6 +10,7 @@ class PurchaseCombo extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql_paylink';
     protected $table = 'purchase_combo';
 
     protected $fillable = [

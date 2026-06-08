@@ -41,6 +41,9 @@ Route::get('test', function () {
 Route::get('courtesy/mail/{code}', [CourtesyPassController::class, 'viewMail'])
     ->name('courtesy.mail');
 
+Route::get('coupon/mail/birthday/{code}', [CouponManagementController::class, 'viewMail'])
+    ->name('birthday.mail');
+
 Route::get('courtesyfdt/mail/{code}', [FdtPassController::class, 'viewMail'])
     ->name('courtesyfdt.mail');
 
@@ -253,6 +256,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/Ver/{id}', [BowlingController::class, 'invoice'])->name('bowling.show');
         Route::get('member/{id}', [BowlingController::class, 'member'])->name('paymentLink.show');
         Route::put('member/{id}', [BowlingController::class, 'updateMember']);
+
+
+        //Cumpeaños Bowling
+
     });
 
     Route::prefix('Cupon')->group(function () {

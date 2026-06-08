@@ -10,8 +10,8 @@ class Promotions extends Model
     use HasFactory;
 
 
-    public static function getPromotions($company_id)
+    public static function getPromotions($company_id, $template)
     {
-        return Promotions::where('company_id', $company_id)->get();
+        return Promotions::where('of_company', $template)->where('company_id', $company_id)->get();
     }
 }

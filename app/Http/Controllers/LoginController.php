@@ -31,7 +31,14 @@ class LoginController extends Controller
         }
 
         Auth::loginUsingId($user->idusuario);
-        session(['user' => $user]);
+
+        $companiesArray = explode(',', $user->companies);
+
+        session([
+            'user' => $user,
+            'companies' => $user->companies,
+            'companies_array' => $companiesArray
+        ]);
 
         $redirectRoute = $this->getRedirectRoute($user);
 
@@ -72,6 +79,7 @@ class LoginController extends Controller
             2 => [
                 1 => 'Boleteria',
                 2 => 'cupon.validate',
+                7 => 'coupon.index',
             ],
             3 => [
                 2 => 'cupon.validate',

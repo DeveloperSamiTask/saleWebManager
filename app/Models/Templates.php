@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Templates extends Model
 {
@@ -14,6 +15,11 @@ class Templates extends Model
         return $this->belongsTo(Companies::class);
     }
 
+    public function templateCompany()
+    {
+        return $this->belongsTo(Companies::class, 'template_company', 'id');
+    }
+
     public function promotion()
     {
         return $this->belongsTo(Promotions::class);
@@ -21,7 +27,14 @@ class Templates extends Model
 
     public static function getTemplates()
     {
-        $query = self::with(['company', 'promotion']);
+        $userCompanies = session('companies_array', []);
+
+        if (empty($userCompanies)) {
+            return [];
+        }
+
+        $query = self::with(['company', 'promotion'])
+            ->whereIn('template_company', $userCompanies);
         $templates =  $query->orderByDesc('created_at')->get();
         $data = [];
         foreach ($templates as $row) {
@@ -33,6 +46,8 @@ class Templates extends Model
                 'promotion_id' =>  $row->promotion_id,
                 'text' => $row->content,
                 'issue_date' => $row->created_at,
+                'template_company_id' => $row->template_company,
+                'template_company' => optional($row->templateCompany)->name,
             ];
         }
         return $data;
