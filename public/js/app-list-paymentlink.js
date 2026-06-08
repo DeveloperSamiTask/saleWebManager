@@ -128,6 +128,7 @@ $(function () {
                 { data: "status" },
                 { data: "" },
                 { data: "" },
+                { data: "" },
             ],
             columnDefs: [
                 {
@@ -167,7 +168,7 @@ $(function () {
                     },
                 },
                 {
-                    targets: -3,
+                    targets: -4,
                     render: function (e, t, a, n) {
                         const info = status[e] || {
                             title: "DESCONOCIDO",
@@ -177,7 +178,7 @@ $(function () {
                     },
                 },
                 {
-                    targets: -2,
+                    targets: -3,
                     title: "Acciones",
                     render: function (a, e, t, s) {
                         // Si no está autorizado → mostrar botón "Autorizar"
@@ -206,16 +207,29 @@ $(function () {
                     },
                 },
                 {
-                    target: -1,
+                    target: -2,
                     title: "Autorización",
                     visible: !1,
                     render: function (e, t, a, n) {
                         if (!a.user_auth) {
                             return "No autorizado";
                         }
-                        return `Autorizado | ${a.date_auth}`;
+                        return `${a.user_auth} | ${a.date_auth}`;
+                    }
+                },
+                {
+                    target: -1,
+                    title: "Activación",
+                    visible: !1,
+                    render: function (e, t, a, n) {
+                        if (!a.user_active) {
+                            return "No activado";
+                        }
+                        return `${a.user_active} | ${a.activate_date}`;
                     }
                 }
+
+
             ],
             order: [[6, "desc"]],
             dom: '<"row mx-2"<"col-md-2"<"me-3"l>><"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0 gap-3"fB>>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
@@ -236,7 +250,7 @@ $(function () {
                             text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -279,7 +293,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -310,7 +324,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -341,7 +355,7 @@ $(function () {
                             text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;
@@ -372,7 +386,7 @@ $(function () {
                             text: '<i class="mdi mdi-content-copy me-1"></i>Copy',
                             className: "dropdown-item",
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
                                 format: {
                                     body: function (e, t, a) {
                                         var n;

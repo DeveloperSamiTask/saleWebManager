@@ -36,6 +36,10 @@ class PurchaseLink extends Model
     {
         return $this->belongsTo(User::class, 'user_auth', 'idusuario');
     }
+    public function activeBy()
+    {
+        return $this->belongsTo(User::class, 'user_active', 'idusuario');
+    }
 
     public function combos()
     {
@@ -97,6 +101,8 @@ class PurchaseLink extends Model
                 'user_auth'       => $row->user_auth,
                 'authorized_by_name' => $row->authorizedBy?->usuario,
                 'date_auth'        => $row->date_auth,
+                'user_active'      => $row->activeBy?->usuario,
+                'activate_date'    => $row->activate_date,
                 'status'            => $row->status ?? null,
             ];
         }

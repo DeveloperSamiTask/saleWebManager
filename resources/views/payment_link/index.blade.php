@@ -114,6 +114,7 @@
                             <th>Estado</th>
                             <th></th>
                             <th></th>
+                            <th>CAJERO</th>
                         </tr>
                     </thead>
                 </table>
