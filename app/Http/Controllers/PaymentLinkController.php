@@ -496,9 +496,10 @@ class PaymentLinkController extends Controller
     public function validateCombo(Request $request)
     {
         $request->validate([
-            'record_id' => 'required|exists:purchase_combo,id',
+            'record_id' => 'required',
             'quantity'  => 'required|integer|min:1',
         ]);
+        
 
         $combo = PurchaseCombo::with('combo')->findOrFail($request->record_id);
 
