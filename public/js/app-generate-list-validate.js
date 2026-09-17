@@ -48,7 +48,7 @@ $(() => {
         t = $(".datatables-permissions"),
         csrfToken = $('meta[name="csrf-token"]').attr("content"),
         s;
-    t.length &&
+    (t.length &&
         (e = t.DataTable({
             columns: [
                 { data: "" },
@@ -202,8 +202,8 @@ $(() => {
             ".delete-record",
             function () {
                 e.row($(this).parents("tr")).remove().draw();
-            }
-        );
+            },
+        ));
     $(document).on("click", ".notSelect", function () {
         var cashier = $(this).data("name");
         if ($(this).prop("checked")) {
@@ -350,12 +350,23 @@ $(() => {
                 var pdfUrl = response.pdfUrl;
 
                 // Abrir una nueva ventana con el PDF generado
-                var newWindow = window.open(pdfUrl);
+                var newWindow = window.open(pdfUrl, "_blank");
 
                 // Cuando el PDF se cargue en la nueva ventana, imprimir automáticamente
-                newWindow.onload = function () {
-                    newWindow.print();
-                };
+                if (newWindow) {
+                    newWindow.onload = function () {
+                        newWindow.print();
+                    };
+                } else {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Boleta generada",
+                        text: "El navegador bloqueó la ventana de impresión.",
+                        confirmButtonText: "Abrir boleta",
+                    }).then(() => {
+                        window.location.href = pdfUrl;
+                    });
+                }
                 e.clear().draw();
                 $("#qrCode").val("").focus();
             })
@@ -428,10 +439,10 @@ $(() => {
                                 <input class="form-check-input ${
                                     isChecked ? "" : "notSelect"
                                 }" type="checkbox" value="" id="customCheckboxIcon${
-                    box.id_box
-                }"  ${isChecked ? "checked disabled" : ""} data-name="${
-                    box.name_box
-                }">
+                                    box.id_box
+                                }"  ${isChecked ? "checked disabled" : ""} data-name="${
+                                    box.name_box
+                                }">
                             </label>
                         </div>
                     </div>
@@ -460,10 +471,10 @@ $(() => {
                             <input class="form-check-input  ${
                                 isChecked ? "" : "notSelect"
                             }" type="checkbox" value="" id="customCheckboxIcon${
-                    box.id_box
-                }" ${isChecked ? "checked disabled" : ""} data-name="${
-                    box.name_box
-                }">
+                                box.id_box
+                            }" ${isChecked ? "checked disabled" : ""} data-name="${
+                                box.name_box
+                            }">
                         </label>
                     </div>
                 </div>

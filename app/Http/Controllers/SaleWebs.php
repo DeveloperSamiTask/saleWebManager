@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Collection;
 use Dompdf\Dompdf;
 use App\Models\DetCart;
 use App\Models\Ticket;
@@ -74,6 +74,104 @@ class SaleWebs extends Controller
         $tickets = DetCart::countTicketsForTodayFDT();
         return response()->json([$tickets]);
     }
+
+    public function receiptByClient(int $clientCode)
+    {
+        $validatedEntries = DetCart::where('cliente_cClieCode', $clientCode)
+            ->where('ticketstatus', 1)
+            ->get();
+
+        abort_if($validatedEntries->isEmpty(), 404, 'El cliente no tiene entradas validadas.');
+
+        $entryIds = $validatedEntries->pluck('intCartdetId')->map(fn($id) => (int) $id);
+        $receipt = Ticket::where('method', 2)
+            ->where(function ($query) use ($entryIds) {
+                foreach ($entryIds as $id) {
+                    $query->orWhereRaw('FIND_IN_SET(?, tickets)', [$id]);
+                }
+            })
+            ->orderByDesc('id_coupon')
+            ->first();
+
+        if ($receipt) {
+            $receiptIds = collect(explode(',', $receipt->tickets))
+                ->map(fn($id) => (int) trim($id))
+                ->filter();
+            $entriesById = $validatedEntries->keyBy('intCartdetId');
+            $entries = $receiptIds
+                ->map(fn($id) => $entriesById->get($id))
+                ->filter()
+                ->values();
+        } else {
+            $entries = $validatedEntries->sortBy('intCartdetId')->values();
+        }
+
+        abort_if($entries->isEmpty(), 404, 'No se encontraron entradas para regenerar la boleta.');
+
+        $code = $receipt->code ?? 'CLIENTE-' . $clientCode;
+        $fecha = $receipt->date_used
+            ?? $receipt->date_generate
+            ?? $entries->max('ticketdateuse')
+            ?? now();
+
+        return $this->receiptResponse(
+            $entries,
+            $code,
+            $fecha,
+            'boleta_cliente_' . $clientCode . '_' . $code . '.pdf'
+        );
+    }
+
+    private function receiptResponse(Collection $entries, string $code, $fecha, string $filename)
+    {
+        $data = $this->receiptData($entries);
+        $total = array_sum(array_column($data, 'precio'));
+        $html = view('sale_web/print', compact('code', 'data', 'total', 'fecha'))->render();
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper($this->receiptPaper(count($data)));
+        $dompdf->render();
+
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            'Cache-Control' => 'no-store, max-age=0',
+        ]);
+    }
+
+    private function receiptData(Collection $carts): array
+    {
+        $shiftOptions = [
+            1 => 'TURNO COMPLETO',
+            2 => 'AFTER SCHOOL',
+        ];
+        $deviceOptions = [
+            'Seleccione' => 'SIN DISPOSITIVO',
+            'Tarjeta' => 'TARJETA',
+            'Portatarjeta' => 'TARJETA + LANGER',
+            'Pulserasilicona' => 'PULSERA SILICONA',
+            'Pulserafashion' => 'PULSERA SILICONA AJUSTABLE',
+        ];
+
+        return $carts->map(function ($cart) use ($shiftOptions, $deviceOptions) {
+            $shift = $shiftOptions[$cart->shiftCart] ?? 'SIN TURNO';
+            $device = $deviceOptions[$cart->deviceCart] ?? 'SIN DISPOSITIVO';
+
+            return [
+                'id' => $cart->intCartdetId,
+                'producto' => strtoupper($shift . ' - ' . $device),
+                'precio' => $cart->decCartdetStotal,
+            ];
+        })->all();
+    }
+
+    private function receiptPaper(int $rowCount): array
+    {
+        return [0, 0, 200, max(426, 190 + ($rowCount * 40))];
+    }
+
 
     public function generateQr(Request $request, $token)
     {

@@ -9,6 +9,8 @@ use App\Models\Box;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ValidateWebs extends Controller
 {
@@ -42,7 +44,7 @@ class ValidateWebs extends Controller
         if ($ticket->status_coupon == 1) {
             return response()->json([
                 'message' => 'Este QR ya ha sido validado',
-                'icon' => 'warning' 
+                'icon' => 'warning'
             ], 400);
         }
 
@@ -94,151 +96,188 @@ class ValidateWebs extends Controller
 
     public function print(Request $request)
     {
+        @set_time_limit(60);
+
+        $request->validate([
+            'ids' => 'required|string',
+            'ticket' => 'required|string',
+        ]);
+
         $boxValue = session('box');
-        $idUsuario = session('user')['idusuario'];
+        $idUsuario = session('user')['idusuario'] ?? null;
 
-        // Obtener los datos del formulario
         $ids = $request->input('ids');
-        $ticket = $request->input('ticket');
+        $ticket = trim($request->input('ticket'));
 
-        // Convertir los IDs a un array
-        $ticketCodesArray = explode(',', $ids);
+        $ticketCodesArray = collect(explode(',', $ids))
+            ->map(fn($id) => trim($id))
+            ->filter()
+            ->unique()
+            ->values();
 
-        // Inicializar un array para almacenar los datos
-        $data = [];
-
-        $ticketModel = Ticket::where('code', $ticket)->first();
-        if ($ticketModel) {
-            $ticketModel->status_coupon = 1;
-            $ticketModel->date_used = now();
-            $ticketModel->save();
+        if ($ticketCodesArray->isEmpty()) {
+            return response()->json([
+                'icon' => 'error',
+                'message' => 'No se recibieron entradas para validar.',
+            ], 422);
         }
 
-        foreach ($ticketCodesArray as $id) {
-            $detCartModel = DetCart::find($id);
-            if ($detCartModel) {
-                $detCartModel->ticketstatus = 1;
-                $detCartModel->ticketdateuse = now(); // O la fecha y hora actual
-                $detCartModel->cashier = $idUsuario;
-                $detCartModel->box = $boxValue;
-                $detCartModel->save();
+        try {
+            $ticketModel = Ticket::where('code', $ticket)->first();
+
+            if (!$ticketModel) {
+                return response()->json([
+                    'icon' => 'error',
+                    'message' => 'QR no encontrado.',
+                ], 404);
             }
-        }
-        $shiftOptions = [
-            1 => "TURNO COMPLETO",
-            2 => "AFTER SCHOOL",
-        ];
-        $deviceOptions = [
-            "Seleccione" => "SIN DISPOSITIVO",
-            "Tarjeta" => "TARJETA",
-            "Portatarjeta" => "TARJETA + LANGER",
-            "Pulserasilicona" => "PULSERA SILICONA",
-            "Pulserafashion" => "PULSERA SILICONA AJUSTABLE",
-        ];
 
-        // Iterar sobre cada ID de entrada y obtener los datos de DetCart
-        foreach ($ticketCodesArray as $id) {
-            $cartDetRecord = DetCart::find($id);
+            $cartItems = DetCart::whereIn('intCartdetId', $ticketCodesArray)->get();
 
-            // Verificar si se encontró el registro
-            if ($cartDetRecord) {
+            if ($cartItems->isEmpty()) {
+                return response()->json([
+                    'icon' => 'error',
+                    'message' => 'No se encontraron entradas para validar.',
+                ], 404);
+            }
 
+            $shiftOptions = [
+                1 => 'TURNO COMPLETO',
+                2 => 'AFTER SCHOOL',
+            ];
 
-                // Obtener los valores de shift y device del registro actual
-                $shiftValue = $cartDetRecord->shiftCart;
-                $deviceValue = $cartDetRecord->deviceCart;
+            $deviceOptions = [
+                'Seleccione' => 'SIN DISPOSITIVO',
+                'Tarjeta' => 'TARJETA',
+                'Portatarjeta' => 'TARJETA + LANGER',
+                'Pulserasilicona' => 'PULSERA SILICONA',
+                'Pulserafashion' => 'PULSERA SILICONA AJUSTABLE',
+            ];
 
-                // Formatear los valores según las definiciones
-                $shift = isset($shiftOptions[$shiftValue]) ? strtoupper($shiftOptions[$shiftValue]) : "SIN TURNO";
-                $device = isset($deviceOptions[$deviceValue]) ? strtoupper($deviceOptions[$deviceValue]) : "SIN DISPOSITIVO";
+            $data = $cartItems->map(function ($cartDetRecord) use ($shiftOptions, $deviceOptions) {
+                $shift = $shiftOptions[$cartDetRecord->shiftCart] ?? 'SIN TURNO';
+                $device = $deviceOptions[$cartDetRecord->deviceCart] ?? 'SIN DISPOSITIVO';
 
-                // Concatenar device y shift en producto
-                $producto = $shift . " " . $device;
-
-                // Agregar los datos formateados al array de datos
-                $data[] = [
+                return [
                     'id' => $cartDetRecord->intCartdetId,
-                    'producto' => $producto,
-                    'precio' => $cartDetRecord->decCartdetStotal,
+                    'producto' => strtoupper($shift . ' ' . $device),
+                    'precio' => (float) $cartDetRecord->decCartdetStotal,
                 ];
+            })->values()->toArray();
+
+            $total = array_sum(array_column($data, 'precio'));
+
+            $html = '<!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <title>Validación de Ventas Web</title>
+                <style>
+                    @page { margin-left: 23px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; }
+                    * { font-family: "century gothic", sans-serif; }
+                    table { margin: 5px; font-size: 12px; border-collapse: collapse; width: 100%; }
+                    thead tr th { background-color: #00BCD4; text-align: center; padding: 5px; color: white; }
+                    tbody tr td { padding: 6px 4px; }
+                    .total { text-align: right; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <h4>Validación de Ventas Web</h4>
+                <p>Fecha: ' . now()->format('Y-m-d H:i:s') . '</p>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Codigo</th>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+            foreach ($data as $index => $row) {
+                $html .= '<tr>
+                <td>' . ($index + 1) . '</td>
+                <td>' . e($row['id']) . '</td>
+                <td>' . e($row['producto']) . '</td>
+                <td>' . number_format($row['precio'], 2, '.', '') . '</td>
+            </tr>';
             }
-        }
 
-        // Generar HTML para el PDF
-        $html = '<!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>PDF</title>
-                    <style>
-                    @page { margin-left: 23px; }
-                    *	  		{ font-family: "century gothic"; }
-                    table 		{ margin: 5px; font-size:12px; border-collapse: collapse; }
-                    thead tr td { background-color: #00BCD4; text-align: center; padding: 5px; color: white; }
-                    thead 		{ border-bottom: 1px solid #000; border-style: dotted; }
-                    tbody tr td	{ padding: 1em; }
-                    </style>
-                </head>
-                <body>
-                    <h4>Validación de Ventas Web</h4>
-                    <p>Fecha: ' . date('Y-m-d H:i:s') . '</p>
-                    <table border="1">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Codigo</th>
-                                <th>Producto</th>
-                                <th>Precio</th>
-                            </tr>
-                        </thead>
-                        <tbody>';
-
-        // Agregar filas de datos al HTML
-        $total = array_sum(array_column($data, 'precio'));
-        $contador = 0;
-        foreach ($data as $row) {
-            $contador++;
             $html .= '<tr>
-                    <td>' . $contador . '</td>
-                    <td>' . $row['id'] . '</td>
-                    <td>' . $row['producto'] . '</td>
-                    <td>' . $row['precio'] . '</td>
-                </tr>';
+                <th colspan="3" class="total">TOTAL</th>
+                <th>S/. ' . number_format($total, 2, '.', '') . '</th>
+            </tr>';
+
+            $html .= '</tbody></table></body></html>';
+
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+
+            $dompdf = new Dompdf($options);
+            $dompdf->loadHtml($html);
+
+            $paperHeight = max(426, 190 + (count($data) * 32));
+            $dompdf->setPaper([0, 0, 220, $paperHeight]);
+
+            $dompdf->render();
+
+            $pdfContent = $dompdf->output();
+
+            $pdfDir = '/home/ep3s6easy863/web.lagranjavilla.com/validate';
+
+            // $pdfDir = 'Z:/ruta/que/no/existe/validate';
+
+            if (!is_dir($pdfDir)) {
+                mkdir($pdfDir, 0755, true);
+            }
+
+            if (!is_writable($pdfDir)) {
+                return response()->json([
+                    'icon' => 'error',
+                    'message' => 'La carpeta de boletas no tiene permisos de escritura.',
+                ], 500);
+            }
+
+            $pdfPath = $pdfDir . '/' . $ticket . '.pdf';
+            $written = file_put_contents($pdfPath, $pdfContent);
+
+            if ($written === false || !file_exists($pdfPath)) {
+                return response()->json([
+                    'icon' => 'error',
+                    'message' => 'No se pudo generar la boleta.',
+                ], 500);
+            }
+
+            DB::transaction(function () use ($ticketModel, $ticketCodesArray, $idUsuario, $boxValue) {
+                $ticketModel->status_coupon = 1;
+                $ticketModel->date_used = now();
+                $ticketModel->save();
+
+                DetCart::whereIn('intCartdetId', $ticketCodesArray)->update([
+                    'ticketstatus' => 1,
+                    'ticketdateuse' => now(),
+                    'cashier' => $idUsuario,
+                    'box' => $boxValue,
+                ]);
+            });
+
+            return response()->json([
+                'icon' => 'success',
+                'message' => 'Entradas validadas correctamente.',
+                'pdfUrl' => asset('validate/' . $ticket . '.pdf'),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error validando entradas web', [
+                'ticket' => $ticket,
+                'ids' => $ids,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'icon' => 'error',
+                'message' => 'Error al validar las entradas o generar la boleta.',
+            ], 500);
         }
-
-        $html .= '<tr>
-        <th colspan="3" class="grand total" style="text-align: right !important;">TOTAL </th>
-        <th class="grand total"> S/. ' . $total . '</th>
-        </tr>';
-
-        // Cerrar el cuerpo y la tabla HTML
-        $html .= '</tbody></table></body></html>';
-
-        // Configurar opciones de Dompdf
-        $options = new \Dompdf\Options();
-        $options->set('isRemoteEnabled', true);
-
-        // Establecer el tamaño del papel
-
-        // Crear una instancia de Dompdf
-        $dompdf = new Dompdf($options);
-        // Cargar el HTML en Dompdf
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper([0, 0, 200, 426]);
-
-        // Renderizar el PDF
-        $dompdf->render();
-
-        // Obtener el contenido del PDF como una cadena
-        $pdfContent = $dompdf->output();
-
-
-        // Guardar el PDF temporalmente en el servidor
-        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/validate/' . $ticket . '.pdf';
-        file_put_contents($pdfPath, $pdfContent);
-
-        // Devolver la URL del PDF como respuesta a la solicitud AJAX
-        return response()->json(['pdfUrl' => asset('validate/' . $ticket . '.pdf')]);
     }
 }

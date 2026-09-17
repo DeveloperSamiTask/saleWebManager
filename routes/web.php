@@ -76,6 +76,11 @@ Route::middleware('auth')->group(function () {
     Route::get('ticketsValidate', [SaleWebs::class, 'tickets']);
     Route::get('ticketsValidateFDT', [SaleWebs::class, 'tickets_fdt']);
 
+    Route::get('/Boleteria/boleta/cliente/{clientCode}', [SaleWebs::class, 'receiptByClient'])
+        ->whereNumber('clientCode')
+        ->name('Boleteria.receipt.client');
+
+
     // Rutas para ValidateWebs
     Route::get('/Validar_Lista', [ValidateWebs::class, 'index'])->name('validateList');
     Route::post('viewList', [ValidateWebs::class, 'getList']);
