@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Dompdf\Dompdf;
 use App\Models\DetCart;
 use App\Models\Ticket;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SaleWebs extends Controller
@@ -75,53 +76,30 @@ class SaleWebs extends Controller
         return response()->json([$tickets]);
     }
 
-    public function receiptByClient(int $clientCode)
+    public function receiptByClient(Request $request, int $clientCode)
     {
-        $validatedEntries = DetCart::where('cliente_cClieCode', $clientCode)
-            ->where('ticketstatus', 1)
-            ->get();
+        $date = $request->query('fecha', $request->query('date'));
+        $baseQuery = DetCart::where('cliente_cClieCode', $clientCode)
+            ->where('ticketstatus', 1);
 
-        abort_if($validatedEntries->isEmpty(), 404, 'El cliente no tiene entradas validadas.');
-
-        $entryIds = $validatedEntries->pluck('intCartdetId')->map(fn($id) => (int) $id);
-        $receipt = Ticket::where('method', 2)
-            ->where(function ($query) use ($entryIds) {
-                foreach ($entryIds as $id) {
-                    $query->orWhereRaw('FIND_IN_SET(?, tickets)', [$id]);
-                }
-            })
-            ->orderByDesc('id_coupon')
-            ->first();
-
-        if ($receipt) {
-            $receiptIds = collect(explode(',', $receipt->tickets))
-                ->map(fn($id) => (int) trim($id))
-                ->filter();
-            $entriesById = $validatedEntries->keyBy('intCartdetId');
-            $entries = $receiptIds
-                ->map(fn($id) => $entriesById->get($id))
-                ->filter()
-                ->values();
-        } else {
-            $entries = $validatedEntries->sortBy('intCartdetId')->values();
+        if (!$date) {
+            $date = (clone $baseQuery)->max('dateCartdetFreg');
         }
 
-        abort_if($entries->isEmpty(), 404, 'No se encontraron entradas para regenerar la boleta.');
+        $entries = (clone $baseQuery)
+            ->when($date, fn($query) => $query->whereDate('dateCartdetFreg', $date))
+            ->orderBy('intCartdetId')
+            ->get();
 
-        $code = $receipt->code ?? 'CLIENTE-' . $clientCode;
-        $fecha = $receipt->date_used
-            ?? $receipt->date_generate
-            ?? $entries->max('ticketdateuse')
-            ?? now();
+        abort_if($entries->isEmpty(), 404, 'No hay entradas validadas para ese cliente' . ($date ? ' en la fecha ' . $date : '') . '.');
 
         return $this->receiptResponse(
             $entries,
-            $code,
-            $fecha,
-            'boleta_cliente_' . $clientCode . '_' . $code . '.pdf'
+            'CLIENTE-' . $clientCode,
+            $date ?? now(),
+            'boleta_cliente_' . $clientCode . ($date ? '_' . $date : '') . '.pdf'
         );
     }
-
     private function receiptResponse(Collection $entries, string $code, $fecha, string $filename)
     {
         $data = $this->receiptData($entries);
@@ -193,85 +171,115 @@ class SaleWebs extends Controller
 
     public function printQR(Request $request)
     {
-        $ids = $request->input('ids'); // String con IDs separados por coma
-        $method = $request->input('method');
-        $boxValue = session('box');
-        $idUsuario = session('user')['idusuario'];
+        @set_time_limit(120);
 
-        // 1. Generar código único
-        do {
-            $code = Str::upper(Str::random(10));
-        } while (Ticket::where('code', $code)->exists());
+        $ids = collect(explode(',', (string) $request->input('ids')))
+            ->map(fn($id) => trim($id))
+            ->filter()
+            ->unique()
+            ->values();
 
-        // 2. Guardar Ticket
-        $ticket = new Ticket();
-        $ticket->code_coupon = $code;
-        $ticket->tickets = $ids;
-        $ticket->code = $code;
-        $ticket->method = $method;
-        $ticket->status_coupon = 1;
-        $ticket->date_used = now();
-        $ticket->save();
-
-        // 3. Convertir IDs y actualizar DetCart
-        $ticketCodesArray = explode(',', $ids);
-        $data = [];
-        $shiftOptions = [
-            1 => "TURNO COMPLETO",
-            2 => "AFTER SCHOOL",
-        ];
-        $deviceOptions = [
-            "Seleccione" => "SIN DISPOSITIVO",
-            "Tarjeta" => "TARJETA",
-            "Portatarjeta" => "TARJETA + LANGER",
-            "Pulserasilicona" => "PULSERA SILICONA",
-            "Pulserafashion" => "PULSERA SILICONA AJUSTABLE",
-        ];
-
-        foreach ($ticketCodesArray as $id) {
-            $cart = DetCart::find($id);
-            if ($cart) {
-                $cart->ticketstatus = 1;
-                $cart->ticketdateuse = now();
-                $cart->cashier = $idUsuario;
-                $cart->box = $boxValue;
-                $cart->save();
-
-                $shift = $shiftOptions[$cart->shiftCart] ?? 'SIN TURNO';
-                $device = $deviceOptions[$cart->deviceCart] ?? 'SIN DISPOSITIVO';
-
-                $data[] = [
-                    'id' => $cart->intCartdetId,
-                    'producto' => strtoupper($shift . ' - ' . $device),
-                    'precio' => $cart->decCartdetStotal,
-                ];
-            }
+        if ($ids->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se recibieron entradas para validar.',
+            ], 422);
         }
 
-        // 5. Generar HTML PDF
-        $total = array_sum(array_column($data, 'precio'));
-        $html = view('sale_web/print', [
-            'code' => $code,
-            'data' => $data,
-            'total' => $total,
-        ])->render();
+        $method = $request->input('method');
+        $boxValue = session('box');
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
 
-        // 6. PDF con Dompdf
-        $options = new \Dompdf\Options();
-        $options->set('isRemoteEnabled', true);
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper([0, 0, 200, 426]);
-        $dompdf->render();
+        try {
+            do {
+                $code = Str::upper(Str::random(10));
+            } while (Ticket::where('code', $code)->exists());
 
-        // 7. Guardar PDF temporal
-        $pdfPath = '/home/ep3s6easy863/web.lagranjavilla.com/validate/' . $code . '.pdf';
-        file_put_contents($pdfPath, $dompdf->output());
+            $carts = DetCart::whereIn('intCartdetId', $ids)->get()->keyBy('intCartdetId');
+            $missing = $ids->reject(fn($id) => $carts->has($id))->values();
 
-        // 8. Responder con URL
-        return response()->json(['pdfUrl' => asset('validate/' . $code . '.pdf')]);
+            if ($missing->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Algunas entradas no existen o no fueron encontradas.',
+                    'missing' => $missing,
+                ], 422);
+            }
+
+            $entries = $ids->map(fn($id) => $carts->get((int) $id))->filter()->values();
+            $data = $this->receiptData($entries);
+            $total = array_sum(array_column($data, 'precio'));
+            $html = view('sale_web/print', compact('code', 'data', 'total'))->render();
+
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+            $dompdf = new Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper($this->receiptPaper(count($data)));
+            $dompdf->render();
+
+            $validateDir = '/home/ep3s6easy863/web.lagranjavilla.com/validate';
+            if (!is_dir($validateDir)) {
+                $validateDir = public_path('validate');
+            }
+            if (!is_dir($validateDir) && !mkdir($validateDir, 0775, true)) {
+                throw new \RuntimeException('No se pudo crear la carpeta para guardar la boleta.');
+            }
+
+            $pdfPath = $validateDir . DIRECTORY_SEPARATOR . $code . '.pdf';
+            if (@file_put_contents($pdfPath, $dompdf->output()) === false) {
+                throw new \RuntimeException('No se pudo guardar el PDF de validación.');
+            }
+
+            $updated = DB::transaction(function () use ($ids, $method, $boxValue, $idUsuario, $code) {
+                $locked = DetCart::whereIn('intCartdetId', $ids)->lockForUpdate()->get();
+
+                if ($locked->count() !== $ids->count()) {
+                    throw new \RuntimeException('La cantidad de entradas cambió durante la validación.');
+                }
+
+                $alreadyUsed = $locked->where('ticketstatus', 1)->pluck('intCartdetId')->values();
+                if ($alreadyUsed->isNotEmpty()) {
+                    throw new \RuntimeException('Algunas entradas ya estaban validadas: ' . $alreadyUsed->implode(', '));
+                }
+
+                $ticket = new Ticket();
+                $ticket->code_coupon = $code;
+                $ticket->tickets = $ids->implode(',');
+                $ticket->code = $code;
+                $ticket->method = $method;
+                $ticket->status_coupon = 1;
+                $ticket->date_used = now();
+                $ticket->save();
+
+                return DetCart::whereIn('intCartdetId', $ids)->update([
+                    'ticketstatus' => 1,
+                    'ticketdateuse' => now(),
+                    'cashier' => $idUsuario,
+                    'box' => $boxValue,
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'pdfUrl' => asset('validate/' . $code . '.pdf'),
+                'received' => $ids->count(),
+                'updated' => $updated,
+                'code' => $code,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error validating ticketera web entries', [
+                'ids' => $ids->all(),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo completar la validación: ' . $e->getMessage(),
+            ], 500);
+        }
     }
-
     public function printfdtQr(Request $request)
     {
         $ids = $request->input('ids'); // String con IDs separados por coma

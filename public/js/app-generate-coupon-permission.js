@@ -485,44 +485,85 @@ $(() => {
     });
 
     $(".send-data").on("click", function () {
+        const $button = $(this);
+
+        if ($button.data("loading")) {
+            return;
+        }
+
         if (e.rows().count() === 0) {
             Toast.fire({
                 icon: "error",
                 title: "No hay entradas en la lista",
             });
-        } else {
-            $.blockUI({
-                message:
-                    '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
-                css: { backgroundColor: "transparent", border: "0" },
-                overlayCSS: { opacity: 0.5 },
-            });
-            var ids = e.column(1).data().toArray().join(",");
-            $.ajax({
-                url: "printQR",
-                method: "POST",
-                data: { ids: ids, _token: csrfToken, method: 2 },
-            })
-                .done((response) => {
-                    var pdfUrl = response.pdfUrl;
+            return;
+        }
 
-                    var newWindow = window.open(pdfUrl);
+        var ids = e.column(1).data().toArray().join(",");
+        $button.data("loading", true).prop("disabled", true);
 
+        $.blockUI({
+            message:
+                '<div class="sk-wave mx-auto"><div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div> <div class="sk-rect sk-wave-rect"></div></div>',
+            css: { backgroundColor: "transparent", border: "0" },
+            overlayCSS: { opacity: 0.5 },
+        });
+
+        $.ajax({
+            url: "printQR",
+            method: "POST",
+            timeout: 120000,
+            data: { ids: ids, _token: csrfToken, method: 2 },
+        })
+            .done((response) => {
+                if (!response.success) {
+                    Toast.fire({
+                        icon: "error",
+                        title: response.message || "No se pudo validar las entradas",
+                    });
+                    return;
+                }
+
+                var pdfUrl = response.pdfUrl;
+                var newWindow = window.open(pdfUrl, "_blank");
+
+                if (newWindow) {
                     newWindow.onload = function () {
                         newWindow.print();
                     };
+                } else {
+                    Toast.fire({
+                        icon: "warning",
+                        title: "La boleta se generó, pero el navegador bloqueó la ventana emergente",
+                    });
+                }
 
-                    e.clear().draw();
-                })
-                .fail((error) => {
-                    console.log(error.responseText);
-                })
-                .always(() => {
-                    $.unblockUI();
+                e.clear().draw();
+                entriesAmount();
+
+                Toast.fire({
+                    icon: "success",
+                    title: `${response.updated || 0} de ${response.received || 0} entradas validadas`,
                 });
-        }
-    });
+            })
+            .fail((error) => {
+                const response = error.responseJSON || {};
+                const message = response.message ||
+                    (error.statusText === "timeout"
+                        ? "La validación tardó demasiado. Revisa si se generó la boleta antes de volver a intentar."
+                        : "Error al validar las entradas");
 
+                Toast.fire({
+                    icon: "error",
+                    title: message,
+                });
+                console.error(error.responseText || error);
+            })
+            .always(() => {
+                $button.data("loading", false).prop("disabled", false);
+                $.unblockUI();
+            });
+    });
     $(".send-whatsapp").on("click", function () {
         $.blockUI({
             message:
