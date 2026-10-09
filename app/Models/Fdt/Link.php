@@ -102,7 +102,11 @@ class Link extends Model
                 'user_auth'       => $row->user_auth,
                 'authorized_by_name' => $row->authorizedBy?->usuario,
                 'date_auth'        => $row->date_auth,
+                'observation'      => $row->observation,
                 'status'            => $row->status ?? null,
+                'created_at'        => $row->created_at->format('Y-m-d H:i:s'),
+                'user_created'      => $row->user?->usuario,
+                'code_auth'         => $row->code_auth,
             ];
         }
 

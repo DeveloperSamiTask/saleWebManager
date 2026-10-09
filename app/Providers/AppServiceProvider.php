@@ -200,7 +200,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'Validate courtesy pass entries',
             ],
             [
-                'roles' => [1],
+                'roles' => [1,2],
                 'companies' => [1,2],
                 'route' => 'courtesy.validate_food',
                 'icon' => 'mdi mdi-food-fork-drink',
