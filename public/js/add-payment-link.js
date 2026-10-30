@@ -215,16 +215,17 @@
                         },
                     },
                 },
-                number_doc: {
-                    validators: {
-                        notEmpty: {
-                            message: "Ingresa el número de documento",
-                        },
-                        numeric: {
-                            message: "El número de documento debe ser numérico",
-                        },
-                    },
-                },
+               number_doc: {
+    validators: {
+        notEmpty: {
+            message: "Ingresa el numero de documento",
+        },
+        regexp: {
+            regexp: /^[A-Za-z0-9]+$/,
+            message: "El documento solo debe contener letras y numeros",
+        },
+    },
+},
                 phone: {
                     validators: {
                         notEmpty: {

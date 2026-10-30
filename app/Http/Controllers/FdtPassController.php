@@ -932,4 +932,33 @@ class FdtPassController extends Controller
             ], 500);
         }
     }
+    
+    
+    public function resendValidationEmail(string $code)
+    {
+        $code = trim($code);
+    
+        $purchase = Link::where('code', $code)->first();
+    
+        if (!$purchase) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró el pase de cortesía.',
+            ], 404);
+        }
+    
+        if ($purchase->date_auth || (string) $purchase->code_auth === '1') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este pase ya fue autorizado; no necesita otro correo de validación.',
+            ], 409);
+        }
+    
+        JobVCourtesy::dispatch($purchase->code);
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'El correo de validación fue puesto nuevamente en la cola de envío.',
+        ]);
+    }
 }

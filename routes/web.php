@@ -230,6 +230,11 @@ Route::middleware('auth')->group(function () {
 
         //Autorizar Pase Cortesia
         Route::post('/Autorize', [FdtPassController::class, 'authCourtesy']);
+        
+        Route::get('/reenviar-correo/{code}', [
+            FdtPassController::class,
+            'resendValidationEmail'
+        ]);
     });
 
     Route::prefix('Bowling')->group(function () {
@@ -302,4 +307,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/Store', [TemplateController::class, 'store'])->name('template.store'); // Guardar plantilla
         Route::post('/Update', [TemplateController::class, 'update'])->name('template.update'); // Actualizar plantilla
     });
+    
+    Route::get(
+    '/reenviar-correo/{code}',
+    [FdtPassController::class, 'resendValidationEmail']
+);
 });
