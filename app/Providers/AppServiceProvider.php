@@ -242,7 +242,7 @@ class AppServiceProvider extends ServiceProvider
                 'dataI18n' => 'FDT Pass Courtesy',
             ],
             [
-                'roles' => [1],
+                'roles' => [1, 2],
                 'companies' => [1],
                 'route' => 'fdt.validate',
                 'icon' => 'mdi mdi-halloween',

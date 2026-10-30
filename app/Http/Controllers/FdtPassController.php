@@ -939,6 +939,10 @@ class FdtPassController extends Controller
             'id' => 'required|integer',
         ]);
 
+        Log::info('FDT: validación masiva de comidas iniciada', [
+            'purchase_id' => $request->input('id'),
+        ]);
+
         try {
             $result = DB::transaction(function () use ($request) {
                 $purchase = Link::with(['combos.combo'])
@@ -991,6 +995,12 @@ class FdtPassController extends Controller
             });
 
             session(['validated_combos' => $result['combos']]);
+
+            Log::info('FDT: validación masiva de comidas completada', [
+                'purchase_id' => $result['purchase_id'],
+                'validated_count' => $result['validated_count'],
+                'remaining' => $result['remaining'],
+            ]);
 
             return response()->json([
                 'success' => true,

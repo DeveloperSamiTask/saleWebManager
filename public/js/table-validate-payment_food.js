@@ -2,6 +2,16 @@
 
 $(function () {
     const qrStorageKey = "paymentLink.validate.food.qr";
+
+    function setDebugStatus(message, color = "muted") {
+        $("#paymentLinkDebug")
+            .removeClass("text-muted text-success text-danger text-warning")
+            .addClass(`text-${color}`)
+            .text(message);
+    }
+
+    setDebugStatus("JAVASCRIPT NUEVO CARGADO - frontend comida funcionando", "success");
+
     var t,
         s = $(".dt-row-grouping"),
         d =
@@ -120,10 +130,20 @@ $(function () {
 
         blockUI();
         clearAlerts();
+        setDebugStatus("FRONTEND COMIDA OK - consultando QR...", "warning");
 
         fetchQRDetails(code)
-            .done(renderQRInfo)
-            .fail(showQRFetchError)
+            .done(function (response) {
+                renderQRInfo(response);
+                setDebugStatus("FRONTEND COMIDA OK - respuesta recibida del backend", "success");
+            })
+            .fail(function (xhr) {
+                showQRFetchError(xhr);
+                setDebugStatus(
+                    `FRONTEND COMIDA ERROR - backend respondió ${xhr.status || "sin respuesta"}`,
+                    "danger"
+                );
+            })
             .always($.unblockUI);
     }
 
