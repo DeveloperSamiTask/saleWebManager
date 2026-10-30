@@ -74,6 +74,9 @@
                                                 placeholder="Escanea Código QR Aqui">
                                             <label class="mb-0" for="qrCode">Escanea Código QR Aqui</label>
                                         </div>
+                                        <small id="paymentLinkDebug" class="d-block text-muted mt-2">
+                                            VISTA NUEVA CARGADA - esperando JavaScript...
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -144,7 +147,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Validar</button>
+                            <button type="submit" id="btnValidateDni" class="btn btn-primary">Validar</button>
                         </div>
                     </form>
                 </div>

@@ -141,6 +141,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/qr/details/{code}', [PaymentLinkController::class, 'getQrDetails'])->name('qr.details');
         Route::get('/qr/details_food/{code}', [PaymentLinkController::class, 'getQrDetailsByCombo'])->name('qr.details_food');
         Route::post('/validate/dni', [PaymentLinkController::class, 'dniValidate']);
+        Route::post('/validate/all', [PaymentLinkController::class, 'validateAll'])->name('paymentLink.validate_all');
+        Route::post('/validate/all-food', [PaymentLinkController::class, 'validateAllFood'])->name('paymentLink.validate_all_food');
         Route::post('/validate/combos', [PaymentLinkController::class, 'validateCombo']);
         Route::get('/printFood', [PaymentLinkController::class, 'printFood'])->name('printFood');
         Route::get('/print', [PaymentLinkController::class, 'print'])->name('print');
@@ -223,6 +225,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/Validar_Comidas_Pase_Cortesia', [FdtPassController::class, 'validateFormFood'])->name('fdt.validate_food'); // Api pagos
 
         Route::post('/validate/dni', [FdtPassController::class, 'dniValidate']);
+        Route::post('/validate/all', [FdtPassController::class, 'validateAll'])->name('fdt.validate_all');
+        Route::post('/validate/all-food', [FdtPassController::class, 'validateAllFood'])->name('fdt.validate_all_food');
         Route::post('/validate/combos', [FdtPassController::class, 'validateCombo']);
 
         Route::get('/print', [FdtPassController::class, 'print'])->name('print');

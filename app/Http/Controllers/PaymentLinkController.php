@@ -24,6 +24,7 @@ use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\Label\Font\OpenSans;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 use ZipArchive;
@@ -309,6 +310,11 @@ class PaymentLinkController extends Controller
     public function getQrDetails($code, Request $request)
     {
         session()->forget('validated_members');
+        Log::info('Pago Link: consulta de QR recibida', [
+            'code' => $code,
+            'validate' => $request->query('validate') === '1',
+        ]);
+
         try {
             $link = $this->findPurchaseLinkByCode($code);
 
@@ -323,6 +329,12 @@ class PaymentLinkController extends Controller
 
 
             $data = $this->formatMembersData($link);
+
+            Log::info('Pago Link: consulta de QR respondida', [
+                'purchase_id' => $link->id,
+                'status' => $link->status,
+                'members_count' => count($data),
+            ]);
 
             return response()->json([
                 'data' => $data,
@@ -364,6 +376,7 @@ class PaymentLinkController extends Controller
                     'names'  => $member->name,
                     'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción') . ' (' . $combo->quantity . ')',
                     'document'    => $member->dni,
+                    'dni'         => $member->dni,
                     'user'    => $member->user,
                     'activate'    => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : 'No activado',
                     'status' => $member->status_entrie ?? null,
@@ -493,6 +506,181 @@ class PaymentLinkController extends Controller
         return $data;
     }
 
+    /**
+     * Valida todas las entradas pendientes de una compra Pago Link en una sola transacción.
+     */
+    public function validateAll(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        Log::info('Pago Link: validación masiva iniciada', [
+            'purchase_id' => $request->input('id'),
+        ]);
+
+        try {
+            $result = DB::connection('mysql_paylink')->transaction(function () use ($request) {
+                $purchase = PurchaseLink::with('combos')
+                    ->lockForUpdate()
+                    ->findOrFail($request->input('id'));
+
+                $comboIds = $purchase->combos->pluck('id');
+                $members = PurchaseComboMember::whereIn('purchase_combo_id', $comboIds)
+                    ->where('status_entrie', 'unused')
+                    ->lockForUpdate()
+                    ->get();
+
+                $now = now();
+                $user = session('user')['usuario'] ?? 'Desconocido';
+                $validatedMembers = [];
+
+                foreach ($members as $member) {
+                    $member->status_entrie = 'used';
+                    $member->user = $user;
+                    $member->issue_entrie = $now;
+                    $member->save();
+
+                    $validatedMembers[] = [
+                        'id' => $member->id,
+                        'name' => $member->name,
+                        'dni' => $member->dni,
+                    ];
+                }
+
+                $remaining = PurchaseComboMember::whereIn('purchase_combo_id', $comboIds)
+                    ->where('status_entrie', 'unused')
+                    ->count();
+
+                $purchase->status = $remaining === 0 ? 'used' : 'unused';
+                $purchase->user_active = session('user')['idusuario'] ?? null;
+                $purchase->activate_date = $now;
+                $purchase->save();
+
+                return [
+                    'purchase_id' => $purchase->id,
+                    'validated_count' => count($validatedMembers),
+                    'remaining' => $remaining,
+                    'members' => $validatedMembers,
+                ];
+            });
+
+            session(['validated_members' => $result['members']]);
+
+            Log::info('Pago Link: validación masiva completada', [
+                'purchase_id' => $result['purchase_id'],
+                'validated_count' => $result['validated_count'],
+                'remaining' => $result['remaining'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['validated_count'] > 0
+                    ? 'Todas las entradas fueron validadas correctamente.'
+                    : 'Las entradas ya estaban validadas.',
+                'data' => $result,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró la compra Pago Link.',
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error('Error en validación masiva de Pago Link', [
+                'purchase_id' => $request->input('id'),
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudieron validar las entradas. No se aplicaron cambios.',
+            ], 500);
+        }
+    }
+
+    /**
+     * Valida todos los combos pendientes de comida de una compra Pago Link en una sola transacción.
+     */
+    public function validateAllFood(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        try {
+            $result = DB::connection('mysql_paylink')->transaction(function () use ($request) {
+                $purchase = PurchaseLink::with('combos')
+                    ->lockForUpdate()
+                    ->findOrFail($request->input('id'));
+
+                $validatedCombos = [];
+                $remaining = 0;
+                $now = now();
+
+                foreach ($purchase->combos as $combo) {
+                    $validations = PurchaseComboValidation::where('purchase_link_combo_id', $combo->id)
+                        ->lockForUpdate()
+                        ->get();
+                    $validatedQty = $validations->sum('validated_qty');
+                    $pendingQty = max(0, $combo->quantity - $validatedQty);
+
+                    if ($pendingQty > 0) {
+                        PurchaseComboValidation::create([
+                            'purchase_link_combo_id' => $combo->id,
+                            'validated_qty' => $pendingQty,
+                            'validated_at' => $now,
+                            'validated_by' => auth()->id(),
+                        ]);
+
+                        $validatedCombos[] = [
+                            'id' => $combo->id,
+                            'quantity' => $pendingQty,
+                        ];
+                    }
+
+                    $remaining += max(0, $combo->quantity - ($validatedQty + $pendingQty));
+                }
+
+                $purchase->status = $remaining === 0 ? 'used' : 'unused';
+                $purchase->user_active = session('user')['idusuario'] ?? null;
+                $purchase->activate_date = $now;
+                $purchase->save();
+
+                return [
+                    'purchase_id' => $purchase->id,
+                    'validated_count' => count($validatedCombos),
+                    'remaining' => $remaining,
+                    'combos' => $validatedCombos,
+                ];
+            });
+
+            session(['validated_combos' => $result['combos']]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['validated_count'] > 0
+                    ? 'Todos los combos fueron validados correctamente.'
+                    : 'Los combos ya estaban validados.',
+                'data' => $result,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró la compra Pago Link.',
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error('Error en validación masiva de comidas Pago Link', [
+                'purchase_id' => $request->input('id'),
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudieron validar los combos. No se aplicaron cambios.',
+            ], 500);
+        }
+    }
+
     public function validateCombo(Request $request)
     {
         $request->validate([
@@ -573,49 +761,41 @@ class PaymentLinkController extends Controller
             $id = $request->input('id');
 
             // 1️⃣ Traemos la compra con sus combos
-            $purchase = PurchaseLink::with('combos.combo')->findOrFail($id);
+            $purchase = PurchaseLink::with(['combos.combo', 'combos.validations'])->findOrFail($id);
 
             // 2️⃣ Actualizamos estado general de la compra (usada / sin usar)
-            $unusedCombos = $purchase->combos()->whereDoesntHave('validations')->count();
+            $unusedCombos = $purchase->combos->filter(function ($combo) {
+                return $combo->validations->sum('validated_qty') < $combo->quantity;
+            })->count();
 
             $purchase->status = $unusedCombos > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->user_active = session('user')['idusuario'] ?? null;
             $purchase->activate_date = now();
             $purchase->save();
 
-            // 3️⃣ Recuperamos lo validado en la sesión
-            $validated = session('validated_combos', []);
-
-            // Agrupar lo validado por combo_id
-            $agrupadosPorCombo = collect($validated)->groupBy('id');
+            // El ticket usa las cantidades reales guardadas en BD.
+            $validated = [];
+            $agrupadosPorCombo = collect();
 
             $data = [];
 
-            foreach ($agrupadosPorCombo as $comboId => $validaciones) {
-                $combo = $purchase->combos->firstWhere('id', $comboId);
-
-                if (!$combo) continue; // por seguridad
-
+            foreach ($purchase->combos as $combo) {
                 $cantidad       = $combo->quantity;
                 $precioUnitario = $combo->combo->price ?? 0;
                 $descripcion    = $combo->combo->description ?? '';
                 $nombre         = $combo->combo->name ?? '';
+                $validados      = $combo->validations->sum('validated_qty');
 
-                $validadosPrevios = PurchaseComboValidation::where('purchase_link_combo_id', $comboId)
-                    ->sum('validated_qty');
-
-                Log::info("Combo ID: {$comboId}, Validados Previos: {$validadosPrevios}");
-
-                $validados = $validaciones->sum('quantity');
-
-                $pendientes = max(0, $cantidad - $validadosPrevios);
+                if ($validados === 0) {
+                    continue;
+                }
 
                 $data[] = [
                     'combo'       => strtoupper($nombre),
                     'descripcion' => strtoupper($descripcion),
                     'cantidad'    => $cantidad,
                     'validados'   => $validados,
-                    'pendientes'  => $pendientes,
+                    'pendientes'  => max(0, $cantidad - $validados),
                     'subtotal'    => $cantidad * $precioUnitario,
                 ];
             }
@@ -718,6 +898,7 @@ class PaymentLinkController extends Controller
                 'names'    => $member->name,
                 'combo'    => $combo->name . ' - ' . ($combo->description ?? 'Sin descripción'),
                 'document' => $member->dni,
+                'dni'      => $member->dni,
                 'status'   => $member->status_entrie,
             ],
         ]);
@@ -728,7 +909,7 @@ class PaymentLinkController extends Controller
         try {
             $id = $request->input('id');
 
-            $purchase = PurchaseLink::with('combos.combo')->findOrFail($id);
+            $purchase = PurchaseLink::with(['combos.combo', 'combos.members'])->findOrFail($id);
 
             $purchaseComboMembersUnused = PurchaseComboMember::whereHas('purchaseCombo', function ($query) use ($id) {
                 $query->whereHas('purchaseLink', function ($query) use ($id) {
@@ -737,7 +918,7 @@ class PaymentLinkController extends Controller
             })->where('status_entrie', 'unused')->count();
 
             $purchase->status = $purchaseComboMembersUnused > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->user_active = session('user')['idusuario'] ?? null;
             $purchase->activate_date = now();
             $purchase->save();
 
@@ -751,9 +932,8 @@ class PaymentLinkController extends Controller
                 $precioUnitario = $combo->combo->price ?? 0;
                 $descripcion = $combo->combo->description ?? '';
                 $nombre = $combo->combo->name ?? '';
-                $validados = $agrupadosPorCombo->has($nombre)
-                    ? $agrupadosPorCombo[$nombre]->count()
-                    : 0;
+                // El total impreso se obtiene de BD, no solo de la sesión.
+                $validados = $combo->members->where('status_entrie', 'used')->count();
 
 
                 $data[] = [

@@ -15,6 +15,7 @@ use Dompdf\Dompdf;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 
@@ -380,7 +381,7 @@ class FdtPassController extends Controller
         try {
             $id = $request->input('id');
 
-            $purchase = Link::with('combos.combo')->findOrFail($id);
+            $purchase = Link::with(['combos.combo', 'combos.members'])->findOrFail($id);
 
             $purchaseComboMembersUnused = ComboMember::whereHas('purchaseCombo', function ($query) use ($id) {
                 $query->whereHas('purchaseLink', function ($query) use ($id) {
@@ -389,7 +390,7 @@ class FdtPassController extends Controller
             })->where('status_entrie', 'unused')->count();
 
             $purchase->status = $purchaseComboMembersUnused > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->user_active = session('user')['idusuario'] ?? null;
             $purchase->activate_date = now();
             $purchase->save();
 
@@ -403,9 +404,8 @@ class FdtPassController extends Controller
                 $precioUnitario = $combo->combo->price ?? 0;
                 $descripcion = $combo->combo->description ?? '';
                 $nombre = $combo->combo->name ?? '';
-                $validados = $agrupadosPorCombo->has($nombre)
-                    ? $agrupadosPorCombo[$nombre]->count()
-                    : 0;
+                // El ticket usa el estado real guardado en BD.
+                $validados = $combo->members->where('status_entrie', 'used')->count();
 
 
                 $data[] = [
@@ -544,47 +544,47 @@ class FdtPassController extends Controller
             $id = $request->input('id');
 
             // 1️⃣ Traemos la compra con sus combos
-            $purchase = Link::with('combos.combo')->findOrFail($id);
+            $purchase = Link::with(['combos.combo', 'combos.validations'])->findOrFail($id);
 
             // 2️⃣ Actualizamos estado general de la compra (usada / sin usar)
-            $unusedCombos = $purchase->combos()->whereDoesntHave('validations')->count();
+            $unusedCombos = $purchase->combos->filter(function ($combo) {
+                return $combo->combo
+                    && $combo->combo->has_food == 1
+                    && $combo->validations->sum('validated_qty') < $combo->quantity;
+            })->count();
 
             $purchase->status = $unusedCombos > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->user_active = session('user')['idusuario'] ?? null;
             $purchase->activate_date = now();
             $purchase->save();
 
-            // 3️⃣ Recuperamos lo validado en la sesión
-            $validated = session('validated_combos', []);
-
-            // Agrupar lo validado por combo_id
-            $agrupadosPorCombo = collect($validated)->groupBy('id');
+            // El ticket usa las cantidades reales guardadas en BD.
+            $validated = [];
+            $agrupadosPorCombo = collect();
 
             $data = [];
 
-            foreach ($agrupadosPorCombo as $comboId => $validaciones) {
-                $combo = $purchase->combos->firstWhere('id', $comboId);
-
-                if (!$combo) continue; // por seguridad
+            foreach ($purchase->combos as $combo) {
+                if (!$combo->combo || $combo->combo->has_food != 1) {
+                    continue;
+                }
 
                 $cantidad       = $combo->quantity;
                 $precioUnitario = $combo->combo->price ?? 0;
                 $descripcion    = $combo->combo->description ?? '';
                 $nombre         = $combo->combo->name ?? '';
+                $validados      = $combo->validations->sum('validated_qty');
 
-                $validadosPrevios = ComboValidation::where('purchase_link_combo_id', $comboId)
-                    ->sum('validated_qty');
-
-                $validados = $validaciones->sum('quantity');
-
-                $pendientes = max(0, $cantidad - $validadosPrevios);
+                if ($validados === 0) {
+                    continue;
+                }
 
                 $data[] = [
                     'combo'       => strtoupper($nombre),
                     'descripcion' => strtoupper($descripcion),
                     'cantidad'    => $cantidad,
                     'validados'   => $validados,
-                    'pendientes'  => $pendientes,
+                    'pendientes'  => max(0, $cantidad - $validados),
                     'subtotal'    => $cantidad * $precioUnitario,
                 ];
             }
@@ -663,6 +663,11 @@ class FdtPassController extends Controller
     public function getQrDetails($code, Request $request)
     {
         session()->forget('validated_members');
+        Log::info('FDT: consulta de QR recibida', [
+            'code' => $code,
+            'validate' => $request->query('validate') === '1',
+        ]);
+
         try {
 
             $link = $this->findPurchaseLinkByCode($code);
@@ -678,6 +683,12 @@ class FdtPassController extends Controller
 
 
             $data = $this->formatMembersData($link);
+
+            Log::info('FDT: consulta de QR respondida', [
+                'purchase_id' => $link->id,
+                'status' => $link->status,
+                'members_count' => count($data),
+            ]);
 
             return response()->json([
                 'data' => $data,
@@ -720,6 +731,7 @@ class FdtPassController extends Controller
                     'names'  => $member->name,
                     'combo'  => $combo->combo->name . ' - ' . ($combo->combo->description ?? 'Sin descripción') . ' (' . $combo->quantity . ')',
                     'document'    => $member->dni,
+                    'dni'         => $member->dni,
                     'user'    => $member->user,
                     'activate'    => $member->issue_entrie ? Carbon::parse($member->issue_entrie)->format('d/m/Y H:i:s') : 'No activado',
                     'status' => $member->status_entrie ?? null,
@@ -820,6 +832,189 @@ class FdtPassController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * Valida todas las entradas pendientes de un pase FDT en una sola transacción.
+     */
+    public function validateAll(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        Log::info('FDT: validación masiva iniciada', [
+            'purchase_id' => $request->input('id'),
+        ]);
+
+        try {
+            $result = DB::transaction(function () use ($request) {
+                $purchase = Link::with(['combos.combo'])
+                    ->lockForUpdate()
+                    ->findOrFail($request->input('id'));
+
+                $comboIds = $purchase->combos->pluck('id');
+                $members = ComboMember::whereIn('purchase_combo_id', $comboIds)
+                    ->where('status_entrie', 'unused')
+                    ->lockForUpdate()
+                    ->get();
+
+                $now = now();
+                $user = session('user')['usuario'] ?? 'Desconocido';
+                $validatedMembers = [];
+
+                foreach ($members as $member) {
+                    $member->status_entrie = 'used';
+                    $member->user = $user;
+                    $member->issue_entrie = $now;
+                    $member->save();
+
+                    $combo = $member->purchaseCombo->combo;
+                    $validatedMembers[] = [
+                        'id' => $member->id,
+                        'name' => $member->name,
+                        'combo_id' => $combo->id ?? null,
+                        'combo' => $combo->name ?? 'Sin nombre',
+                        'descripcion' => $combo->description ?? 'Sin descripción',
+                        'dni' => $member->dni,
+                    ];
+                }
+
+                $remaining = ComboMember::whereIn('purchase_combo_id', $comboIds)
+                    ->where('status_entrie', 'unused')
+                    ->count();
+
+                $purchase->status = $remaining === 0 ? 'used' : 'unused';
+                $purchase->user_active = session('user')['idusuario'] ?? null;
+                $purchase->activate_date = $now;
+                $purchase->save();
+
+                return [
+                    'purchase_id' => $purchase->id,
+                    'validated_count' => count($validatedMembers),
+                    'remaining' => $remaining,
+                    'members' => $validatedMembers,
+                ];
+            });
+
+            session(['validated_members' => $result['members']]);
+
+            Log::info('FDT: validación masiva completada', [
+                'purchase_id' => $result['purchase_id'],
+                'validated_count' => $result['validated_count'],
+                'remaining' => $result['remaining'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['validated_count'] > 0
+                    ? 'Todas las entradas fueron validadas correctamente.'
+                    : 'Las entradas ya estaban validadas.',
+                'data' => $result,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró el pase de cortesía.',
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error('Error en validación masiva FDT', [
+                'purchase_id' => $request->input('id'),
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudieron validar las entradas. No se aplicaron cambios.',
+            ], 500);
+        }
+    }
+
+    /**
+     * Valida todos los combos de comida pendientes de un pase FDT.
+     */
+    public function validateAllFood(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        try {
+            $result = DB::transaction(function () use ($request) {
+                $purchase = Link::with(['combos.combo'])
+                    ->lockForUpdate()
+                    ->findOrFail($request->input('id'));
+
+                $validatedCombos = [];
+                $remaining = 0;
+                $now = now();
+
+                foreach ($purchase->combos as $combo) {
+                    if (!$combo->combo || $combo->combo->has_food != 1) {
+                        continue;
+                    }
+
+                    $validations = ComboValidation::where('purchase_link_combo_id', $combo->id)
+                        ->lockForUpdate()
+                        ->get();
+                    $validatedQty = $validations->sum('validated_qty');
+                    $pendingQty = max(0, $combo->quantity - $validatedQty);
+
+                    if ($pendingQty > 0) {
+                        ComboValidation::create([
+                            'purchase_link_combo_id' => $combo->id,
+                            'validated_qty' => $pendingQty,
+                            'validated_at' => $now,
+                            'validated_by' => auth()->id(),
+                        ]);
+
+                        $validatedCombos[] = [
+                            'id' => $combo->id,
+                            'quantity' => $pendingQty,
+                        ];
+                    }
+
+                    $remaining += max(0, $combo->quantity - ($validatedQty + $pendingQty));
+                }
+
+                $purchase->status = $remaining === 0 ? 'used' : 'unused';
+                $purchase->user_active = session('user')['idusuario'] ?? null;
+                $purchase->activate_date = $now;
+                $purchase->save();
+
+                return [
+                    'purchase_id' => $purchase->id,
+                    'validated_count' => count($validatedCombos),
+                    'remaining' => $remaining,
+                    'combos' => $validatedCombos,
+                ];
+            });
+
+            session(['validated_combos' => $result['combos']]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['validated_count'] > 0
+                    ? 'Todos los combos fueron validados correctamente.'
+                    : 'Los combos ya estaban validados.',
+                'data' => $result,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró el pase de cortesía.',
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error('Error en validación masiva de comidas FDT', [
+                'purchase_id' => $request->input('id'),
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudieron validar los combos. No se aplicaron cambios.',
+            ], 500);
+        }
     }
 
     private function formatLinkData($link)

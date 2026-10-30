@@ -1,6 +1,7 @@
 "use strict";
 
 $(function () {
+    const qrStorageKey = "paymentLink.validate.food.qr";
     var t,
         s = $(".dt-row-grouping"),
         d =
@@ -87,6 +88,11 @@ $(function () {
                         sortDescending: ": activar para ordenar descendente",
                     },
                 },
+                rowCallback: function (row, data) {
+                    $(row)
+                        .toggleClass("table-success", data.status === "used")
+                        .toggleClass("table-danger", data.status !== "used");
+                },
             })),
             $(".dt-row-grouping tbody").on("click", "tr.group", function () {
                 var e = t.order()[0];
@@ -98,11 +104,19 @@ $(function () {
 
     $("#qrCode").change(handleQRCodeChange);
 
+    const savedQrCode = sessionStorage.getItem(qrStorageKey);
+    if (savedQrCode) {
+        $("#qrCode").val(savedQrCode);
+        handleQRCodeChange.call($("#qrCode")[0]);
+    }
+
     // Controlador principal del cambio de QR
     function handleQRCodeChange() {
         const code = this.value?.trim();
 
         if (!code) return;
+
+        sessionStorage.setItem(qrStorageKey, code);
 
         blockUI();
         clearAlerts();
@@ -140,11 +154,27 @@ $(function () {
     }
 
     function updateStatusBadge(status, id) {
+        if (!id) {
+            $("#status").empty();
+            return;
+        }
+
+        const statusLabels = {
+            unused: { text: "SIN USAR", color: "danger" },
+            partial: { text: "PARCIAL", color: "warning" },
+            used: { text: "USADO", color: "success" },
+        };
+        const label = statusLabels[status] || {
+            text: "DESCONOCIDO",
+            color: "secondary",
+        };
+        const action = status === "used" ? "IMPRIMIR" : "VALIDAR TODO";
 
         $("#status").html(`
-        <button class="btn btn-sm btn-danger" id ="btnPrint" data-id="${id}">
-            <i class="mdi mdi-file-pdf-box me-1"></i> Imprimir
+        <button class="btn btn-sm btn-${label.color}" id="btnPrint" data-id="${id}" data-status="${status}">
+            <i class="mdi mdi-file-pdf-box me-1"></i> ${label.text}
         </button>
+        <small class="d-block mt-1 text-muted">${action}</small>
     `);
     }
 
@@ -287,6 +317,53 @@ $(function () {
 
     $(document).on("click", "#btnPrint", function () {
         const id = $(this).data("id");
+        const status = $(this).data("status");
+
+        if (status !== "used") {
+            const printWindow = window.open("about:blank", "_blank");
+
+            $.ajax({
+                url: "validate/all-food",
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                data: { id },
+                beforeSend: blockUI,
+                success: function (response) {
+                    updateStatusBadge("used", id);
+
+                    const table = $(".dt-row-grouping").DataTable();
+                    table.rows().every(function () {
+                        const row = this.data();
+                        row.status = "used";
+                        row.validated_qty = row.quantity;
+                        this.data(row);
+                    });
+                    table.draw(false);
+
+                    Toast.fire({ icon: "success", title: response.message });
+                    if (printWindow) {
+                        printWindow.location = "printFood?id=" + id;
+                    } else {
+                        window.open("printFood?id=" + id, "_blank");
+                    }
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                },
+                error: function (xhr) {
+                    if (printWindow) printWindow.close();
+                    Toast.fire({
+                        icon: "error",
+                        title: xhr.responseJSON?.message || "No se pudieron validar los combos.",
+                    });
+                },
+                complete: $.unblockUI,
+            });
+            return;
+        }
+
         window.open("printFood?id=" + id, "_blank");
 
         setTimeout(function () {

@@ -1,6 +1,17 @@
 "use strict";
 
 $(function () {
+    const qrStorageKey = "paymentLink.validate.qr";
+
+    function setDebugStatus(message, color = "muted") {
+        $("#paymentLinkDebug")
+            .removeClass("text-muted text-success text-danger text-warning")
+            .addClass(`text-${color}`)
+            .text(message);
+    }
+
+    setDebugStatus("JAVASCRIPT NUEVO CARGADO - frontend funcionando", "success");
+
     var t,
         s = $(".dt-row-grouping"),
         d =
@@ -9,7 +20,7 @@ $(function () {
                 columns: [
                     { data: "" },
                     { data: "names" },
-                    { data: "combo" },
+                    { data: "document" },
                     { data: "status" },
                 ],
                 columnDefs: [
@@ -29,7 +40,12 @@ $(function () {
                             return `<span class="text-dark text-uppercase">${a.names}</span>`;
                         },
                     },
-                    { visible: !1, targets: 2 },
+                    {
+                        targets: 2,
+                        render: function (e, t, a) {
+                            return `<span class="text-dark">${a.document ?? a.dni ?? ""}</span>`;
+                        },
+                    },
                     {
                         targets: 3,
                         render: function (e, t, a, s) {
@@ -58,7 +74,7 @@ $(function () {
 
                             return `
                             <button
-                                class="btn btn-sm ${btnClass} btnValidate"
+                                class="btn btn-sm ${btnClass} memberStatus"
                                 data-id="${a.id}"
                                 data-names="${a.names}"
                                 data-status="${a.status}"
@@ -94,34 +110,51 @@ $(function () {
                         sortDescending: ": activar para ordenar descendente",
                     },
                 },
-                drawCallback: function (e) {
-                    var t = this.api(),
-                        a = t.rows({ page: "current" }).nodes(),
-                        s = null;
-                    t.column(2, { page: "current" })
-                        .data()
-                        .each(function (e, t) {
-                            s !== e &&
-                                ($(a)
-                                    .eq(t)
-                                    .before(
-                                        '<tr class="group"><td colspan="8">' +
-                                            e +
-                                            "</td></tr>"
-                                    ),
-                                (s = e));
-                        });
+                rowCallback: function (row, data) {
+                    $(row)
+                        .toggleClass("table-success", data.status === "used")
+                        .toggleClass("table-danger", data.status !== "used");
+                },
+                drawCallback: function () {
+                    const table = this.api();
+                    const rows = table.rows({ page: "current" }).nodes();
+                    let lastCombo = null;
+                    let position = 0;
+
+                    table.rows({ page: "current" }).every(function () {
+                        const rowData = this.data();
+                        const combo = rowData?.combo || "";
+
+                        if (lastCombo !== combo) {
+                            $(rows)
+                                .eq(position)
+                                .before(
+                                    '<tr class="group"><td colspan="8">' +
+                                        combo +
+                                        "</td></tr>"
+                                );
+                            lastCombo = combo;
+                        }
+
+                        position++;
+                    });
                 },
             })),
             $(".dt-row-grouping tbody").on("click", "tr.group", function () {
                 var e = t.order()[0];
-                (2 === e[0] && "asc" === e[1]
-                    ? t.order([2, "desc"])
-                    : t.order([2, "asc"])
+                (1 === e[0] && "asc" === e[1]
+                    ? t.order([1, "desc"])
+                    : t.order([1, "asc"])
                 ).draw();
             }));
 
     $("#qrCode").change(handleQRCodeChange);
+
+    const savedQrCode = sessionStorage.getItem(qrStorageKey);
+    if (savedQrCode) {
+        $("#qrCode").val(savedQrCode);
+        handleQRCodeChange.call($("#qrCode")[0]);
+    }
 
     // Controlador principal del cambio de QR
     function handleQRCodeChange() {
@@ -129,12 +162,24 @@ $(function () {
 
         if (!code) return;
 
+        sessionStorage.setItem(qrStorageKey, code);
+
         blockUI();
         clearAlerts();
+        setDebugStatus("FRONTEND OK - consultando QR...", "warning");
 
         fetchQRDetails(code)
-            .done(renderQRInfo)
-            .fail(showQRFetchError)
+            .done(function (response) {
+                renderQRInfo(response);
+                setDebugStatus("FRONTEND OK - respuesta recibida del backend", "success");
+            })
+            .fail(function (xhr) {
+                showQRFetchError(xhr);
+                setDebugStatus(
+                    `FRONTEND ERROR - backend respondió ${xhr.status || "sin respuesta"}`,
+                    "danger"
+                );
+            })
             .always($.unblockUI);
     }
 
@@ -156,7 +201,12 @@ $(function () {
     }
 
     function updateDataTable(data) {
-        $(".dt-row-grouping").DataTable().clear().rows.add(data).draw();
+        const normalizedData = (data || []).map((member) => ({
+            ...member,
+            document: member.document ?? member.dni ?? "",
+        }));
+
+        $(".dt-row-grouping").DataTable().clear().rows.add(normalizedData).draw();
     }
 
     function updateUserInfo(link) {
@@ -165,6 +215,11 @@ $(function () {
     }
 
     function updateStatusBadge(status, id) {
+        if (!id) {
+            $("#status").empty();
+            return;
+        }
+
         const statusLabels = {
             unused: { text: "SIN USAR", color: "danger" },
             used: { text: "USADO", color: "success" },
@@ -175,10 +230,13 @@ $(function () {
             color: "secondary",
         };
 
+        const action = status === "unused" ? "VALIDAR TODO" : "IMPRIMIR";
+
         $("#status").html(`
-        <button class="btn btn-sm btn-${color}" id ="btnPrint" data-id="${id}">
+        <button class="btn btn-sm btn-${color}" id="btnPrint" data-id="${id}" data-status="${status}">
             <i class="mdi mdi-file-pdf-box me-1"></i> ${text}
         </button>
+        <small class="d-block mt-1 text-muted">${action}</small>
     `);
     }
 
@@ -218,6 +276,20 @@ $(function () {
         updateUserInfo({ names: "", document: "" });
         updateStatusBadge("");
     }
+
+    // El estado de cada persona abre el modal con el DNI cargado desde la BD.
+    t.on("click", ".memberStatus", function () {
+        const rowData = t.row($(this).closest("tr")).data();
+
+        if (!rowData) return;
+
+        $("#modalName").text(rowData.names || "");
+        $("#inputDni").val(rowData.document ?? rowData.dni ?? "");
+        $("#inputDni").prop("readonly", rowData.status === "used");
+        $("#btnValidateDni").toggle(rowData.status !== "used");
+        $("#hiddenRecordId").val(rowData.id || "");
+        $("#validateModal").modal("show");
+    });
 
     t.on("click", ".btnValidate", function () {
         const id = $(this).data("id");
@@ -320,6 +392,52 @@ $(function () {
 
     $(document).on("click", "#btnPrint", function () {
         const id = $(this).data("id");
+        const status = $(this).data("status");
+
+        if (status === "unused") {
+            const printWindow = window.open("about:blank", "_blank");
+
+            $.ajax({
+                url: "validate/all",
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                data: { id },
+                beforeSend: blockUI,
+                success: function (response) {
+                    updateStatusBadge("used", id);
+
+                    const table = $(".dt-row-grouping").DataTable();
+                    table.rows().every(function () {
+                        const row = this.data();
+                        row.status = "used";
+                        this.data(row);
+                    });
+                    table.draw(false);
+
+                    Toast.fire({ icon: "success", title: response.message });
+                    if (printWindow) {
+                        printWindow.location = "print?id=" + id;
+                    } else {
+                        window.open("print?id=" + id, "_blank");
+                    }
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                },
+                error: function (xhr) {
+                    if (printWindow) printWindow.close();
+                    Toast.fire({
+                        icon: "error",
+                        title: xhr.responseJSON?.message || "No se pudieron validar las entradas.",
+                    });
+                },
+                complete: $.unblockUI,
+            });
+            return;
+        }
+
         window.open("print?id=" + id, "_blank");
 
         setTimeout(function () {
