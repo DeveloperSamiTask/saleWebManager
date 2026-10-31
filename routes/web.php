@@ -190,6 +190,11 @@ Route::middleware('auth')->group(function () {
 
         //Autorizar Pase Cortesia
         Route::post('/Autorize', [CourtesyPassController::class, 'authCourtesy']);
+
+        Route::get('/reenviar-correo/{code}', [
+            CourtesyPassController::class,
+            'resendValidationEmail',
+        ]);
     });
 
     Route::prefix('FDT')->group(function () {

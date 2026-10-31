@@ -104,7 +104,7 @@ class ValidateWebs extends Controller
         ]);
 
         $boxValue = session('box');
-        $idUsuario = session('user')['idusuario'] ?? null;
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
 
         $ids = $request->input('ids');
         $ticket = trim($request->input('ticket'));

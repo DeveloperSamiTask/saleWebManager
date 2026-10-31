@@ -515,12 +515,14 @@ class PaymentLinkController extends Controller
             'id' => 'required|integer',
         ]);
 
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
+
         Log::info('Pago Link: validación masiva iniciada', [
             'purchase_id' => $request->input('id'),
         ]);
 
         try {
-            $result = DB::connection('mysql_paylink')->transaction(function () use ($request) {
+            $result = DB::connection('mysql_paylink')->transaction(function () use ($request, $idUsuario) {
                 $purchase = PurchaseLink::with('combos')
                     ->lockForUpdate()
                     ->findOrFail($request->input('id'));
@@ -532,7 +534,7 @@ class PaymentLinkController extends Controller
                     ->get();
 
                 $now = now();
-                $user = session('user')['usuario'] ?? 'Desconocido';
+                $user = session('user')['usuario'] ?? auth()->user()?->usuario;
                 $validatedMembers = [];
 
                 foreach ($members as $member) {
@@ -553,7 +555,7 @@ class PaymentLinkController extends Controller
                     ->count();
 
                 $purchase->status = $remaining === 0 ? 'used' : 'unused';
-                $purchase->user_active = session('user')['idusuario'] ?? null;
+                $purchase->user_active = $idUsuario ?? $purchase->user_active;
                 $purchase->activate_date = $now;
                 $purchase->save();
 
@@ -607,8 +609,10 @@ class PaymentLinkController extends Controller
             'id' => 'required|integer',
         ]);
 
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
+
         try {
-            $result = DB::connection('mysql_paylink')->transaction(function () use ($request) {
+            $result = DB::connection('mysql_paylink')->transaction(function () use ($request, $idUsuario) {
                 $purchase = PurchaseLink::with('combos')
                     ->lockForUpdate()
                     ->findOrFail($request->input('id'));
@@ -629,7 +633,7 @@ class PaymentLinkController extends Controller
                             'purchase_link_combo_id' => $combo->id,
                             'validated_qty' => $pendingQty,
                             'validated_at' => $now,
-                            'validated_by' => auth()->id(),
+                            'validated_by' => $idUsuario,
                         ]);
 
                         $validatedCombos[] = [
@@ -642,7 +646,7 @@ class PaymentLinkController extends Controller
                 }
 
                 $purchase->status = $remaining === 0 ? 'used' : 'unused';
-                $purchase->user_active = session('user')['idusuario'] ?? null;
+                $purchase->user_active = $idUsuario ?? $purchase->user_active;
                 $purchase->activate_date = $now;
                 $purchase->save();
 
@@ -687,7 +691,8 @@ class PaymentLinkController extends Controller
             'record_id' => 'required',
             'quantity'  => 'required|integer|min:1',
         ]);
-        
+
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
 
         $combo = PurchaseCombo::with('combo')->findOrFail($request->record_id);
 
@@ -718,7 +723,7 @@ class PaymentLinkController extends Controller
             'purchase_link_combo_id' => $combo->id,
             'validated_qty'          => $request->quantity,
             'validated_at'           => now(),
-            'validated_by'           => auth()->id(),
+            'validated_by'           => $idUsuario,
         ]);
 
         // 2️⃣ Guardar también en la sesión
@@ -759,6 +764,7 @@ class PaymentLinkController extends Controller
     {
         try {
             $id = $request->input('id');
+            $idUsuario = session('user')['idusuario'] ?? auth()->id();
 
             // 1️⃣ Traemos la compra con sus combos
             $purchase = PurchaseLink::with(['combos.combo', 'combos.validations'])->findOrFail($id);
@@ -769,7 +775,7 @@ class PaymentLinkController extends Controller
             })->count();
 
             $purchase->status = $unusedCombos > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? null;
+            $purchase->user_active = $idUsuario ?? $purchase->user_active;
             $purchase->activate_date = now();
             $purchase->save();
 
@@ -866,9 +872,18 @@ class PaymentLinkController extends Controller
 
         // Marcar como usado
         $member->status_entrie = 'used';
-        $member->user = session('user')['usuario'];
+        $member->user = session('user')['usuario'] ?? auth()->user()?->usuario;
         $member->issue_entrie = now();
         $member->save();
+
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
+        $purchase = $member->purchaseCombo?->purchaseLink;
+
+        if ($purchase && $idUsuario) {
+            $purchase->user_active = $idUsuario ?? $purchase->user_active;
+            $purchase->activate_date = now();
+            $purchase->save();
+        }
 
         $combo = $member->purchaseCombo->combo;
 
@@ -908,6 +923,7 @@ class PaymentLinkController extends Controller
     {
         try {
             $id = $request->input('id');
+            $idUsuario = session('user')['idusuario'] ?? auth()->id();
 
             $purchase = PurchaseLink::with(['combos.combo', 'combos.members'])->findOrFail($id);
 
@@ -918,7 +934,7 @@ class PaymentLinkController extends Controller
             })->where('status_entrie', 'unused')->count();
 
             $purchase->status = $purchaseComboMembersUnused > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? null;
+            $purchase->user_active = $idUsuario ?? $purchase->user_active;
             $purchase->activate_date = now();
             $purchase->save();
 

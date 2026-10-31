@@ -285,6 +285,34 @@ class CourtesyPassController extends Controller
         ]);
     }
 
+    public function resendValidationEmail(string $code)
+    {
+        $code = trim($code);
+
+        $purchase = Link::where('code', $code)->first();
+
+        if (!$purchase) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró el pase de cortesía.',
+            ], 404);
+        }
+
+        if ($purchase->date_auth || (string) $purchase->code_auth === '1') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este pase ya fue autorizado; no necesita otro correo de validación.',
+            ], 409);
+        }
+
+        JobVCourtesy::dispatch($purchase->code);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'El correo de validación fue puesto nuevamente en la cola de envío.',
+        ]);
+    }
+
 
     public function validateForm()
     {
@@ -337,9 +365,18 @@ class CourtesyPassController extends Controller
 
         // Marcar como usado
         $member->status_entrie = 'used';
-        $member->user = session('user')['usuario'];
+        $member->user = session('user')['usuario'] ?? auth()->user()?->usuario;
         $member->issue_entrie = now();
         $member->save();
+
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
+        $purchase = $member->purchaseCombo?->purchaseLink;
+
+        if ($purchase && $idUsuario) {
+            $purchase->user_active = $idUsuario;
+            $purchase->activate_date = now();
+            $purchase->save();
+        }
 
         $combo = $member->purchaseCombo->combo;
 
@@ -388,7 +425,7 @@ class CourtesyPassController extends Controller
             })->where('status_entrie', 'unused')->count();
 
             $purchase->status = $purchaseComboMembersUnused > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->user_active = session('user')['idusuario'] ?? auth()->id() ?? $purchase->user_active;
             $purchase->activate_date = now();
             $purchase->save();
 
@@ -549,7 +586,7 @@ class CourtesyPassController extends Controller
             $unusedCombos = $purchase->combos()->whereDoesntHave('validations')->count();
 
             $purchase->status = $unusedCombos > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? 'Desconocido';
+            $purchase->user_active = session('user')['idusuario'] ?? auth()->id() ?? $purchase->user_active;
             $purchase->activate_date = now();
             $purchase->save();
 

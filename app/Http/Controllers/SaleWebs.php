@@ -285,7 +285,7 @@ class SaleWebs extends Controller
         $ids = $request->input('ids'); // String con IDs separados por coma
         $method = $request->input('method');
         $boxValue = session('box');
-        $idUsuario = session('user')['idusuario'];
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
 
         // 1. Generar código único
         do {

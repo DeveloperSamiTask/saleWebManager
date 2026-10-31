@@ -194,6 +194,12 @@ $(function () {
                                     title="Autorizar">
                                     <i class="mdi mdi-check-circle-outline"></i> Autorizar
                                 </button>
+                                <button
+                                    class="btn btn-sm btn-label-secondary btnResendEmail ms-2"
+                                    title="Reenviar correo de validación"
+                                    data-code="${t.code}">
+                                    <i class="mdi mdi-email-send-outline"></i>
+                                </button>
                             </div>`;
                         }
 
@@ -530,6 +536,38 @@ $(function () {
                     });
             }
         });
+    });
+
+    e.on("click", ".btnResendEmail", function () {
+        const button = $(this);
+        const code = button.data("code");
+
+        button.prop("disabled", true);
+        blockUI();
+
+        $.ajax({
+            url: "reenviar-correo/" + encodeURIComponent(code),
+            type: "GET",
+            dataType: "json",
+        })
+            .done((response) => {
+                Toast.fire({
+                    icon: "success",
+                    title: response.message,
+                });
+            })
+            .fail((response) => {
+                Toast.fire({
+                    icon: "error",
+                    title:
+                        response.responseJSON?.message ||
+                        "No se pudo reenviar el correo.",
+                });
+            })
+            .always(() => {
+                button.prop("disabled", false);
+                $.unblockUI();
+            });
     });
 
     function formatDate(date) {

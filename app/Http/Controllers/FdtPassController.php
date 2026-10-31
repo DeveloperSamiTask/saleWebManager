@@ -339,9 +339,18 @@ class FdtPassController extends Controller
 
         // Marcar como usado
         $member->status_entrie = 'used';
-        $member->user = session('user')['usuario'];
+        $member->user = session('user')['usuario'] ?? auth()->user()?->usuario;
         $member->issue_entrie = now();
         $member->save();
+
+        $idUsuario = session('user')['idusuario'] ?? auth()->id();
+        $purchase = $member->purchaseCombo?->purchaseLink;
+
+        if ($purchase && $idUsuario) {
+            $purchase->user_active = $idUsuario;
+            $purchase->activate_date = now();
+            $purchase->save();
+        }
 
         $combo = $member->purchaseCombo->combo;
 
@@ -390,7 +399,7 @@ class FdtPassController extends Controller
             })->where('status_entrie', 'unused')->count();
 
             $purchase->status = $purchaseComboMembersUnused > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? null;
+            $purchase->user_active = session('user')['idusuario'] ?? auth()->id() ?? $purchase->user_active;
             $purchase->activate_date = now();
             $purchase->save();
 
@@ -554,7 +563,7 @@ class FdtPassController extends Controller
             })->count();
 
             $purchase->status = $unusedCombos > 0 ? 'unused' : 'used';
-            $purchase->user_active = session('user')['idusuario'] ?? null;
+            $purchase->user_active = session('user')['idusuario'] ?? auth()->id() ?? $purchase->user_active;
             $purchase->activate_date = now();
             $purchase->save();
 
@@ -860,7 +869,7 @@ class FdtPassController extends Controller
                     ->get();
 
                 $now = now();
-                $user = session('user')['usuario'] ?? 'Desconocido';
+                $user = session('user')['usuario'] ?? auth()->user()?->usuario;
                 $validatedMembers = [];
 
                 foreach ($members as $member) {
@@ -885,7 +894,7 @@ class FdtPassController extends Controller
                     ->count();
 
                 $purchase->status = $remaining === 0 ? 'used' : 'unused';
-                $purchase->user_active = session('user')['idusuario'] ?? null;
+                    $purchase->user_active = session('user')['idusuario'] ?? auth()->id() ?? $purchase->user_active;
                 $purchase->activate_date = $now;
                 $purchase->save();
 
@@ -982,7 +991,7 @@ class FdtPassController extends Controller
                 }
 
                 $purchase->status = $remaining === 0 ? 'used' : 'unused';
-                $purchase->user_active = session('user')['idusuario'] ?? null;
+                $purchase->user_active = session('user')['idusuario'] ?? auth()->id() ?? $purchase->user_active;
                 $purchase->activate_date = $now;
                 $purchase->save();
 
